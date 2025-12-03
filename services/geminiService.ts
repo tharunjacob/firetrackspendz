@@ -117,7 +117,12 @@ export const getFileMappingFromAI = async (headers: string[], sampleRows: any[][
     4. Check if there is an explicit "Type" column (often values like "Income", "Expense", "Transfer").
     `;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
@@ -165,7 +170,12 @@ export const detectFileStructure = async (rawRows: any[][]): Promise<{ headerInd
         }
         `;
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ 
+            model: 'gemini-1.5-flash',
+            generationConfig: {
+                responseMimeType: 'application/json'
+            }
+        });
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
@@ -192,7 +202,12 @@ export const suggestCategories = async (descriptions: string[]): Promise<Record<
         Example: { "UBER *TRIP": "Transport", "NETFLIX": "Entertainment" }
         `;
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ 
+            model: 'gemini-1.5-flash',
+            generationConfig: {
+                responseMimeType: 'application/json'
+            }
+        });
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
@@ -223,10 +238,15 @@ export const extractTransactionsFromPDF = async (base64Data: string): Promise<an
 
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const result = await model.generateContent([
-      { text: prompt },
-      { inlineData: { mimeType: 'application/pdf', data: base64Data } }
-    ]);
+    const result = await model.generateContent({
+      contents: [{
+        role: 'user',
+        parts: [
+          { text: prompt },
+          { inlineData: { mimeType: 'application/pdf', data: base64Data } }
+        ]
+      }]
+    });
     const response = await result.response;
     
     // Clean response
