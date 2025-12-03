@@ -9,13 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/genai": "^1.29.0",
+    "@vercel/analytics": "^1.6.1",
+    "html2canvas": "1.4.1",
+    "jspdf": "2.5.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "recharts": "^3.4.1",
-    "@google/genai": "^1.29.0",
-    "xlsx": "latest",
-    "html2canvas": "1.4.1",
-    "jspdf": "2.5.1"
+    "xlsx": "latest"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
