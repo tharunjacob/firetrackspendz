@@ -1,5 +1,5 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FileMapping } from '../types';
 
 // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
@@ -10,10 +10,10 @@ if (!API_KEY) {
 }
 
 // Initialize AI only if key exists to prevent immediate crash
-const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 export const generateFinancialInsights = async (summary: string): Promise<string> => {
-  if (!ai || !API_KEY) {
+  if (!genAI || !API_KEY) {
     return "AI Insights unavailable. Please configure the API Key in your environment variables.";
   }
   
@@ -36,16 +36,16 @@ export const generateFinancialInsights = async (summary: string): Promise<string
       Now, provide your expert, creative, and actionable insights for the summary above:
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-    if (!response.text) {
+    if (!text) {
         throw new Error("Received an empty response from the AI.");
     }
     
-    return response.text;
+    return text;
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     return "Unable to generate insights at this time. Please try again later.";
@@ -53,7 +53,7 @@ export const generateFinancialInsights = async (summary: string): Promise<string
 };
 
 export const getStrategicAdvice = async (context: string, question: string): Promise<string> => {
-  if (!ai || !API_KEY) return "AI Service Unavailable. Please check API Key configuration.";
+  if (!genAI || !API_KEY) return "AI Service Unavailable. Please check API Key configuration.";
 
   try {
     const prompt = `
@@ -69,19 +69,18 @@ export const getStrategicAdvice = async (context: string, question: string): Pro
     Keep it concise, encouraging, and professional yet friendly.
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
 
-    return response.text || "I couldn't generate a response.";
+    return response.text() || "I couldn't generate a response.";
   } catch (e) {
     return "Error connecting to AI Advisor.";
   }
 };
 
 export const getFileMappingFromAI = async (headers: string[], sampleRows: any[][]): Promise<FileMapping | null> => {
-  if (!ai || !API_KEY) return null;
+  if (!genAI || !API_KEY) return null;
 
   try {
     const prompt = `
@@ -118,14 +117,13 @@ export const getFileMappingFromAI = async (headers: string[], sampleRows: any[][
     4. Check if there is an explicit "Type" column (often values like "Income", "Expense", "Transfer").
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: { responseMimeType: 'application/json' }
-    });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-    if (!response.text) return null;
-    return JSON.parse(response.text) as FileMapping;
+    if (!text) return null;
+    return JSON.parse(text) as FileMapping;
   } catch (error) {
     console.warn("AI Mapping Error:", error);
     return null;
@@ -133,7 +131,7 @@ export const getFileMappingFromAI = async (headers: string[], sampleRows: any[][
 };
 
 export const detectFileStructure = async (rawRows: any[][]): Promise<{ headerIndex: number, mapping: FileMapping } | null> => {
-    if (!ai || !API_KEY) return null;
+    if (!genAI || !API_KEY) return null;
 
     try {
         const prompt = `
@@ -167,14 +165,13 @@ export const detectFileStructure = async (rawRows: any[][]): Promise<{ headerInd
         }
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: { responseMimeType: 'application/json' }
-        });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
 
-        if (!response.text) return null;
-        return JSON.parse(response.text);
+        if (!text) return null;
+        return JSON.parse(text);
     } catch (error) {
         console.warn("AI Structure Detection Error:", error);
         return null;
@@ -182,7 +179,7 @@ export const detectFileStructure = async (rawRows: any[][]): Promise<{ headerInd
 };
 
 export const suggestCategories = async (descriptions: string[]): Promise<Record<string, string>> => {
-    if (!ai || !API_KEY) return {};
+    if (!genAI || !API_KEY) return {};
 
     try {
         const prompt = `
@@ -195,14 +192,13 @@ export const suggestCategories = async (descriptions: string[]): Promise<Record<
         Example: { "UBER *TRIP": "Transport", "NETFLIX": "Entertainment" }
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: { responseMimeType: 'application/json' }
-        });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
 
-        if (!response.text) return {};
-        return JSON.parse(response.text);
+        if (!text) return {};
+        return JSON.parse(text);
     } catch (error) {
         console.error("AI Categorization Error:", error);
         return {};
@@ -210,7 +206,7 @@ export const suggestCategories = async (descriptions: string[]): Promise<Record<
 };
 
 export const extractTransactionsFromPDF = async (base64Data: string): Promise<any[]> => {
-  if (!ai || !API_KEY) return [];
+  if (!genAI || !API_KEY) return [];
   
   const prompt = `
     Analyze this bank statement PDF. Extract all financial transactions into a JSON array.
@@ -226,15 +222,15 @@ export const extractTransactionsFromPDF = async (base64Data: string): Promise<an
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [
-        { role: 'user', parts: [{ text: prompt }, { inlineData: { mimeType: 'application/pdf', data: base64Data } }] }
-      ]
-    });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent([
+      { text: prompt },
+      { inlineData: { mimeType: 'application/pdf', data: base64Data } }
+    ]);
+    const response = await result.response;
     
     // Clean response
-    let text = response.text || '[]';
+    let text = response.text() || '[]';
     text = text.replace(/```json/g, '').replace(/```/g, '').trim();
     return JSON.parse(text);
   } catch (e) {
