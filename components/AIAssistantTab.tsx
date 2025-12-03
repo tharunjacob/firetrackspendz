@@ -59,26 +59,49 @@ const FireProjectionHero = ({ metrics }: { metrics: any }) => {
 };
 
 const DeepInsightCard = ({ title, value, description, trend, icon }: { title: string, value: string, description: string, trend: string, icon: string }) => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300 group h-full">
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300 group h-full flex flex-col">
         <div className="flex justify-between items-start mb-4">
             <div className={`p-3 rounded-xl ${trend === 'good' ? 'bg-green-50 text-green-600' : trend === 'bad' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
                 <Icon name={icon} className="w-6 h-6" />
             </div>
-            {trend === 'good' && <span className="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-full">Positive</span>}
-            {trend === 'bad' && <span className="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full">Attention</span>}
+            {trend === 'good' && <span className="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-full h-fit">Positive</span>}
+            {trend === 'bad' && <span className="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full h-fit">Attention</span>}
         </div>
         <h4 className="text-slate-500 text-xs uppercase font-bold tracking-wider mb-1">{title}</h4>
         <div className="text-2xl font-black text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">{value}</div>
-        <p className="text-slate-500 text-sm leading-relaxed">{description}</p>
+        <p className="text-slate-500 text-sm leading-relaxed mt-auto">{description}</p>
     </div>
 );
+
+const IncomeGrowthCard = ({ growth, inflation }: { growth: number, inflation: number }) => {
+    const realGrowth = growth - inflation;
+    const isPositive = realGrowth > 0;
+    
+    return (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300 group h-full flex flex-col">
+            <div className="flex justify-between items-start mb-4">
+                <div className={`p-3 rounded-xl ${isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600'}`}>
+                    <Icon name="chart" className="w-6 h-6" />
+                </div>
+                <span className={`text-xs font-bold px-2 py-1 rounded-full h-fit ${isPositive ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>
+                    {isPositive ? 'Wealth Building' : 'Losing Power'}
+                </span>
+            </div>
+            <h4 className="text-slate-500 text-xs uppercase font-bold tracking-wider mb-1">Real Income Growth</h4>
+            <div className="text-2xl font-black text-slate-800 mb-2">{(growth * 100).toFixed(1)}%</div>
+            <p className="text-slate-500 text-sm leading-relaxed mt-auto">
+                Your income grew by {(growth * 100).toFixed(1)}% this year. Adjusted for inflation ({(inflation * 100).toFixed(1)}%), your real buying power change is <strong>{(realGrowth * 100).toFixed(1)}%</strong>.
+            </p>
+        </div>
+    );
+};
 
 const RecurringBox = ({ recurring }: { recurring: any[] }) => {
     const { formatCurrency } = useCurrency();
     const totalRecurring = recurring.reduce((sum, r) => sum + r.avgAmount, 0);
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="font-bold text-slate-800 text-lg">Recurring Commitments</h3>
                 <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold">{recurring.length} Found</span>
@@ -89,7 +112,7 @@ const RecurringBox = ({ recurring }: { recurring: any[] }) => {
                 <span className="text-slate-500 text-sm ml-2">/ month estimated fixed cost</span>
             </div>
 
-            <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-2">
+            <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-2 flex-grow">
                 {recurring.map((rec, i) => (
                     <div key={i} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
                         <div className="flex flex-col">
@@ -113,15 +136,16 @@ const SavingsBox = ({ data }: { data: Transaction[] }) => {
     const rate = income > 0 ? (savings / income) * 100 : 0;
 
     return (
-        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-2xl shadow-lg text-white h-full relative overflow-hidden">
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-2xl shadow-lg text-white h-full relative overflow-hidden flex flex-col justify-between">
              <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-[50px] opacity-20 -mr-10 -mt-10"></div>
              
-             <h3 className="text-emerald-100 font-bold text-lg mb-8 relative z-10">Total Savings Pool</h3>
-             
-             <div className="mb-2 relative z-10">
-                 <span className="text-4xl font-black">{formatCurrency(savings)}</span>
+             <div>
+                <h3 className="text-emerald-100 font-bold text-lg mb-8 relative z-10">Total Savings Pool</h3>
+                <div className="mb-2 relative z-10">
+                    <span className="text-4xl font-black">{formatCurrency(savings)}</span>
+                </div>
+                <p className="text-emerald-100 text-sm mb-8 relative z-10">Net saved across all time</p>
              </div>
-             <p className="text-emerald-100 text-sm mb-8 relative z-10">Net saved across all time</p>
 
              <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 relative z-10">
                  <div className="flex justify-between items-center mb-2">
@@ -129,7 +153,7 @@ const SavingsBox = ({ data }: { data: Transaction[] }) => {
                      <span className="text-xl font-bold">{rate.toFixed(1)}%</span>
                  </div>
                  <div className="w-full bg-black/20 h-2 rounded-full overflow-hidden">
-                     <div className="h-full bg-white rounded-full transition-all duration-1000" style={{ width: `${Math.min(rate, 100)}%` }}></div>
+                     <div className="h-full bg-white rounded-full transition-all duration-1000" style={{ width: `${Math.min(Math.max(rate, 0), 100)}%` }}></div>
                  </div>
              </div>
         </div>
@@ -219,45 +243,56 @@ export const FireCalculatorTab = ({ data }: { data: Transaction[] }) => {
             {/* 1. FIRE HERO & TIMELINE */}
             <FireProjectionHero metrics={fireMetrics} />
 
-            {/* 2. GRID LAYOUT */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
+            {/* 2. GRID LAYOUT - Uniform 3 Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 items-stretch">
                 
-                {/* Column 1: Recurring & Savings (Vertical Stack) */}
-                <div className="flex flex-col gap-6 h-full">
-                    <div className="flex-1 min-h-[250px]">
-                        <RecurringBox recurring={recurring} />
-                    </div>
-                    <div className="flex-1 min-h-[250px]">
-                         <SavingsBox data={data} />
-                    </div>
-                </div>
+                {/* 1. Recurring */}
+                <RecurringBox recurring={recurring} />
 
-                {/* Column 2 & 3: Deep Insights (2x2 Grid ideally, or vertical) */}
-                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-                    {deepInsights.map((insight, idx) => (
-                        <div key={idx} className="h-full">
-                            <DeepInsightCard 
-                                title={insight.title}
-                                value={insight.value}
-                                description={insight.description}
-                                trend={insight.trend}
-                                icon={insight.trend === 'bad' ? 'flash' : insight.trend === 'good' ? 'shield' : 'chart'}
-                            />
-                        </div>
-                    ))}
-                    {/* Fallback if not enough insights */}
-                    {deepInsights.length < 3 && (
-                        <div className="h-full">
-                            <DeepInsightCard 
-                                title="Data Analyst"
-                                value="Learning..."
-                                description="Add more transactions to unlock deeper behavioral insights."
-                                trend="neutral"
-                                icon="ai"
-                            />
-                        </div>
-                    )}
-                </div>
+                {/* 2. Income Growth */}
+                <IncomeGrowthCard growth={fireMetrics.annualIncomeGrowth || 0} inflation={fireMetrics.personalInflation} />
+
+                {/* 3. Deep Insight 1 */}
+                {deepInsights[0] ? (
+                    <DeepInsightCard 
+                        title={deepInsights[0].title}
+                        value={deepInsights[0].value}
+                        description={deepInsights[0].description}
+                        trend={deepInsights[0].trend}
+                        icon={deepInsights[0].trend === 'bad' ? 'flash' : deepInsights[0].trend === 'good' ? 'shield' : 'chart'}
+                    />
+                ) : (
+                    <DeepInsightCard title="Insight" value="Analyzing..." description="More data needed." trend="neutral" icon="ai" />
+                )}
+
+                {/* 4. Savings Pool */}
+                <SavingsBox data={data} />
+
+                {/* 5. Deep Insight 2 */}
+                {deepInsights[1] ? (
+                    <DeepInsightCard 
+                        title={deepInsights[1].title}
+                        value={deepInsights[1].value}
+                        description={deepInsights[1].description}
+                        trend={deepInsights[1].trend}
+                        icon={deepInsights[1].trend === 'bad' ? 'flash' : deepInsights[1].trend === 'good' ? 'shield' : 'chart'}
+                    />
+                ) : (
+                    <DeepInsightCard title="Insight" value="Processing" description="Add more transactions." trend="neutral" icon="ai" />
+                )}
+
+                {/* 6. Deep Insight 3 */}
+                {deepInsights[2] ? (
+                    <DeepInsightCard 
+                        title={deepInsights[2].title}
+                        value={deepInsights[2].value}
+                        description={deepInsights[2].description}
+                        trend={deepInsights[2].trend}
+                        icon={deepInsights[2].trend === 'bad' ? 'flash' : deepInsights[2].trend === 'good' ? 'shield' : 'chart'}
+                    />
+                ) : (
+                    <DeepInsightCard title="Analyst" value="Ready" description="Upload data to unlock." trend="neutral" icon="ai" />
+                )}
             </div>
         </div>
     );

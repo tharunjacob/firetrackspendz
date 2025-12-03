@@ -1,7 +1,7 @@
 
 import { Transaction, TransactionType, FileMapping } from '../types';
 import * as XLSX from 'xlsx';
-import { getFileMappingFromAI, detectFileStructure } from './geminiService';
+import { getFileMappingFromAI, detectFileStructure, extractTransactionsFromPDF } from './geminiService';
 import { getStoredMapping, saveMapping } from './learningService';
 
 // --- CONFIGURATION ---
@@ -459,6 +459,51 @@ const getRuleBasedMapping = (header: string[]): FileMapping => {
 }
 
 export const transformData = async (file: File, owner: string): Promise<{ transactions: Transaction[], error?: string }> => {
+  // PDF HANDLER
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      return new Promise(async (resolve, reject) => {
+          try {
+              const reader = new FileReader();
+              reader.onload = async (e) => {
+                  const result = e.target?.result as string;
+                  // Get Base64 part only
+                  const base64 = result.split(',')[1];
+                  const rawData = await extractTransactionsFromPDF(base64);
+                  
+                  if (!Array.isArray(rawData) || rawData.length === 0) {
+                      throw new Error("No transactions found in PDF or failed to extract.");
+                  }
+
+                  const transactions: Transaction[] = rawData.map((item: any, idx: number) => {
+                        const safeOwner = owner.replace(/[^a-z0-9]/gi, '');
+                        const desc = item.description || '';
+                        const safeDesc = desc.substring(0, 10).replace(/[^a-z0-9]/gi, '');
+                        // Basic validation/cleaning
+                        const date = item.date; // AI returns YYYY-MM-DD
+                        const amount = typeof item.amount === 'number' ? Math.abs(item.amount) : parseFloat(item.amount);
+                        const id = `${safeOwner}-${date}-${amount}-${safeDesc}-${idx}`;
+                        
+                        return {
+                            id,
+                            owner,
+                            type: (item.type === 'Income' || item.type === 'Expense') ? item.type : 'Expense',
+                            date: date,
+                            time: '00:00',
+                            category: item.category || 'Unclassified',
+                            subCategory: 'General',
+                            notes: desc,
+                            amount: amount || 0,
+                            project: 'None'
+                        };
+                  });
+                  resolve({ transactions });
+              }
+              reader.onerror = () => reject(new Error("Failed to read PDF file"));
+              reader.readAsDataURL(file);
+          } catch(e) { reject(e); }
+      });
+  }
+
   return new Promise(async (resolve, reject) => {
     const reader = new FileReader();
 

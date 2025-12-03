@@ -1,8 +1,7 @@
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Transaction } from './types';
 import Dashboard from './Dashboard';
-import { Icon } from './constants';
+import { Icon, LOGO_DATA_URI } from './constants';
 import { transformData } from './services/transformer';
 import { loadFromStorage, saveToStorage, deleteFromStorage, resetApplicationData } from './services/storageService';
 import { PricingPage, ContactPage, FeaturesPage, PrivacyPage, TermsPage } from './components/PublicPages';
@@ -28,11 +27,8 @@ const Toast = ({ message, onClose }: { message: string, onClose: () => void }) =
 const Logo = () => (
     <div className="relative w-10 h-10 transition-transform hover:scale-105 duration-500">
         <div className="absolute inset-0 bg-blue-600 rounded-lg rotate-6 opacity-20 blur-md animate-pulse"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg shadow-xl flex items-center justify-center text-white border border-white/10">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 drop-shadow-md">
-                <path d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
-                <path d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
-            </svg>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg shadow-xl flex items-center justify-center text-white border border-white/10 overflow-hidden">
+             <img src={LOGO_DATA_URI} alt="TrackSpendz Logo" className="w-full h-full object-cover" />
         </div>
     </div>
 );
@@ -91,6 +87,9 @@ const Footer = ({ setView }: { setView: (v: string) => void }) => (
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
                 <div className="flex items-center gap-2 mb-4">
+                    <div className="w-6 h-6 overflow-hidden rounded">
+                        <img src={LOGO_DATA_URI} alt="Logo" className="w-full h-full object-cover" />
+                    </div>
                     <span className="font-bold text-lg text-slate-800">Track<span className="text-blue-600">Spendz</span></span>
                 </div>
                 <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
@@ -235,9 +234,14 @@ const FileUploaderSection = ({ onUploadSuccess }: { onUploadSuccess: (data: Tran
         setMessage(`Success! Processed ${allTransactions.length} transactions.`);
         setStatus('success');
         
-        await saveToStorage(allTransactions);
+        // Pass data to parent immediately for instant UI feedback
+        onUploadSuccess(allTransactions);
 
-        setTimeout(() => onUploadSuccess(allTransactions), 1500);
+        // Save to storage in background (non-blocking)
+        saveToStorage(allTransactions).catch(err => {
+            console.error("Background save error:", err);
+            // Optional: Show toast "Data loaded but failed to save for next visit"
+        });
 
     } catch (error: any) {
         console.error(error);
@@ -258,7 +262,7 @@ const FileUploaderSection = ({ onUploadSuccess }: { onUploadSuccess: (data: Tran
     <div id="upload-section" className="w-full max-w-4xl bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/50 mb-20 transform transition-all hover:scale-[1.01] duration-500">
         <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-800">Upload Financial Data</h2>
-            <p className="text-sm text-slate-500 mt-1">Combine expense details from different accounts or family members.</p>
+            <p className="text-sm text-slate-500 mt-1">Combine expense details from different accounts or family members. Supports CSV, Excel, and PDF Statements.</p>
         </div>
         
         <div className="space-y-4 mb-8">
@@ -299,7 +303,7 @@ const FileUploaderSection = ({ onUploadSuccess }: { onUploadSuccess: (data: Tran
                         >
                             <input
                                 type="file"
-                                accept=".csv,.xlsx,.xls"
+                                accept=".csv,.xlsx,.xls,.pdf"
                                 ref={(el) => { if(el) fileInputRefs.current[row.id] = el }}
                                 className="hidden"
                                 onChange={(e) => updateRowFile(row.id, e.target.files ? e.target.files[0] : null)}
@@ -384,7 +388,6 @@ const FileUploaderSection = ({ onUploadSuccess }: { onUploadSuccess: (data: Tran
 const App = () => {
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [currentView, setCurrentView] = useState('home'); // 'home', 'pricing', 'contact', 'features', 'privacy', 'terms'
-  const [loadingStorage, setLoadingStorage] = useState(true);
   const [toast, setToast] = useState<{message: string, visible: boolean}>({ message: '', visible: false });
 
   // Update Page Title based on View for SEO
@@ -420,6 +423,8 @@ const App = () => {
         }
 
         // 2. Normal Load
+        // Ensure API Key exists to avoid crashes, although defined logic handles it.
+        // Vite env var is process.env.API_KEY due to vite.config.ts define
         try {
             const data = await loadFromStorage();
             if (data && data.length > 0) {
@@ -427,8 +432,6 @@ const App = () => {
             }
         } catch (e) {
             console.error("Failed to load storage", e);
-        } finally {
-            setLoadingStorage(false);
         }
     };
     init();
@@ -563,11 +566,6 @@ const App = () => {
       }
   };
 
-  // Safe loading state check (prevents white screen if storage is slow but data exists)
-  if (loadingStorage && !transactions) {
-    return <div className="h-screen flex items-center justify-center text-slate-400">Loading...</div>;
-  }
-
   return (
       <div className="h-full overflow-y-auto bg-slate-50 selection:bg-blue-100 selection:text-blue-900 flex flex-col">
         <Navbar activeView={currentView} setView={setCurrentView} />
@@ -639,7 +637,7 @@ const App = () => {
                                     </div>
                                     <h3 className="text-xl font-bold text-slate-800 mb-3">100% Private</h3>
                                     <p className="text-slate-500 leading-relaxed">
-                                        Your financial data never leaves your browser. All processing happens locally. We don't store your expense details or transaction history.
+                                        Your financial data never leaves your browser. All processing happens locally. (Note: PDF uploads are securely processed via Gemini AI for extraction only; we never store your data).
                                     </p>
                                 </div>
                                 <div onClick={() => setCurrentView('features')} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group cursor-pointer">

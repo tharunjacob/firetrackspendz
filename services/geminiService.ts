@@ -1,33 +1,9 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { FileMapping } from '../types';
 
-// Robust API Key Retrieval for Vercel/Vite/Node environments
-const getApiKey = () => {
-  let key = '';
-  try {
-    // @ts-ignore: Vite specific environment variable check
-    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
-      // @ts-ignore
-      key = import.meta.env.VITE_API_KEY;
-    }
-  } catch (e) {
-    // Ignore error if import.meta is not available
-  }
-
-  if (!key) {
-    try {
-      // Fallback to process.env for Node/Webpack environments
-      if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-        key = process.env.API_KEY;
-      }
-    } catch (e) {
-      // Ignore error if process is not defined
-    }
-  }
-  return key;
-};
-
-const API_KEY = getApiKey();
+// The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+const API_KEY = process.env.API_KEY;
 
 if (!API_KEY) {
   console.warn("Gemini API key not found. AI features will be disabled. Please set VITE_API_KEY (Vite) or API_KEY (Node) in your environment variables.");
@@ -231,4 +207,38 @@ export const suggestCategories = async (descriptions: string[]): Promise<Record<
         console.error("AI Categorization Error:", error);
         return {};
     }
+};
+
+export const extractTransactionsFromPDF = async (base64Data: string): Promise<any[]> => {
+  if (!ai || !API_KEY) return [];
+  
+  const prompt = `
+    Analyze this bank statement PDF. Extract all financial transactions into a JSON array.
+    Each object in the array should have:
+    - "date": Transaction date in YYYY-MM-DD format.
+    - "description": Description or Narration of the transaction.
+    - "amount": The absolute amount of the transaction (number).
+    - "type": "Income" or "Expense" based on credit/debit.
+    - "category": A suggested category based on the description (e.g. Food, Transport, Salary, Transfer, Utilities, Shopping).
+    
+    Ignore opening/closing balances, headers, and footers.
+    Return ONLY the JSON array. No markdown formatting.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        { role: 'user', parts: [{ text: prompt }, { inlineData: { mimeType: 'application/pdf', data: base64Data } }] }
+      ]
+    });
+    
+    // Clean response
+    let text = response.text || '[]';
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("PDF Extraction Error", e);
+    return [];
+  }
 };

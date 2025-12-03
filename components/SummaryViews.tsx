@@ -960,6 +960,18 @@ const CompareTab = ({ data }: { data: Transaction[] }) => {
         return { data1: getPeriodData(period1), data2: getPeriodData(period2) };
     }, [data, periodType, period1, period2]);
 
+    const formatLabel = (value: string) => {
+        if (!value) return '';
+        if (periodType === 'Yearly') return value;
+        try {
+            const [y, m] = value.split('-');
+            const date = new Date(parseInt(y), parseInt(m) - 1);
+            return `${date.toLocaleString('default', { month: 'short' })} '${y.slice(2)}`;
+        } catch (e) {
+            return value;
+        }
+    };
+
     const ChangeIndicator = ({ current, prev, type }: { current: number, prev: number, type: 'income' | 'expense' }) => {
         if (prev === 0 && current === 0) return <span className="text-gray-400">-</span>;
         if (prev === 0) return <span className="text-slate-500 font-bold">New</span>;
@@ -1033,11 +1045,11 @@ const CompareTab = ({ data }: { data: Transaction[] }) => {
             </div>
             <div className="flex items-center justify-center gap-4 bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <select value={period1} onChange={e => setPeriod1(e.target.value)} className="px-4 py-2 bg-white border border-blue-200 rounded-lg font-medium text-slate-700 shadow-sm">
-                    {options.map(o => <option key={`p1-${o}`} value={o}>{o}</option>)}
+                    {options.map(o => <option key={`p1-${o}`} value={o}>{formatLabel(o)}</option>)}
                 </select>
                 <span className="text-blue-400 font-bold text-xl">VS</span>
                 <select value={period2} onChange={e => setPeriod2(e.target.value)} className="px-4 py-2 bg-white border border-blue-200 rounded-lg font-medium text-slate-700 shadow-sm">
-                    {options.map(o => <option key={`p2-${o}`} value={o}>{o}</option>)}
+                    {options.map(o => <option key={`p2-${o}`} value={o}>{formatLabel(o)}</option>)}
                 </select>
             </div>
             {comparisonData && <div className="overflow-hidden rounded-xl border border-slate-200">
@@ -1045,8 +1057,8 @@ const CompareTab = ({ data }: { data: Transaction[] }) => {
                     <thead className="bg-slate-800 text-white">
                         <tr>
                             <th className="px-6 py-4 font-semibold">Metric / Category</th>
-                            <th className="px-6 py-4 text-right font-semibold">{period1}</th>
-                            <th className="px-6 py-4 text-right font-semibold">{period2}</th>
+                            <th className="px-6 py-4 text-right font-semibold">{formatLabel(period1)}</th>
+                            <th className="px-6 py-4 text-right font-semibold">{formatLabel(period2)}</th>
                             <th className="px-6 py-4 text-right font-semibold">Change</th>
                         </tr>
                     </thead>

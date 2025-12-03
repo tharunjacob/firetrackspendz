@@ -388,11 +388,19 @@ export const PrivacyPage = () => (
             </section>
 
             <section>
-                <h2 className="text-lg font-bold text-slate-900 mb-3">2. Local-First Data Processing</h2>
-                <p className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-blue-800 font-medium">
-                    <strong>Important:</strong> TrackSpendz operates on a "Zero-Knowledge" architecture for financial data. When you upload expense details or expense files, they are processed <strong>locally within your browser</strong> using JavaScript. Your financial transaction data is <strong>NOT</strong> uploaded to our servers or stored in our databases.
+                <h2 className="text-lg font-bold text-slate-900 mb-3">2. Data Processing & AI Integration</h2>
+                <p className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-blue-800 font-medium mb-4">
+                    <strong>Important:</strong> TrackSpendz operates primarily on a "Zero-Knowledge" architecture for financial data, with specific exceptions for PDF processing capabilities.
                 </p>
-                <p className="mt-2">We do not have access to your bank account numbers, transaction history, or financial balances.</p>
+                <ul className="list-disc pl-5 space-y-3">
+                    <li>
+                        <strong>CSV/Excel Files:</strong> When you upload expense details in CSV, XLS, or XLSX formats, they are processed <strong>100% locally within your browser</strong> using JavaScript. This data never leaves your device and is not uploaded to any server.
+                    </li>
+                    <li>
+                        <strong>PDF Files:</strong> If you choose to upload a PDF statement, the file content is securely transmitted to <strong>Google Gemini AI</strong> solely for the purpose of data extraction (OCR and parsing). The data is processed in memory and returned immediately to your device. We do not store this data on our servers, and Google processes this data according to their enterprise privacy standards for API usage.
+                    </li>
+                </ul>
+                <p className="mt-4">We do not have access to your bank account numbers, transaction history, or financial balances in our persistent databases.</p>
             </section>
 
             <section>
