@@ -8,6 +8,38 @@
   }
 }
 
+/* --- CRITICAL SAFETY STYLES --- */
+/* These execute immediately with HTML parsing, preventing "Giant Logo" syndrome */
+
+img, svg, video, canvas, audio, iframe, embed, object {
+  display: block; 
+  /* Critical: prevents them from exceeding container width even if explicit size is missing */
+  max-width: 100%; 
+}
+
+/* Fallback size for all SVGs if attributes AND classes fail. */
+svg {
+  width: 1.5rem; /* Default to 24px */
+  height: 1.5rem;
+}
+
+/* Force specific dimensions for icons if Tailwind classes are missing/delayed */
+svg.icon-safe {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  min-width: 1.5rem;
+}
+
+svg.logo-safe {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+/* Ensure hidden elements stay hidden */
+.hidden {
+  display: none !important;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -36,7 +68,7 @@
   border-radius: 20px;
 }
 
-.fade-in {
+.animate-fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
 

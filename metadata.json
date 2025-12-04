@@ -1,5 +1,5 @@
 {
-  "name": "AI Financial Analyst Dashboard",
+  "name": "Better AI Financial Analyst Dashboard",
   "description": "An intelligent dashboard that transforms expense details into a standardized format, then provides real-time AI-powered financial analysis through an interactive interface.",
   "requestFramePermissions": []
 }

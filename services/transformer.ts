@@ -1,8 +1,7 @@
-
 import { Transaction, TransactionType, FileMapping } from '../types';
 import * as XLSX from 'xlsx';
 import { getFileMappingFromAI, detectFileStructure, extractTransactionsFromPDF } from './geminiService';
-import { getStoredMapping, saveMapping } from './learningService';
+import { getStoredMapping, saveMapping, getLearnedCategory } from './learningService';
 
 // --- CONFIGURATION ---
 const CONFIG = {
@@ -137,7 +136,8 @@ const CONFIG = {
     'cashback': 'Income', 'bonus': 'Income',
 
     // OTHERS
-    'rent': 'Housing', 'maintenance': 'Housing', 'loan': 'EMI', 'emi': 'EMI', 'card': 'Bill Payment'
+    'rent': 'Housing', 'maintenance': 'Housing', 'loan': 'EMI', 'card': 'Bill Payment'
+    // REMOVED 'emi': 'EMI' from here to prevent loose matching (e.g. "Pay in EMI")
   },
   
   // Regex patterns for smarter matching when simple inclusion fails
@@ -153,6 +153,8 @@ const CONFIG = {
       { regex: /^ACH\s?C/i, category: 'Income' },
       { regex: /^INT\.?\s?PD/i, category: 'Income' }, // Interest Paid
       { regex: /^INT\.?\s?COLL/i, category: 'Income' }, // Interest Collected
+      // STRICT EMI/LOAN DETECTION (Must be a distinct word)
+      { regex: /\b(loan|emi)\b/i, category: 'EMI' },
       { regex: /^(UPI|IMPS|NEFT|RTGS)/i, category: 'Transfer' } // Default for banking terms if no other match
   ]
 };
@@ -342,6 +344,11 @@ const applyMapping = (dataRows: any[][], header: string[], mapping: FileMapping,
              else if (dr > 0) { amount = dr; type = 'Expense'; }
          } else if (mapping.amountColumn) {
              const rawVal = getVal(mapping.amountColumn);
+             
+             // Detect explicit '+' sign (common in CSV exports for Income/Credit)
+             // Must check rawVal before cleanAmount strips it
+             const hasPlusSign = String(rawVal).trim().startsWith('+');
+             
              const val = cleanAmount(rawVal);
              amount = Math.abs(val);
 
@@ -351,7 +358,7 @@ const applyMapping = (dataRows: any[][], header: string[], mapping: FileMapping,
 
              if (hasDr) {
                  type = 'Expense';
-             } else if (hasCr) {
+             } else if (hasCr || hasPlusSign) { // Explicit + means Income
                  type = 'Income';
              } else {
                  const colName = mapping.amountColumn.toLowerCase();
@@ -376,8 +383,15 @@ const applyMapping = (dataRows: any[][], header: string[], mapping: FileMapping,
          const combinedText = (category + ' ' + subCategory + ' ' + notes).toLowerCase();
          
          // 3. SMART CATEGORIZATION (Local)
-         // Only if category is not already well-defined
-         if (category === 'Unclassified' || category === 'General' || category === '' || category === 'SYSTEM') {
+         
+         // Priority 0: CHECK USER LEARNED RULES FIRST (The Brain)
+         const learnedCat = getLearnedCategory(notes); // Check notes (description) primarily
+         
+         if (learnedCat) {
+             category = learnedCat;
+         }
+         // Priority 1: Default Logic (only if not already well-defined)
+         else if (category === 'Unclassified' || category === 'General' || category === '' || category === 'SYSTEM') {
              
              // A. Exact Keyword Match from Dictionary
              for (const [key, mappedCat] of Object.entries(CONFIG.category_mapping)) {
@@ -461,6 +475,21 @@ const getRuleBasedMapping = (header: string[]): FileMapping => {
 export const transformData = async (file: File, owner: string): Promise<{ transactions: Transaction[], error?: string }> => {
   // PDF HANDLER
   if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      // PRE-CHECK: Check if PDF is encrypted before doing anything expensive
+      try {
+          const rawText = await file.text();
+          // This checks the raw PDF bytes for standard encryption markers.
+          // Note: file.text() treats binary as text, but keywords are ASCII, so this works for detection.
+          if (rawText.includes('/Encrypt') && !rawText.includes('/Encrypt null')) {
+             throw new Error("This PDF appears to be password protected. Please remove the password and try again.");
+          }
+      } catch (err: any) {
+          // If the error is our own password error, rethrow it.
+          if (err.message && err.message.includes("password protected")) throw err;
+          // Otherwise ignore read errors and proceed to let Gemini try
+          console.warn("Could not pre-scan PDF for encryption:", err);
+      }
+
       return new Promise(async (resolve, reject) => {
           try {
               const reader = new FileReader();
@@ -474,28 +503,46 @@ export const transformData = async (file: File, owner: string): Promise<{ transa
                       throw new Error("No transactions found in PDF or failed to extract.");
                   }
 
-                  const transactions: Transaction[] = rawData.map((item: any, idx: number) => {
+                  const transactions: Transaction[] = rawData.reduce((acc: Transaction[], item: any, idx: number) => {
                         const safeOwner = owner.replace(/[^a-z0-9]/gi, '');
                         const desc = item.description || '';
                         const safeDesc = desc.substring(0, 10).replace(/[^a-z0-9]/gi, '');
-                        // Basic validation/cleaning
-                        const date = item.date; // AI returns YYYY-MM-DD
-                        const amount = typeof item.amount === 'number' ? Math.abs(item.amount) : parseFloat(item.amount);
-                        const id = `${safeOwner}-${date}-${amount}-${safeDesc}-${idx}`;
                         
-                        return {
+                        // Strict Date Parsing - normalize any date format from AI to YYYY-MM-DD
+                        const parsedDate = parseDate(item.date);
+                        if (!parsedDate) return acc; // Skip invalid dates
+                        
+                        // Strict Category Length - force 2 words max
+                        let category = item.category || 'Unclassified';
+                        if (category.split(' ').length > 2) {
+                            category = category.split(' ').slice(0, 2).join(' ');
+                        }
+
+                        // Check User Rules (PDF logic also needs to check memory)
+                        const learnedCat = getLearnedCategory(desc);
+                        if (learnedCat) {
+                            category = learnedCat;
+                        }
+
+                        // Clean numeric amount
+                        const amount = typeof item.amount === 'number' ? Math.abs(item.amount) : parseFloat(item.amount);
+                        const id = `${safeOwner}-${parsedDate.date}-${amount}-${safeDesc}-${idx}`;
+                        
+                        acc.push({
                             id,
                             owner,
                             type: (item.type === 'Income' || item.type === 'Expense') ? item.type : 'Expense',
-                            date: date,
+                            date: parsedDate.date, // Use standard YYYY-MM-DD from parseDate
                             time: '00:00',
-                            category: item.category || 'Unclassified',
+                            category: category,
                             subCategory: 'General',
                             notes: desc,
-                            amount: amount || 0,
+                            amount: isNaN(amount) ? 0 : amount,
                             project: 'None'
-                        };
-                  });
+                        });
+                        return acc;
+                  }, []);
+                  
                   resolve({ transactions });
               }
               reader.onerror = () => reject(new Error("Failed to read PDF file"));

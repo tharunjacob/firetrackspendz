@@ -1,8 +1,8 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Transaction, TransactionType } from '../types';
 import { useCurrency } from '../Dashboard';
 import { suggestCategories } from '../services/geminiService';
+import { saveCategoryRule } from '../services/learningService';
 
 const MultiSelect = ({ label, options, selected, onChange }: { label: string, options: string[], selected: string[], onChange: (selected: string[]) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -58,6 +58,7 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState<Partial<Transaction>>({});
+    const [saveRule, setSaveRule] = useState(false);
     
     // --- BULK ACTION STATE ---
     const [bulkAction, setBulkAction] = useState<'category' | 'type' | 'project' | 'delete' | null>(null);
@@ -166,11 +167,13 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
     const startEditing = (t: Transaction) => {
         setEditingId(t.id);
         setEditForm({ ...t });
+        setSaveRule(false);
     };
 
     const cancelEditing = () => {
         setEditingId(null);
         setEditForm({});
+        setSaveRule(false);
     };
 
     const saveEditing = () => {
@@ -186,9 +189,19 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
             amount: Number(editForm.amount) || 0, // Ensure valid number
         };
 
+        // SAVE RULE LOGIC
+        if (saveRule && editForm.category && editForm.notes) {
+            // We save the rule mapping the DESCRIPTION (Notes) to the CATEGORY
+            // We use the first 2 words of description as the key to be general enough but specific
+            // Or better, just use the notes as provided by user in edit form if they shortened it
+            saveCategoryRule(editForm.notes, editForm.category);
+            alert(`Rule Saved! Future uploads containing "${editForm.notes}" will be categorized as "${editForm.category}".`);
+        }
+
         onUpdate([updatedTx]);
         setEditingId(null);
         setEditForm({});
+        setSaveRule(false);
     };
 
     // Key Listener for Quick Save (Enter) or Cancel (Escape)
@@ -333,7 +346,7 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                         </button>
                     )}
                     <button onClick={exportToCsv} className="px-4 py-2 text-sm rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-900 transition shadow flex items-center gap-2 w-full md:w-auto justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="16" height="16" className="w-4 h-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
                         <span>Export CSV</span>
@@ -353,7 +366,7 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                             onChange={e => setSearchTerm(e.target.value)}
                             className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm shadow-sm"
                         />
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-slate-400 absolute left-3 top-2.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="16" height="16" className="w-4 h-4 text-slate-400 absolute left-3 top-2.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
                      </div>
@@ -558,7 +571,19 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                                 {/* Category */}
                                 <td className="px-6 py-3 text-slate-800 font-medium">
                                     {isEditing ? (
-                                        <input list="cat-options" className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" value={editForm.category || ''} onChange={e => setEditForm({...editForm, category: e.target.value})} onKeyDown={handleKeyDown} />
+                                        <div className="flex flex-col gap-1">
+                                            <input list="cat-options" className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" value={editForm.category || ''} onChange={e => setEditForm({...editForm, category: e.target.value})} onKeyDown={handleKeyDown} />
+                                            {/* LEARN RULE OPTION */}
+                                            <label className="flex items-center gap-1 text-[10px] text-slate-500 cursor-pointer">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={saveRule} 
+                                                    onChange={(e) => setSaveRule(e.target.checked)} 
+                                                    className="w-3 h-3 text-blue-600 rounded border-slate-300 focus:ring-0" 
+                                                />
+                                                <span>Apply to future "{editForm.notes?.substring(0, 15)}..."</span>
+                                            </label>
+                                        </div>
                                     ) : t.category}
                                 </td>
 

@@ -10,6 +10,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { CURRENCIES, Currency, detectUserCurrency, formatAmount } from './services/currency';
 import { FeedbackModal } from './components/FeedbackModal';
+import { transformData } from './services/transformer';
 
 interface CurrencyContextType {
     currency: Currency;
@@ -106,7 +107,7 @@ const MultiSelect = ({ label, options, selected, onChange }: { label: string, op
     );
 };
 
-const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear, onBackup, onRestore }: { 
+const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear, onBackup, onRestore, onUpdate }: { 
     transactions: Transaction[], 
     filters: FilterState, 
     setFilters: React.Dispatch<React.SetStateAction<FilterState>>, 
@@ -114,11 +115,15 @@ const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear
     setIsOpen: (isOpen: boolean) => void, 
     onClear?: () => void,
     onBackup?: () => void,
-    onRestore?: (file: File) => void
+    onRestore?: (file: File) => void,
+    onUpdate?: (updated: Transaction[]) => void
 }) => {
     const { currency, setCurrency } = useCurrency();
     const restoreInputRef = useRef<HTMLInputElement>(null);
+    const uploadInputRef = useRef<HTMLInputElement>(null);
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     
     const uniqueValues = useMemo(() => {
         const projects = [...new Set(transactions.map(t => t.project).filter((p): p is string => !!p && typeof p === 'string' && p.trim() !== ''))].sort();
@@ -140,6 +145,74 @@ const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear
             excludedCategories: [],
             excludedProjects: [],
         })
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Password protection check
+        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+             try {
+                 const text = await file.text();
+                 if (text.includes('/Encrypt') && !text.includes('/Encrypt null')) {
+                     alert("🔒 This PDF is password protected.\n\nPlease remove the password and try again.");
+                     e.target.value = '';
+                     return;
+                 }
+             } catch (err) {
+                 console.warn("PDF check failed", err);
+             }
+        }
+
+        // Auto-generate Owner Name: "File N" based on existing unique owners
+        const distinctOwners = new Set(transactions.map(t => t.owner));
+        let nextIndex = distinctOwners.size + 1;
+        let ownerName = `File ${nextIndex}`;
+        // Ensure uniqueness if user named something "File 2" manually
+        while (distinctOwners.has(ownerName)) {
+            nextIndex++;
+            ownerName = `File ${nextIndex}`;
+        }
+
+        setIsUploading(true);
+        setUploadProgress(0);
+
+        // Fake progress since transformData is atomic
+        const interval = setInterval(() => {
+            setUploadProgress(prev => {
+                if (prev >= 90) return prev;
+                return prev + 10;
+            });
+        }, 300);
+
+        try {
+            // Process file
+            const result = await transformData(file, ownerName);
+            
+            clearInterval(interval);
+            setUploadProgress(100);
+            
+            // Small delay to show completion
+            await new Promise(resolve => setTimeout(resolve, 600));
+
+            if (result.transactions.length > 0) {
+                if (onUpdate) {
+                    onUpdate(result.transactions);
+                }
+            }
+        } catch (err: any) {
+            clearInterval(interval);
+            console.error(err);
+            alert("Import failed: " + (err.message || "Unknown error"));
+        } finally {
+            // Wait a bit before hiding the progress bar
+            setTimeout(() => {
+                setIsUploading(false);
+                setUploadProgress(0);
+            }, 1000);
+            e.target.value = '';
+        }
     };
 
     return (
@@ -219,6 +292,48 @@ const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear
                             </button>
                         )}
                     </div>
+
+                    {/* ADD FILE BUTTON */}
+                    {onUpdate && (
+                        <div>
+                            <button 
+                                onClick={() => uploadInputRef.current?.click()} 
+                                disabled={isUploading}
+                                className="w-full text-center text-sm py-2.5 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm font-medium flex items-center justify-center gap-2"
+                            >
+                                {isUploading ? (
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                ) : (
+                                    <Icon name="upload" className="w-4 h-4 text-white" />
+                                )}
+                                <span>{isUploading ? 'Analyzing...' : 'Add More Files'}</span>
+                            </button>
+                            <input 
+                                type="file" 
+                                ref={uploadInputRef} 
+                                className="hidden" 
+                                accept=".csv,.xlsx,.xls,.pdf" 
+                                onChange={handleFileUpload} 
+                            />
+                            
+                            {/* Progress Loader UI */}
+                            {isUploading && (
+                                <div className="mt-3 animate-fade-in bg-white p-2 rounded-lg border border-slate-200">
+                                    <div className="flex justify-between text-[10px] text-slate-500 mb-1 font-semibold uppercase tracking-wider">
+                                        <span>Processing</span>
+                                        <span>{uploadProgress}%</span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                        <div 
+                                            className="h-full bg-blue-600 rounded-full transition-all duration-300" 
+                                            style={{ width: `${uploadProgress}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {onClear && (
                         <button type="button" onClick={onClear} className="w-full text-center text-sm py-2.5 px-4 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition shadow-sm font-medium flex items-center justify-center gap-2">
                             <Icon name="trash" className="w-4 h-4" />
@@ -362,6 +477,7 @@ const Dashboard = ({ initialTransactions, onUpdate, onDelete, onClear, onBackup,
                     onClear={onClear}
                     onBackup={onBackup}
                     onRestore={onRestore}
+                    onUpdate={onUpdate}
                 />
                 
                 <main className="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
