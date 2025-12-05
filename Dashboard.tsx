@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo, useCallback, createContext, useContext, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, createContext, useContext, useEffect, useRef, useLayoutEffect } from 'react';
 import { Transaction, TransactionType, FilterState } from './types';
 import { TABS, COLORS, Icon } from './constants';
 import SummaryViews from './components/SummaryViews';
@@ -10,7 +9,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { CURRENCIES, Currency, detectUserCurrency, formatAmount } from './services/currency';
 import { FeedbackModal } from './components/FeedbackModal';
-import { transformData } from './services/transformer';
+import { transformData, identifyInterAccountTransfers } from './services/transformer';
 
 interface CurrencyContextType {
     currency: Currency;
@@ -26,6 +25,57 @@ export const useCurrency = () => {
 };
 
 // --- Components ---
+
+const ProcessingBanner = ({ isProcessing, progress }: { isProcessing: boolean, progress: number }) => {
+    const [showDone, setShowDone] = useState(false);
+    
+    useEffect(() => {
+        if (!isProcessing && progress === 100) {
+            setShowDone(true);
+            const timer = setTimeout(() => setShowDone(false), 3000);
+            return () => clearTimeout(timer);
+        }
+        if (isProcessing) setShowDone(false);
+    }, [isProcessing, progress]);
+
+    if (!isProcessing && !showDone) return null;
+
+    return (
+        <div className="sticky top-0 z-[60] bg-white/95 backdrop-blur-md border-b border-indigo-100 shadow-sm animate-fade-in">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 flex-1">
+                    {showDone ? (
+                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-white animate-pulse">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" /></svg>
+                        </div>
+                    ) : (
+                        <div className="w-5 h-5 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                    )}
+                    <div>
+                        <p className={`text-sm font-bold ${showDone ? 'text-green-600' : 'text-indigo-900'}`}>
+                            {showDone ? "Analysis Complete" : "Processing Files..."}
+                        </p>
+                        {!showDone && <p className="text-xs text-indigo-500">Live updating dashboard</p>}
+                    </div>
+                </div>
+                {!showDone && (
+                    <div className="w-48 sm:w-64">
+                        <div className="flex justify-between text-[10px] font-bold text-indigo-400 mb-1 uppercase tracking-wide">
+                            <span>Progress</span>
+                            <span>{progress}%</span>
+                        </div>
+                        <div className="w-full bg-indigo-50 rounded-full h-1.5 overflow-hidden">
+                            <div 
+                                className="h-full bg-indigo-500 rounded-full transition-all duration-300 ease-out" 
+                                style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 const Header = ({ data, onExportSnapshot, isExporting }: { data: Transaction[], onExportSnapshot: () => void, isExporting: boolean }) => {
     const { formatCurrency } = useCurrency();
@@ -147,66 +197,79 @@ const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear
         })
     };
 
+    const generateEntityName = (fileName: string): string => {
+        const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "");
+        let cleanName = nameWithoutExt.substring(0, 15).replace(/[-_]/g, ' ');
+        return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    };
+
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        // Password protection check
-        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-             try {
-                 const text = await file.text();
-                 if (text.includes('/Encrypt') && !text.includes('/Encrypt null')) {
-                     alert("🔒 This PDF is password protected.\n\nPlease remove the password and try again.");
-                     e.target.value = '';
-                     return;
-                 }
-             } catch (err) {
-                 console.warn("PDF check failed", err);
-             }
-        }
-
-        // Auto-generate Owner Name: "File N" based on existing unique owners
-        const distinctOwners = new Set(transactions.map(t => t.owner));
-        let nextIndex = distinctOwners.size + 1;
-        let ownerName = `File ${nextIndex}`;
-        // Ensure uniqueness if user named something "File 2" manually
-        while (distinctOwners.has(ownerName)) {
-            nextIndex++;
-            ownerName = `File ${nextIndex}`;
-        }
-
+        if (!e.target.files || e.target.files.length === 0) return;
+        
+        const files: File[] = Array.from(e.target.files);
         setIsUploading(true);
         setUploadProgress(0);
 
-        // Fake progress since transformData is atomic
+        // Check for PDF passwords quickly
+        const safeFiles = [];
+        for (const file of files) {
+            if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                try {
+                    const text = await file.text();
+                    if (text.includes('/Encrypt') && !text.includes('/Encrypt null')) {
+                        alert(`🔒 "${file.name}" is password protected. Skipped.`);
+                        continue; 
+                    }
+                } catch (err) { console.warn(err); }
+            }
+            safeFiles.push(file);
+        }
+
+        if (safeFiles.length === 0) {
+            setIsUploading(false);
+            e.target.value = '';
+            return;
+        }
+
+        // Progress Loop
         const interval = setInterval(() => {
             setUploadProgress(prev => {
-                if (prev >= 90) return prev;
-                return prev + 10;
+                if (prev >= 95) return prev;
+                return prev + 1;
             });
         }, 300);
 
         try {
-            // Process file
-            const result = await transformData(file, ownerName);
+            let newTransactions: Transaction[] = [];
+            
+            // Process sequentially to avoid browser choke
+            for (const file of safeFiles) {
+                // Auto-generate name based on file
+                const ownerName = generateEntityName(file.name);
+                const result = await transformData(file, ownerName);
+                if (result.transactions.length > 0) {
+                    newTransactions = [...newTransactions, ...result.transactions];
+                }
+            }
             
             clearInterval(interval);
             setUploadProgress(100);
-            
-            // Small delay to show completion
             await new Promise(resolve => setTimeout(resolve, 600));
 
-            if (result.transactions.length > 0) {
+            if (newTransactions.length > 0) {
                 if (onUpdate) {
-                    onUpdate(result.transactions);
+                    const combined = [...transactions, ...newTransactions];
+                    const { transactions: processed } = identifyInterAccountTransfers(combined);
+                    onUpdate(processed);
                 }
+            } else {
+                alert("No transactions extracted. Please check file format.");
             }
         } catch (err: any) {
             clearInterval(interval);
             console.error(err);
             alert("Import failed: " + (err.message || "Unknown error"));
         } finally {
-            // Wait a bit before hiding the progress bar
             setTimeout(() => {
                 setIsUploading(false);
                 setUploadProgress(0);
@@ -313,6 +376,7 @@ const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear
                                 ref={uploadInputRef} 
                                 className="hidden" 
                                 accept=".csv,.xlsx,.xls,.pdf" 
+                                multiple
                                 onChange={handleFileUpload} 
                             />
                             
@@ -321,7 +385,7 @@ const Sidebar = ({ transactions, filters, setFilters, isOpen, setIsOpen, onClear
                                 <div className="mt-3 animate-fade-in bg-white p-2 rounded-lg border border-slate-200">
                                     <div className="flex justify-between text-[10px] text-slate-500 mb-1 font-semibold uppercase tracking-wider">
                                         <span>Processing</span>
-                                        <span>{uploadProgress}%</span>
+                                        <span>{uploadProgress.toFixed(0)}%</span>
                                     </div>
                                     <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                                         <div 
@@ -362,9 +426,11 @@ interface DashboardProps {
     onClear?: () => void;
     onBackup?: () => void;
     onRestore?: (file: File) => void;
+    isProcessing?: boolean;
+    processingProgress?: number;
 }
 
-const Dashboard = ({ initialTransactions, onUpdate, onDelete, onClear, onBackup, onRestore }: DashboardProps) => {
+const Dashboard = ({ initialTransactions, onUpdate, onDelete, onClear, onBackup, onRestore, isProcessing = false, processingProgress = 0 }: DashboardProps) => {
     const [activeTab, setActiveTab] = useState(TABS[0]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
@@ -381,6 +447,29 @@ const Dashboard = ({ initialTransactions, onUpdate, onDelete, onClear, onBackup,
             excludedProjects: [],
         };
     });
+
+    // Track known owners to detect new files arriving in the stream
+    const knownOwnersRef = useRef<Set<string>>(new Set(initialTransactions.map(t => t.owner)));
+
+    // Effect: Auto-select newly processed files in the dashboard
+    useEffect(() => {
+        const currentOwners = new Set(initialTransactions.map(t => t.owner));
+        const newOwners: string[] = [];
+
+        currentOwners.forEach(owner => {
+            if (!knownOwnersRef.current.has(owner)) {
+                newOwners.push(owner);
+                knownOwnersRef.current.add(owner);
+            }
+        });
+
+        if (newOwners.length > 0) {
+            setFilters(prev => ({
+                ...prev,
+                owners: [...prev.owners, ...newOwners]
+            }));
+        }
+    }, [initialTransactions]);
 
     const filteredData = useMemo(() => {
         if (!initialTransactions || initialTransactions.length === 0) {
@@ -448,6 +537,23 @@ const Dashboard = ({ initialTransactions, onUpdate, onDelete, onClear, onBackup,
     };
 
     const currencyContextValue = { currency, setCurrency, formatCurrency: formatCurrencyFn };
+    
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to top whenever tab changes or dashboard mounts
+    useLayoutEffect(() => {
+        // 1. Reset Internal Dashboard Scroll
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = 0;
+        }
+        
+        // 2. Reset Outer App Shell Scroll (Fixes "Load at bottom" issue)
+        // The App wrapper has 'h-full overflow-y-auto'
+        const appShell = document.querySelector('.h-full.overflow-y-auto');
+        if (appShell) {
+            appShell.scrollTop = 0;
+        }
+    }, [activeTab]);
 
     return (
         <CurrencyContext.Provider value={currencyContextValue}>
@@ -487,8 +593,11 @@ const Dashboard = ({ initialTransactions, onUpdate, onDelete, onClear, onBackup,
                         </button>
                         <span className="ml-4 font-bold text-slate-800">TrackSpendz</span>
                      </div>
+                    
+                    {/* Processing Banner Logic */}
+                    <ProcessingBanner isProcessing={isProcessing} progress={processingProgress} />
 
-                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                    <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                         <div className="w-full max-w-7xl mx-auto">
                             <Header data={filteredData} onExportSnapshot={handleExportSnapshot} isExporting={isExporting} />
                             

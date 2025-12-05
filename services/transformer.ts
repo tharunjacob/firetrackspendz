@@ -1,3 +1,4 @@
+
 import { Transaction, TransactionType, FileMapping } from '../types';
 import * as XLSX from 'xlsx';
 import { getFileMappingFromAI, detectFileStructure, extractTransactionsFromPDF } from './geminiService';
@@ -11,7 +12,7 @@ const CONFIG = {
       "Expense", "Outflow", "Money Out", "Debit", "Withdrawal", "Charge", 
       "Credit Amount", "Inflow", "Money In", "Income", "Deposit", "Received", 
       "Transaction Amount", "Debits", "Credits", "Net Amount",
-      "amount_inr", "amount_rs", "rs", "₹", "inr", "amt", "$",
+      "amount_inr", "amount_rs", "rs", "₹", "inr", "amt", "$", "£", "€",
       "Withdrawal Amt.", "Deposit Amt.", "Withdrawal Amt", "Deposit Amt"
     ],
     ignore_columns: [
@@ -70,82 +71,82 @@ const CONFIG = {
   // Richer Mapping for Local "Smart Classify"
   category_mapping: {
     // FOOD & DINING
-    'swiggy': 'Food', 'zomato': 'Food', 'eat': 'Food', 'food': 'Food', 
-    'restaurant': 'Food', 'cafe': 'Food', 'coffee': 'Food', 'starbucks': 'Food',
-    'mcdonalds': 'Food', 'kfc': 'Food', 'burger': 'Food', 'pizza': 'Food',
+    'swiggy': 'Food', 'zomato': 'Food', 'eat': 'Food', 'food': 'Food', 'doordash': 'Food', 'grubhub': 'Food', 'deliveroo': 'Food', 'just eat': 'Food',
+    'restaurant': 'Food', 'cafe': 'Food', 'coffee': 'Food', 'starbucks': 'Food', 'dunkin': 'Food', 'costa': 'Food', 'pret': 'Food',
+    'mcdonalds': 'Food', 'kfc': 'Food', 'burger': 'Food', 'pizza': 'Food', 'subway': 'Food', 'chipotle': 'Food', 'taco bell': 'Food',
     'dominos': 'Food', 'biryani': 'Food', 'freshmenu': 'Food', 'barbeque': 'Food',
     'baker': 'Food', 'cake': 'Food', 'sweet': 'Food', 'dairy': 'Food',
     
-    // GROCERIES
-    'grofers': 'Groceries', 'bigbasket': 'Groceries', 'blinkit': 'Groceries', 
-    'zepto': 'Groceries', 'instamart': 'Groceries', 'supermarket': 'Groceries',
-    'mart': 'Groceries', 'kirana': 'Groceries', 'vegetable': 'Groceries',
-    'fruit': 'Groceries', 'milk': 'Groceries', 'licious': 'Groceries',
-    'ratnadeep': 'Groceries', 'dmart': 'Groceries', 'reliance fresh': 'Groceries',
+    // GROCERIES (Global + Local)
+    'grofers': 'Groceries', 'bigbasket': 'Groceries', 'blinkit': 'Groceries', 'instacart': 'Groceries',
+    'zepto': 'Groceries', 'instamart': 'Groceries', 'supermarket': 'Groceries', 'whole foods': 'Groceries', 'trader joe': 'Groceries',
+    'mart': 'Groceries', 'kirana': 'Groceries', 'vegetable': 'Groceries', 'walmart': 'Groceries', 'tesco': 'Groceries', 'sainsbury': 'Groceries',
+    'fruit': 'Groceries', 'milk': 'Groceries', 'licious': 'Groceries', 'aldi': 'Groceries', 'lidl': 'Groceries', 'carrefour': 'Groceries', 'costco': 'Groceries',
+    'ratnadeep': 'Groceries', 'dmart': 'Groceries', 'reliance fresh': 'Groceries', 'kroger': 'Groceries', 'safeway': 'Groceries', 'target': 'Groceries',
 
     // TRANSPORT
-    'uber': 'Transport', 'ola': 'Transport', 'rapido': 'Transport', 'fuel': 'Transport',
-    'petrol': 'Transport', 'diesel': 'Transport', 'shell': 'Transport', 'hpcl': 'Transport',
-    'bpcl': 'Transport', 'iocl': 'Transport', 'toll': 'Transport', 'fastag': 'Transport',
-    'metro': 'Transport', 'irctc': 'Transport', 'railway': 'Transport', 'train': 'Transport',
-    'flight': 'Transport', 'indigo': 'Transport', 'air india': 'Transport', 'vistara': 'Transport',
-    'bus': 'Transport', 'redbus': 'Transport', 'auto': 'Transport', 'cab': 'Transport', 
+    'uber': 'Transport', 'ola': 'Transport', 'rapido': 'Transport', 'lyft': 'Transport', 'grab': 'Transport', 'gojek': 'Transport',
+    'fuel': 'Transport', 'petrol': 'Transport', 'diesel': 'Transport', 'gas station': 'Transport',
+    'shell': 'Transport', 'hpcl': 'Transport', 'bpcl': 'Transport', 'iocl': 'Transport', 'exxon': 'Transport', 'chevron': 'Transport', 'bp ': 'Transport', 'texaco': 'Transport',
+    'toll': 'Transport', 'fastag': 'Transport', 'ezpass': 'Transport', 'congestion': 'Transport',
+    'metro': 'Transport', 'irctc': 'Transport', 'railway': 'Transport', 'train': 'Transport', 'tfl': 'Transport', 'mta': 'Transport', 'amtrak': 'Transport',
+    'flight': 'Transport', 'indigo': 'Transport', 'air india': 'Transport', 'vistara': 'Transport', 'delta': 'Transport', 'united': 'Transport', 'ryanair': 'Transport', 'easyjet': 'Transport',
+    'bus': 'Transport', 'redbus': 'Transport', 'auto': 'Transport', 'cab': 'Transport', 'taxi': 'Transport',
     'parking': 'Transport',
 
     // SHOPPING
-    'amazon': 'Shopping', 'flipkart': 'Shopping', 'myntra': 'Shopping', 'ajio': 'Shopping',
-    'tata': 'Shopping', 'reliance': 'Shopping', 'retail': 'Shopping', 'store': 'Shopping',
+    'amazon': 'Shopping', 'flipkart': 'Shopping', 'myntra': 'Shopping', 'ajio': 'Shopping', 'ebay': 'Shopping', 'shopify': 'Shopping',
+    'tata': 'Shopping', 'reliance': 'Shopping', 'retail': 'Shopping', 'store': 'Shopping', 'etsy': 'Shopping',
     'shop': 'Shopping', 'decathlon': 'Shopping', 'nike': 'Shopping', 'adidas': 'Shopping',
     'zara': 'Shopping', 'h&m': 'Shopping', 'uniqlo': 'Shopping', 'ikea': 'Shopping',
     'lifestyle': 'Shopping', 'pantaloons': 'Shopping', 'westside': 'Shopping', 'cloth': 'Shopping',
-    'shoe': 'Shopping', 'mall': 'Shopping',
+    'shoe': 'Shopping', 'mall': 'Shopping', 'best buy': 'Shopping', 'apple': 'Shopping',
 
     // UTILITIES
-    'bescom': 'Utilities', 'electricity': 'Utilities', 'water': 'Utilities', 'gas': 'Utilities',
-    'bill': 'Utilities', 'recharge': 'Utilities', 'jio': 'Utilities', 'airtel': 'Utilities',
-    'vi ': 'Utilities', 'vodafone': 'Utilities', 'bsnl': 'Utilities', 'broadband': 'Utilities',
-    'act': 'Utilities', 'hathway': 'Utilities', 'spectranet': 'Utilities', 'tatasky': 'Utilities',
-    'dth': 'Utilities', 'mobile': 'Utilities', 'internet': 'Utilities',
+    'bescom': 'Utilities', 'electricity': 'Utilities', 'water': 'Utilities', 'gas': 'Utilities', 'power': 'Utilities',
+    'bill': 'Utilities', 'recharge': 'Utilities', 'jio': 'Utilities', 'airtel': 'Utilities', 'verizon': 'Utilities', 'at&t': 'Utilities', 't-mobile': 'Utilities',
+    'vi ': 'Utilities', 'vodafone': 'Utilities', 'bsnl': 'Utilities', 'broadband': 'Utilities', 'bt group': 'Utilities', 'virgin media': 'Utilities',
+    'act': 'Utilities', 'hathway': 'Utilities', 'spectranet': 'Utilities', 'tatasky': 'Utilities', 'comcast': 'Utilities', 'xfinity': 'Utilities',
+    'dth': 'Utilities', 'mobile': 'Utilities', 'internet': 'Utilities', 'council tax': 'Utilities',
 
     // ENTERTAINMENT
-    'netflix': 'Entertainment', 'prime': 'Entertainment', 'spotify': 'Entertainment',
-    'youtube': 'Entertainment', 'hotstar': 'Entertainment', 'bookmyshow': 'Entertainment',
-    'pvr': 'Entertainment', 'inox': 'Entertainment', 'cinema': 'Entertainment', 'movie': 'Entertainment',
-    'game': 'Entertainment', 'steam': 'Entertainment', 'playstation': 'Entertainment', 'club': 'Entertainment',
+    'netflix': 'Entertainment', 'prime': 'Entertainment', 'spotify': 'Entertainment', 'hulu': 'Entertainment', 'disney': 'Entertainment',
+    'youtube': 'Entertainment', 'hotstar': 'Entertainment', 'bookmyshow': 'Entertainment', 'ticketmaster': 'Entertainment',
+    'pvr': 'Entertainment', 'inox': 'Entertainment', 'cinema': 'Entertainment', 'movie': 'Entertainment', 'amc': 'Entertainment', 'odeon': 'Entertainment',
+    'game': 'Entertainment', 'steam': 'Entertainment', 'playstation': 'Entertainment', 'club': 'Entertainment', 'xbox': 'Entertainment', 'nintendo': 'Entertainment',
     'party': 'Entertainment', 'event': 'Entertainment',
 
     // HEALTH
-    'hospital': 'Health', 'pharmacy': 'Health', 'medplus': 'Health', 'apollo': 'Health',
-    '1mg': 'Health', 'practo': 'Health', 'doctor': 'Health', 'clinic': 'Health',
-    'lab': 'Health', 'gym': 'Health', 'cult': 'Health', 'fitness': 'Health', 
-    'medical': 'Health', 'medicine': 'Health', 'scan': 'Health',
+    'hospital': 'Health', 'pharmacy': 'Health', 'medplus': 'Health', 'apollo': 'Health', 'boots': 'Health', 'cvs': 'Health', 'walgreens': 'Health',
+    '1mg': 'Health', 'practo': 'Health', 'doctor': 'Health', 'clinic': 'Health', 'nhs': 'Health',
+    'lab': 'Health', 'gym': 'Health', 'cult': 'Health', 'fitness': 'Health', 'anytime fitness': 'Health', 'gold': 'Health',
+    'medical': 'Health', 'medicine': 'Health', 'scan': 'Health', 'dentist': 'Health',
 
     // EDUCATION
-    'course': 'Education', 'udemy': 'Education', 'coursera': 'Education', 'book': 'Education',
-    'kindle': 'Education', 'school': 'Education', 'college': 'Education', 'fee': 'Education',
+    'course': 'Education', 'udemy': 'Education', 'coursera': 'Education', 'book': 'Education', 'pluralsight': 'Education', 'masterclass': 'Education',
+    'kindle': 'Education', 'school': 'Education', 'college': 'Education', 'fee': 'Education', 'university': 'Education',
     'tuition': 'Education', 'learning': 'Education', 'stationery': 'Education',
 
     // INVESTMENT
-    'zerodha': 'Investment', 'groww': 'Investment', 'upstox': 'Investment', 'kite': 'Investment',
-    'mutual fund': 'Investment', 'sip': 'Investment', 'ppf': 'Investment', 'nps': 'Investment',
-    'lic': 'Investment', 'insurance': 'Investment', 'premium': 'Investment', 'policy': 'Investment',
-    'stocks': 'Investment', 'equity': 'Investment', 'fd ': 'Investment', 'rd ': 'Investment',
+    'zerodha': 'Investment', 'groww': 'Investment', 'upstox': 'Investment', 'kite': 'Investment', 'robinhood': 'Investment', 'coinbase': 'Investment', 'binance': 'Investment',
+    'mutual fund': 'Investment', 'sip': 'Investment', 'ppf': 'Investment', 'nps': 'Investment', 'vanguard': 'Investment', 'fidelity': 'Investment',
+    'lic': 'Investment', 'insurance': 'Investment', 'premium': 'Investment', 'policy': 'Investment', 'schwab': 'Investment', 'etrade': 'Investment',
+    'stocks': 'Investment', 'equity': 'Investment', 'fd ': 'Investment', 'rd ': 'Investment', '401k': 'Investment', 'ira': 'Investment',
     
     // INCOME
-    'salary': 'Salary', 'dividend': 'Income', 'interest': 'Income', 'refund': 'Income',
+    'salary': 'Salary', 'dividend': 'Income', 'interest': 'Income', 'refund': 'Income', 'payroll': 'Salary',
     'cashback': 'Income', 'bonus': 'Income',
 
     // OTHERS
-    'rent': 'Housing', 'maintenance': 'Housing', 'loan': 'EMI', 'card': 'Bill Payment'
-    // REMOVED 'emi': 'EMI' from here to prevent loose matching (e.g. "Pay in EMI")
+    'rent': 'Housing', 'maintenance': 'Housing', 'loan': 'EMI', 'card': 'Bill Payment', 'mortgage': 'Housing'
   },
   
   // Regex patterns for smarter matching when simple inclusion fails
   smart_patterns: [
-      { regex: /^(UPI|IMPS|NEFT|RTGS)([-/ ])?.*(ZOMATO|SWIGGY)/i, category: 'Food' },
-      { regex: /^(UPI|IMPS|NEFT|RTGS)([-/ ])?.*(UBER|OLA)/i, category: 'Transport' },
-      { regex: /^(UPI|IMPS|NEFT|RTGS)([-/ ])?.*(AMAZON|FLIPKART)/i, category: 'Shopping' },
-      { regex: /^(UPI|IMPS|NEFT|RTGS)([-/ ])?.*(ZERODHA|GROWW|UPSTOX)/i, category: 'Investment' },
+      { regex: /^(UPI|IMPS|NEFT|RTGS|ACH|ZELLE|VENMO)([-/ ])?.*(ZOMATO|SWIGGY|DOORDASH|GRUBHUB|UBER\s?EATS)/i, category: 'Food' },
+      { regex: /^(UPI|IMPS|NEFT|RTGS|ACH|ZELLE|VENMO)([-/ ])?.*(UBER|OLA|LYFT)/i, category: 'Transport' },
+      { regex: /^(UPI|IMPS|NEFT|RTGS|ACH|ZELLE|VENMO)([-/ ])?.*(AMAZON|FLIPKART|EBAY)/i, category: 'Shopping' },
+      { regex: /^(UPI|IMPS|NEFT|RTGS|ACH|ZELLE|VENMO)([-/ ])?.*(ZERODHA|GROWW|UPSTOX|ROBINHOOD|VANGUARD)/i, category: 'Investment' },
       { regex: /^ATM\s?WDL/i, category: 'Cash' },
       { regex: /^ATM\s?CASH/i, category: 'Cash' },
       { regex: /^POS\s/i, category: 'Shopping' }, // POS usually means swiping at a store
@@ -153,9 +154,11 @@ const CONFIG = {
       { regex: /^ACH\s?C/i, category: 'Income' },
       { regex: /^INT\.?\s?PD/i, category: 'Income' }, // Interest Paid
       { regex: /^INT\.?\s?COLL/i, category: 'Income' }, // Interest Collected
+      { regex: /^(DD|DIRECT DEBIT)/i, category: 'Bill Payment' }, // UK Direct Debit
+      { regex: /^(SO|STANDING ORDER)/i, category: 'Transfer' }, // UK Standing Order
       // STRICT EMI/LOAN DETECTION (Must be a distinct word)
-      { regex: /\b(loan|emi)\b/i, category: 'EMI' },
-      { regex: /^(UPI|IMPS|NEFT|RTGS)/i, category: 'Transfer' } // Default for banking terms if no other match
+      { regex: /\b(loan|emi|mortgage)\b/i, category: 'EMI' },
+      { regex: /^(UPI|IMPS|NEFT|RTGS|ZELLE|VENMO|WIRE|SEPA|FASTER PAY)/i, category: 'Transfer' } // Default for banking terms if no other match
   ]
 };
 
@@ -256,7 +259,7 @@ const parseDate = (val: any): { date: string, time: string, year: number } | nul
       'jul': '07', 'aug': '08', 'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
   };
   
-  // DD-MMM-YY or DD-MMM-YYYY (Common in India) -> 01-Apr-25 or 01-Apr-2025
+  // DD-MMM-YY or DD-MMM-YYYY (Common in India/UK) -> 01-Apr-25 or 01-Apr-2025
   let match = str.match(/^(\d{1,2})[-/ ]([a-zA-Z]{3})[-/ ](\d{2,4})/);
   if (match) {
       let day = match[1].padStart(2, '0');
@@ -267,18 +270,20 @@ const parseDate = (val: any): { date: string, time: string, year: number } | nul
       if (month) return { date: `${year}-${month}-${day}`, time: timeStr, year };
   }
 
-  // YYYY-MM-DD
+  // YYYY-MM-DD (ISO)
   match = str.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
   if (match) {
       return { date: `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`, time: timeStr, year: parseInt(match[1]) };
   }
 
-  // DD-MM-YYYY (or DD-MM-YY)
+  // DD-MM-YYYY (or DD-MM-YY) - Priority for non-US
   match = str.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/);
   if (match) {
     let yearStr = match[3];
     if (yearStr.length === 2) yearStr = '20' + yearStr;
     const year = parseInt(yearStr);
+    // Simple heuristic: if first number > 12, it must be DD-MM-YYYY
+    // If not, we assume standard international format DD-MM first for this app context, unless it's clearly US.
     return { date: `${yearStr}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`, time: timeStr, year };
   }
 
@@ -472,6 +477,102 @@ const getRuleBasedMapping = (header: string[]): FileMapping => {
     };
 }
 
+// --- NEW FUNCTION: DETECT INTER-ACCOUNT TRANSFERS ---
+// Updated to be more strict: Different Owner + (Keywords OR Similarity) + Same Date + Exact Amount
+export const identifyInterAccountTransfers = (transactions: Transaction[]): { transactions: Transaction[], transferCount: number } => {
+    let transferCount = 0;
+    
+    // Explicit keywords to look for in descriptions
+    // Added Global Keywords: Zelle, Venmo, Wire, SEPA, Faster Payment, Cash App
+    const TRANSFER_KEYWORDS = [
+        'transfer', 'upi', 'neft', 'imps', 'rtgs', 'payment', 'trf', 'self', 'funds', 'p2a', 'a2a', 'sent to', 'received from',
+        'zelle', 'venmo', 'wire', 'sepa', 'faster payment', 'cash app'
+    ];
+
+    const hasTransferKeyword = (str: string) => {
+        const lower = str.toLowerCase();
+        return TRANSFER_KEYWORDS.some(k => lower.includes(k));
+    };
+
+    // Helper to extract tokens for similarity check
+    const getTokens = (str: string) => {
+        return str.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(' ').filter(x => x.length > 2);
+    };
+
+    const areDescriptionsSimilar = (d1: string, d2: string) => {
+        // If both have explicit banking transfer keywords, that's a good enough signal when combined with exact amount + date match
+        if (hasTransferKeyword(d1) && hasTransferKeyword(d2)) return true;
+
+        // Otherwise check for shared meaningful words (like a person's name or merchant)
+        const t1 = getTokens(d1);
+        const t2 = getTokens(d2);
+        const common = t1.filter(token => t2.includes(token));
+        
+        return common.length > 0; 
+    };
+
+    // Group by Date
+    const groups = new Map<string, Transaction[]>();
+    transactions.forEach(t => {
+        if (!groups.has(t.date)) groups.set(t.date, []);
+        groups.get(t.date)!.push(t);
+    });
+
+    groups.forEach(group => {
+        // Optimization: Skip if only 1 transaction or all same type
+        if (group.length < 2) return;
+        
+        // We need pairs of Income/Expense with matching absolute amounts
+        const incomes = group.filter(t => t.type === 'Income');
+        const expenses = group.filter(t => t.type === 'Expense');
+        
+        if (incomes.length === 0 || expenses.length === 0) return;
+
+        // Iterate incomes and try to match with an expense
+        incomes.forEach(inc => {
+            const incAmt = Math.abs(inc.amount);
+            
+            // Find a matching expense
+            // Criteria: 
+            // 1. Same Amount
+            // 2. Different Owner (File)
+            // 3. Similar Description OR Shared Keywords
+            const matchIndex = expenses.findIndex(exp => {
+                const expAmt = Math.abs(exp.amount);
+                
+                if (Math.abs(incAmt - expAmt) > 0.01) return false; // Strict amount check
+                if (inc.owner === exp.owner) return false; // Must be different files
+
+                const incDesc = inc.notes || inc.category;
+                const expDesc = exp.notes || exp.category;
+                
+                return areDescriptionsSimilar(incDesc, expDesc);
+            });
+
+            if (matchIndex !== -1) {
+                // We found a match!
+                const exp = expenses[matchIndex];
+                
+                // Convert both to Transfer
+                inc.type = 'Transfer';
+                inc.category = 'Transfer';
+                inc.subCategory = 'Inter-Account';
+
+                exp.type = 'Transfer';
+                exp.category = 'Transfer';
+                exp.subCategory = 'Inter-Account';
+                
+                transferCount++;
+                
+                // Remove the matched expense so it isn't matched again
+                expenses.splice(matchIndex, 1);
+            }
+        });
+    });
+
+    return { transactions, transferCount };
+};
+
 export const transformData = async (file: File, owner: string): Promise<{ transactions: Transaction[], error?: string }> => {
   // PDF HANDLER
   if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
@@ -500,7 +601,8 @@ export const transformData = async (file: File, owner: string): Promise<{ transa
                   const rawData = await extractTransactionsFromPDF(base64);
                   
                   if (!Array.isArray(rawData) || rawData.length === 0) {
-                      throw new Error("No transactions found in PDF or failed to extract.");
+                      reject(new Error("AI could not extract transactions. Ensure the PDF contains a readable bank statement, not just images."));
+                      return;
                   }
 
                   const transactions: Transaction[] = rawData.reduce((acc: Transaction[], item: any, idx: number) => {
@@ -653,7 +755,7 @@ export const transformData = async (file: File, owner: string): Promise<{ transa
         }
 
         if (transactions.length === 0) {
-             throw new Error("Could not extract valid transactions. Please check if the file has a Date and Amount column.");
+             throw new Error("Could not extract valid transactions. Please check if the file has 'Date' and 'Amount' columns, or if it's password protected.");
         }
 
         resolve({ transactions });

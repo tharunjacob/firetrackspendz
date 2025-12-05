@@ -1,42 +1,49 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Transaction, TransactionType } from '../types';
 import { useCurrency } from '../Dashboard';
 import { suggestCategories } from '../services/geminiService';
-import { saveCategoryRule } from '../services/learningService';
 
 const MultiSelect = ({ label, options, selected, onChange }: { label: string, options: string[], selected: string[], onChange: (selected: string[]) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
     
     return (
-        <div className="relative">
+        <div className="relative" ref={containerRef}>
             <button onClick={() => setIsOpen(!isOpen)} className="w-full text-left bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm flex justify-between items-center shadow-sm hover:border-blue-400 transition-colors">
                 <span className="truncate block pr-4">{selected.length > 0 ? `${label} (${selected.length})` : label}</span>
                 <span className="text-xs text-slate-500">▼</span>
             </button>
             {isOpen && (
-                <>
-                    <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
-                    <div className="absolute z-20 top-full mt-1 w-full max-h-60 overflow-y-auto bg-white border border-slate-300 rounded-lg shadow-xl p-1">
-                        {options.length === 0 && <div className="p-2 text-xs text-slate-400 text-center">No options</div>}
-                        {options.map(option => (
-                            <label key={option} className="flex items-center gap-2 p-2 hover:bg-slate-50 cursor-pointer rounded transition-colors">
-                                <input 
-                                    type="checkbox"
-                                    checked={selected.includes(option)}
-                                    onChange={() => {
-                                        if (selected.includes(option)) {
-                                            onChange(selected.filter(item => item !== option));
-                                        } else {
-                                            onChange([...selected, option]);
-                                        }
-                                    }}
-                                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-sm text-slate-700 truncate">{option}</span>
-                            </label>
-                        ))}
-                    </div>
-                </>
+                <div className="absolute z-20 top-full mt-1 w-full max-h-60 overflow-y-auto bg-white border border-slate-300 rounded-lg shadow-xl p-1">
+                    {options.length === 0 && <div className="p-2 text-xs text-slate-400 text-center">No options</div>}
+                    {options.map(option => (
+                        <label key={option} className="flex items-center gap-2 p-2 hover:bg-slate-50 cursor-pointer rounded transition-colors">
+                            <input 
+                                type="checkbox"
+                                checked={selected.includes(option)}
+                                onChange={() => {
+                                    if (selected.includes(option)) {
+                                        onChange(selected.filter(item => item !== option));
+                                    } else {
+                                        onChange([...selected, option]);
+                                    }
+                                }}
+                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-slate-700 truncate">{option}</span>
+                        </label>
+                    ))}
+                </div>
             )}
         </div>
     )
@@ -58,7 +65,6 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState<Partial<Transaction>>({});
-    const [saveRule, setSaveRule] = useState(false);
     
     // --- BULK ACTION STATE ---
     const [bulkAction, setBulkAction] = useState<'category' | 'type' | 'project' | 'delete' | null>(null);
@@ -67,9 +73,10 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
     // --- SMART FILL STATE ---
     const [isSmartFilling, setIsSmartFilling] = useState(false);
 
-    // Extract unique values for filters
+    // Extract unique values for filters AND dropdowns
+    const uniqueOwners = useMemo(() => [...new Set(data.map(t => t.owner))].sort(), [data]);
     const uniqueCategories = useMemo(() => [...new Set(data.map(t => t.category))].sort(), [data]);
-    const uniqueSubCategories = useMemo(() => [...new Set(data.map(t => t.subCategory))].sort(), [data]);
+    const uniqueSubCategories = useMemo(() => [...new Set(data.map(t => t.subCategory))].filter(Boolean).sort(), [data]);
     const uniqueProjects = useMemo(() => [...new Set(data.map(t => t.project || 'None'))].sort(), [data]);
     
     const unclassifiedCount = useMemo(() => data.filter(t => t.category === 'Unclassified').length, [data]);
@@ -167,13 +174,11 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
     const startEditing = (t: Transaction) => {
         setEditingId(t.id);
         setEditForm({ ...t });
-        setSaveRule(false);
     };
 
     const cancelEditing = () => {
         setEditingId(null);
         setEditForm({});
-        setSaveRule(false);
     };
 
     const saveEditing = () => {
@@ -189,19 +194,9 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
             amount: Number(editForm.amount) || 0, // Ensure valid number
         };
 
-        // SAVE RULE LOGIC
-        if (saveRule && editForm.category && editForm.notes) {
-            // We save the rule mapping the DESCRIPTION (Notes) to the CATEGORY
-            // We use the first 2 words of description as the key to be general enough but specific
-            // Or better, just use the notes as provided by user in edit form if they shortened it
-            saveCategoryRule(editForm.notes, editForm.category);
-            alert(`Rule Saved! Future uploads containing "${editForm.notes}" will be categorized as "${editForm.category}".`);
-        }
-
         onUpdate([updatedTx]);
         setEditingId(null);
         setEditForm({});
-        setSaveRule(false);
     };
 
     // Key Listener for Quick Save (Enter) or Cancel (Escape)
@@ -325,6 +320,24 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
             </th>
         );
     };
+
+    // Datalists for Combobox behavior
+    const Datalists = () => (
+        <>
+            <datalist id="owner-list">
+                {uniqueOwners.map(o => <option key={o} value={o} />)}
+            </datalist>
+            <datalist id="category-list">
+                {uniqueCategories.map(c => <option key={c} value={c} />)}
+            </datalist>
+            <datalist id="subcategory-list">
+                {uniqueSubCategories.map(s => <option key={s} value={s} />)}
+            </datalist>
+            <datalist id="project-list">
+                {uniqueProjects.map(p => <option key={p} value={p} />)}
+            </datalist>
+        </>
+    );
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm space-y-4 relative">
@@ -476,12 +489,9 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                                     value={bulkValue}
                                     onChange={(e) => setBulkValue(e.target.value)}
                                     className="text-slate-800 px-3 py-1.5 rounded-lg text-sm border-none outline-none w-48"
-                                    list="bulk-options"
+                                    list={bulkAction === 'category' ? 'category-list' : undefined}
                                 />
                             )}
-                            <datalist id="bulk-options">
-                                {uniqueCategories.map(c => <option key={c} value={c} />)}
-                            </datalist>
                             <button onClick={() => handleBulkApply()} className="bg-green-500 hover:bg-green-400 text-white font-bold px-4 py-1.5 rounded-lg text-sm">
                                 Apply
                             </button>
@@ -493,7 +503,10 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
             )}
 
             {/* Data Table */}
-            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm min-h-[400px]">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm min-h-[400px] relative">
+                <div className="absolute top-2 right-4 text-[10px] text-slate-400 font-medium italic z-10 pointer-events-none">
+                    Tip: Double-click any row to quick edit
+                </div>
                 <table className="w-full text-sm text-left text-slate-500 min-w-[1000px]">
                     <thead className="text-xs text-slate-700 uppercase bg-slate-100 font-bold border-b border-slate-200">
                         <tr>
@@ -515,8 +528,16 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                         {paginatedData.map((t, i) => {
                             const isEditing = editingId === t.id;
                             return (
-                            <tr key={t.id} className={`hover:bg-blue-50/50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'} ${selectedIds.has(t.id) ? 'bg-blue-50' : ''}`}>
-                                <td className="px-4 py-3">
+                            <tr 
+                                key={t.id} 
+                                onDoubleClick={() => !isEditing && startEditing(t)}
+                                className={`transition-colors cursor-pointer ${
+                                    isEditing ? 'bg-yellow-50 border-y-2 border-yellow-200 shadow-inner' : 
+                                    selectedIds.has(t.id) ? 'bg-blue-50' : 
+                                    i % 2 === 0 ? 'bg-white hover:bg-blue-50/30' : 'bg-slate-50/30 hover:bg-blue-50/30'
+                                }`}
+                            >
+                                <td className="px-4 py-3 cursor-default" onClick={e => e.stopPropagation()}>
                                     <input 
                                         type="checkbox" 
                                         checked={selectedIds.has(t.id)} 
@@ -526,12 +547,12 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                                 </td>
                                 <td className="px-4 py-3">
                                     {isEditing ? (
-                                        <div className="flex gap-1">
+                                        <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                                             <button onClick={saveEditing} className="text-green-600 hover:text-green-800 p-1 font-bold" title="Save (Enter)">✓</button>
                                             <button onClick={cancelEditing} className="text-red-600 hover:text-red-800 p-1 font-bold" title="Cancel (Esc)">✕</button>
                                         </div>
                                     ) : (
-                                        <button onClick={() => startEditing(t)} className="text-blue-500 hover:text-blue-700 p-1" title="Edit Row">
+                                        <button onClick={(e) => { e.stopPropagation(); startEditing(t); }} className="text-blue-500 hover:text-blue-700 p-1" title="Edit Row">
                                             ✎
                                         </button>
                                     )}
@@ -544,9 +565,18 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                                     {isEditing ? <input type="date" className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" value={editForm.date || ''} onChange={e => setEditForm({...editForm, date: e.target.value})} onKeyDown={handleKeyDown} /> : t.date}
                                 </td>
 
-                                {/* Owner */}
+                                {/* Owner (Combobox) */}
                                 <td className="px-6 py-3">
-                                    {isEditing ? <input className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" value={editForm.owner || ''} onChange={e => setEditForm({...editForm, owner: e.target.value})} onKeyDown={handleKeyDown} /> : t.owner}
+                                    {isEditing ? (
+                                        <input 
+                                            list="owner-list" 
+                                            className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" 
+                                            value={editForm.owner || ''} 
+                                            onChange={e => setEditForm({...editForm, owner: e.target.value})} 
+                                            onKeyDown={handleKeyDown}
+                                            placeholder="Select or Type"
+                                        />
+                                    ) : t.owner}
                                 </td>
 
                                 {/* Type */}
@@ -568,36 +598,46 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                                     )}
                                 </td>
 
-                                {/* Category */}
+                                {/* Category (Combobox) */}
                                 <td className="px-6 py-3 text-slate-800 font-medium">
                                     {isEditing ? (
-                                        <div className="flex flex-col gap-1">
-                                            <input list="cat-options" className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" value={editForm.category || ''} onChange={e => setEditForm({...editForm, category: e.target.value})} onKeyDown={handleKeyDown} />
-                                            {/* LEARN RULE OPTION */}
-                                            <label className="flex items-center gap-1 text-[10px] text-slate-500 cursor-pointer">
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={saveRule} 
-                                                    onChange={(e) => setSaveRule(e.target.checked)} 
-                                                    className="w-3 h-3 text-blue-600 rounded border-slate-300 focus:ring-0" 
-                                                />
-                                                <span>Apply to future "{editForm.notes?.substring(0, 15)}..."</span>
-                                            </label>
-                                        </div>
+                                        <input 
+                                            list="category-list" 
+                                            className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold text-slate-700" 
+                                            value={editForm.category || ''} 
+                                            onChange={e => setEditForm({...editForm, category: e.target.value})} 
+                                            onKeyDown={handleKeyDown} 
+                                            placeholder="Select or Type"
+                                            autoFocus
+                                        />
                                     ) : t.category}
                                 </td>
 
-                                {/* SubCat */}
+                                {/* SubCat (Combobox) */}
                                 <td className="px-6 py-3 text-slate-600">
                                     {isEditing ? (
-                                        <input className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" value={editForm.subCategory || ''} onChange={e => setEditForm({...editForm, subCategory: e.target.value})} onKeyDown={handleKeyDown} />
+                                        <input 
+                                            list="subcategory-list"
+                                            className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" 
+                                            value={editForm.subCategory || ''} 
+                                            onChange={e => setEditForm({...editForm, subCategory: e.target.value})} 
+                                            onKeyDown={handleKeyDown}
+                                            placeholder="Select or Type"
+                                        />
                                     ) : t.subCategory}
                                 </td>
 
-                                {/* Project */}
+                                {/* Project (Combobox) */}
                                 <td className="px-6 py-3 text-slate-600">
                                     {isEditing ? (
-                                        <input className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" value={editForm.project || ''} onChange={e => setEditForm({...editForm, project: e.target.value})} onKeyDown={handleKeyDown} />
+                                        <input 
+                                            list="project-list"
+                                            className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs" 
+                                            value={editForm.project || ''} 
+                                            onChange={e => setEditForm({...editForm, project: e.target.value})} 
+                                            onKeyDown={handleKeyDown}
+                                            placeholder="Select or Type"
+                                        />
                                     ) : (
                                         t.project && t.project !== 'None' ? (
                                             <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs border border-slate-200">{t.project}</span>
@@ -633,9 +673,8 @@ const DataTab = ({ data, onUpdate, onDelete }: DataTabProps) => {
                 )}
             </div>
             
-            <datalist id="cat-options">
-                {uniqueCategories.map(c => <option key={c} value={c} />)}
-            </datalist>
+            {/* INVISIBLE DATALISTS FOR DROPDOWNS */}
+            <Datalists />
 
             {/* Pagination */}
              <div className="flex flex-col sm:flex-row justify-between items-center pt-2 px-2 gap-4">

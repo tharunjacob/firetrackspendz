@@ -250,9 +250,9 @@ const DonutChartCard = ({ title, data, colors, formatCurrency }: { title: string
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
             <h3 className="text-lg font-bold text-slate-800 mb-4 text-center">{title}</h3>
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-3 items-center h-[350px]">
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-3 items-center min-h-[350px]">
                 {/* Chart Section (2/3 width on desktop, full on mobile) */}
-                <div className="col-span-1 md:col-span-2 h-full relative min-h-[250px]">
+                <div className="col-span-1 md:col-span-2 h-[250px] md:h-full relative">
                     {/* Absolute Center Text */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                         <span className="text-xl sm:text-2xl font-bold text-slate-800">{formatCurrency(total)}</span>
@@ -766,8 +766,9 @@ const CategoriesAnalysisTab = ({ data }: { data: Transaction[] }) => {
             
             {chartData.length > 0 ? (
                 <>
-                    <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 h-[500px]">
-                        <div className="xl:col-span-3 h-full">
+                    {/* Responsive Container: Stack on Mobile, Grid on Large Screens */}
+                    <div className="flex flex-col xl:grid xl:grid-cols-5 gap-6 xl:h-[500px]">
+                        <div className="xl:col-span-3 h-[400px] xl:h-full">
                             <h4 className="text-sm font-semibold text-slate-500 mb-4 text-center uppercase tracking-wide">{selectedType} Distribution (Stacked)</h4>
                              <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -789,7 +790,7 @@ const CategoriesAnalysisTab = ({ data }: { data: Transaction[] }) => {
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="xl:col-span-2 h-full">
+                        <div className="xl:col-span-2 h-[300px] xl:h-full">
                             <DonutChartCard 
                                 title={`${selectedType} Breakdown`} 
                                 data={chartData.map((d, i) => ({...d, fill: CATEGORY_PALETTE[i % CATEGORY_PALETTE.length]}))} 

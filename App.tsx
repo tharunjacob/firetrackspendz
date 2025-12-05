@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Transaction } from './types';
+import React, { useState, useEffect, useRef } from 'react';
+import { Transaction, FileJob } from './types';
 import Dashboard from './Dashboard';
 import { Icon } from './constants';
 import { loadFromStorage, saveToStorage, deleteFromStorage, resetApplicationData } from './services/storageService';
@@ -7,6 +7,7 @@ import { PricingPage, ContactPage, FeaturesPage, PrivacyPage, TermsPage } from '
 import { Navbar, Footer, Logo } from './components/Layout';
 import { FileUploaderSection } from './components/FileUploader';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { transformData, identifyInterAccountTransfers } from './services/transformer';
 
 // --- COMPONENTS ---
 
@@ -28,10 +29,14 @@ const Toast = ({ message, onClose }: { message: string, onClose: () => void }) =
 
 const LandingPage = ({ 
     setView, 
-    onUploadSuccess 
+    onStartAnalysis,
+    isProcessing,
+    progress
 }: { 
     setView: (v: string) => void, 
-    onUploadSuccess: (d: Transaction[]) => void 
+    onStartAnalysis: (jobs: FileJob[]) => void,
+    isProcessing: boolean,
+    progress: number
 }) => {
     const scrollToUpload = () => {
       const element = document.getElementById('upload-section');
@@ -65,7 +70,7 @@ const LandingPage = ({
 
             {/* Upload Section wrapped in ErrorBoundary */}
             <ErrorBoundary>
-                <FileUploaderSection onUploadSuccess={onUploadSuccess} />
+                <FileUploaderSection onStartAnalysis={onStartAnalysis} isProcessing={isProcessing} progress={progress} />
             </ErrorBoundary>
 
             {/* Features Grid */}
@@ -107,6 +112,10 @@ const App = () => {
   const [currentView, setCurrentView] = useState('home');
   const [toast, setToast] = useState<{message: string, visible: boolean}>({ message: '', visible: false });
 
+  // Processing State for background loading
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState(0);
+
   // Update Page Title based on View for SEO
   useEffect(() => {
       const titles: {[key: string]: string} = {
@@ -127,7 +136,6 @@ const App = () => {
   // Load data on start
   useEffect(() => {
     const init = async () => {
-        // 1. Check for Forced Reset Flag
         if (localStorage.getItem('FORCE_RESET') === 'true') {
             console.log("Force reset detected. Wiping database...");
             try {
@@ -138,8 +146,6 @@ const App = () => {
                 console.error("Force wipe failed:", e);
             }
         }
-
-        // 2. Normal Load
         try {
             const data = await loadFromStorage();
             if (data && data.length > 0) {
@@ -174,8 +180,67 @@ const App = () => {
     };
   }, []);
 
-  const handleUploadSuccess = (data: Transaction[]) => {
-    setTransactions(data);
+  // --- CORE PROCESSING LOGIC (LIFTED FROM UPLOADER) ---
+  const processFilesBatch = async (jobs: FileJob[]) => {
+    setIsProcessing(true);
+    setProcessingProgress(5); // Immediate start feedback
+    
+    // Start artificial ticker to move progress bar slowly
+    const interval = setInterval(() => {
+        setProcessingProgress(prev => {
+            if (prev >= 95) return prev; // Cap at 95% until actually done
+            return prev + 2; // Increment by 2%
+        });
+    }, 1000); // Every second
+
+    let processedTransactions: Transaction[] = transactions || [];
+    let completedJobs = 0;
+    const totalJobs = jobs.length;
+
+    try {
+        for (const job of jobs) {
+            try {
+                // Process one file
+                const result = await transformData(job.file, job.owner);
+                
+                if (result.transactions.length > 0) {
+                    // Append new transactions to existing set
+                    processedTransactions = [...processedTransactions, ...result.transactions];
+                    
+                    // Run logic to link transfers (important to do this incrementally so data is correct)
+                    const { transactions: cleaned } = identifyInterAccountTransfers(processedTransactions);
+                    processedTransactions = cleaned;
+
+                    // Update UI State immediately
+                    setTransactions(processedTransactions);
+                    
+                    // Save incrementally to storage to be safe
+                    saveToStorage(processedTransactions).catch(console.error);
+                }
+            } catch (err) {
+                console.error(`Error processing file ${job.file.name}:`, err);
+                showToast(`Failed to process ${job.file.name}`);
+            }
+
+            // Update Progress
+            completedJobs++;
+            const realPercentage = Math.round((completedJobs / totalJobs) * 100);
+            
+            // If real progress jumps ahead of fake progress, sync up. 
+            // If fake progress is ahead (because file took long), keep fake progress.
+            setProcessingProgress(prev => Math.max(prev, realPercentage));
+        }
+    } catch (e) {
+        console.error("Batch processing error", e);
+        showToast("An unexpected error occurred during processing.");
+    } finally {
+        clearInterval(interval);
+        // Ensure we hit 100% and finish properly
+        setProcessingProgress(100);
+        setTimeout(() => {
+            setIsProcessing(false);
+        }, 800); // Small delay to let user see 100%
+    }
   };
 
   const showToast = (msg: string) => {
@@ -277,11 +342,13 @@ const App = () => {
                             onClear={handleClearAll}
                             onBackup={handleBackup}
                             onRestore={handleRestore}
+                            isProcessing={isProcessing}
+                            processingProgress={processingProgress}
                         />
                     </div>
                 ) : (
                     <>
-                        {currentView === 'home' && <LandingPage setView={setCurrentView} onUploadSuccess={handleUploadSuccess} />}
+                        {currentView === 'home' && <LandingPage setView={setCurrentView} onStartAnalysis={processFilesBatch} isProcessing={isProcessing} progress={processingProgress} />}
                         {currentView === 'features' && <FeaturesPage setView={setCurrentView} />}
                         {currentView === 'pricing' && <PricingPage />}
                         {currentView === 'contact' && <ContactPage />}

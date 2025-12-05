@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai/web";
+import { GoogleGenAI } from "@google/genai";
 import { FileMapping } from '../types';
 
 // The API key must be obtained exclusively from the environment variable VITE_API_KEY.
@@ -6,7 +6,7 @@ import { FileMapping } from '../types';
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 if (!API_KEY) {
-  console.warn("Gemini API key not found. AI features will be disabled. Please set VITE_API_KEY in your .env file.");
+  console.warn("Gemini API key not found. AI features will be disabled. Please set VITE_API_KEY in your .env file or Vercel environment variables.");
 }
 
 // Initialize AI only if key exists to prevent immediate crash
@@ -226,24 +226,25 @@ export const suggestCategories = async (descriptions: string[]): Promise<Record<
 export const extractTransactionsFromPDF = async (base64Data: string): Promise<any[]> => {
   if (!ai || !API_KEY) return [];
   
+  // STRATEGY 2: Use Pipe-Delimited output instead of JSON to save tokens and speed up response time.
   const prompt = `
-    Analyze this bank statement PDF. Extract all financial transactions into a minified JSON array of arrays.
+    Analyze this bank statement PDF. Extract all financial transactions.
     
-    Output Format: [[date, description, raw_amount_string, type, category], ...]
+    Output Format: Pipe-delimited text. One transaction per line. Do NOT use JSON.
+    Pattern: Date|Description|RawAmount|Type|Category
     
     Columns:
-    0. Date (STRICTLY YYYY-MM-DD format, e.g. 2024-05-25. Convert from DD/MM/YYYY if needed.)
-    1. Description (String)
-    2. Raw Amount (String, exactly as shown in PDF, e.g. "+70.00", "1,200.00", "50.00 Dr")
-    3. Type ("Income" or "Expense")
-    4. Category (Suggested category, MAX 2 WORDS, e.g. "Food", "Transport", "Dining Out")
+    1. Date (YYYY-MM-DD format. Convert from DD/MM/YYYY if needed)
+    2. Description (Remove any '|' characters from description to avoid breaking format)
+    3. Raw Amount (Keep currency symbols and signs, e.g. "+70.00", "1,200.00", "50.00 Dr")
+    4. Type ("Income" or "Expense")
+    5. Category (Suggested category, MAX 2 WORDS, e.g. "Food", "Transport")
 
     Rules:
-    - Keep the amount exactly as shown (do not strip signs).
     - Ignore opening/closing balances.
-    - If the amount is a Credit, Refund, or has a '+' sign, mark type as 'Income'.
-    
-    Return ONLY the raw JSON array of arrays. No markdown.
+    - If the amount is a Credit, Refund, 'CR', or has a '+' sign, type is 'Income'.
+    - Do not output headers. Only data lines.
+    - No markdown code blocks.
   `;
 
   try {
@@ -254,24 +255,35 @@ export const extractTransactionsFromPDF = async (base64Data: string): Promise<an
       ]
     });
     
-    // Clean response
-    const rawText = cleanJSON(response.text);
-    const rawData = JSON.parse(rawText);
+    const rawText = response.text || "";
+    // Remove potential markdown blocks if AI forgets instruction
+    const cleanText = rawText.replace(/^```(csv|txt)?/, '').replace(/```$/, '').trim();
 
-    if (!Array.isArray(rawData)) return [];
+    if (!cleanText) return [];
 
-    // Map minified array back to objects for the app
-    return rawData.map((row: any[]) => {
-        const rawAmountStr = String(row[2]);
-        const description = String(row[1]);
+    const lines = cleanText.split('\n');
+    const transactions = [];
+
+    for (const line of lines) {
+        if (!line.trim()) continue;
+
+        const parts = line.split('|').map(p => p.trim());
         
+        // Basic validation: needs at least Date, Desc, Amount
+        if (parts.length < 3) continue;
+
+        const dateStr = parts[0];
+        const description = parts[1];
+        const rawAmountStr = parts[2];
+        let type = parts[3] || 'Expense'; // Default to Expense if missing
+        const category = parts[4] || 'Unclassified';
+
         // Clean numeric amount
         let amount = parseFloat(rawAmountStr.replace(/[^0-9.]/g, ''));
-        
+
         // --- DETERMINISTIC POST-PROCESSING ---
         // AI can be stubborn with credit card positive/negative logic.
         // 1. Check for explicit signs in the amount string
-        let type = row[3];
         
         if (rawAmountStr.includes('+') || rawAmountStr.toLowerCase().includes('cr') || rawAmountStr.toLowerCase().includes('credit')) {
             type = 'Income';
@@ -286,15 +298,18 @@ export const extractTransactionsFromPDF = async (base64Data: string): Promise<an
                 type = 'Income';
             }
         }
-        
-        return {
-            date: row[0],
+
+        transactions.push({
+            date: dateStr,
             description: description,
             amount: isNaN(amount) ? 0 : amount,
             type: type,
-            category: row[4] || 'Unclassified'
-        };
-    });
+            category: category
+        });
+    }
+
+    return transactions;
+
   } catch (e) {
     console.error("PDF Extraction Error", e);
     return [];

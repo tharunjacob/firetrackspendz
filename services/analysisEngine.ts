@@ -1,4 +1,3 @@
-
 import { Transaction } from '../types';
 
 export interface RecurringTransaction {
@@ -185,7 +184,7 @@ export const getDeepInsights = (data: Transaction[]): DeepInsight[] => {
     smallTxns.forEach(t => {
         // Simple normalization
         const name = t.notes || t.subCategory || t.category;
-        const key = name.toLowerCase().trim();
+        const key = name.toLowerCase().replace(/[^a-z0-9]/g, '').trim().substring(0, 15);
         merchantCounts.set(key, (merchantCounts.get(key) || 0) + 1);
         merchantSums.set(key, (merchantSums.get(key) || 0) + t.amount);
     });
@@ -201,10 +200,12 @@ export const getDeepInsights = (data: Transaction[]): DeepInsight[] => {
 
     if (maxCount > 5) {
         const totalLeak = merchantSums.get(topMerchant) || 0;
+        // Prettify key
+        const displayMerchant = topMerchant.charAt(0).toUpperCase() + topMerchant.slice(1);
         insights.push({
             title: "The Latte Factor",
             value: `${maxCount}x`,
-            description: `You visited '${topMerchant}' ${maxCount} times recently, spending a total of ${Math.round(totalLeak)}. Small drips sink ships!`,
+            description: `You visited '${displayMerchant}' ${maxCount} times recently, spending a total of ${Math.round(totalLeak)}. Small drips sink ships!`,
             trend: 'neutral'
         });
     } else {
@@ -233,64 +234,120 @@ export const getDeepInsights = (data: Transaction[]): DeepInsight[] => {
     return insights;
 };
 
-// --- 3. RECURRING BILL DETECTION (Existing, slightly refined) ---
+// --- 3. RECURRING BILL DETECTION (Improved for accuracy) ---
 export const detectRecurring = (data: Transaction[]): RecurringTransaction[] => {
-    // Group by amount (fuzzy) + description (fuzzy)
+    // 1. FILTERING: Only Expenses.
     const expenses = data.filter(t => t.type === 'Expense');
-    const potentialRecurring = new Map<string, Date[]>();
+    
+    // 2. CONFIG: Categories that are usually "Habits" (Variable) vs "Subscriptions" (Fixed)
+    // We will IGNORE these categories unless the description contains a "subscription keyword".
+    const HABIT_CATEGORIES = new Set(['food', 'dining', 'groceries', 'shopping', 'transport', 'fuel', 'clothing', 'general']);
+    
+    // Keywords that force a check even if it's in a Habit Category (e.g. "Amazon Prime" in Shopping)
+    const SUB_KEYWORDS = ['subscription', 'membership', 'premium', 'plan', 'bill', 'insurance', 'policy', 'fiber', 'internet', 'broadband', 'mobile', 'postpaid', 'electricity', 'water', 'gas', 'rent', 'maintenance', 'emi', 'loan', 'netflix', 'spotify', 'prime', 'hotstar', 'youtube', 'apple', 'icloud', 'drive'];
+
+    const potentialRecurring = new Map<string, { date: Date, amount: number, originalName: string }[]>();
     
     expenses.forEach(t => {
-        // Key: Cleaned Description + Rounded Amount (to nearest 10)
-        const cleanDesc = (t.notes || t.subCategory).toLowerCase().replace(/[0-9]/g, '').trim().substring(0, 15);
-        if (!cleanDesc) return;
-        const roundedAmt = Math.round(t.amount / 10) * 10;
-        const key = `${cleanDesc}_${roundedAmt}`;
+        const descLower = (t.notes || t.subCategory || t.category).toLowerCase();
+        const catLower = t.category.toLowerCase();
         
-        if (!potentialRecurring.has(key)) potentialRecurring.set(key, []);
-        potentialRecurring.get(key)!.push(new Date(t.date));
+        // Skip habit categories unless they look like subscriptions
+        if (HABIT_CATEGORIES.has(catLower)) {
+            const hasKeyword = SUB_KEYWORDS.some(k => descLower.includes(k));
+            if (!hasKeyword) return;
+        }
+
+        // Clean Name: "Netflix 123" -> "netflix"
+        // We keep the original name to display nicely later
+        const cleanKey = descLower
+            .replace(/[0-9]/g, '') 
+            .replace(/[^a-z\s]/g, ' ')
+            .trim()
+            .replace(/\s+/g, ' ');
+            
+        if (!cleanKey || cleanKey.length < 3) return;
+        
+        if (!potentialRecurring.has(cleanKey)) potentialRecurring.set(cleanKey, []);
+        potentialRecurring.get(cleanKey)!.push({ 
+            date: new Date(t.date), 
+            amount: t.amount,
+            originalName: t.notes || t.category
+        });
     });
 
     const results: RecurringTransaction[] = [];
 
-    potentialRecurring.forEach((dates, key) => {
-        if (dates.length >= 2) { // Relaxed to 2 for better visibility, sort by confidence later
-            dates.sort((a, b) => a.getTime() - b.getTime());
+    potentialRecurring.forEach((entries, key) => {
+        // REQUIREMENT: Must have at least 3 occurrences to be a "Commitment", OR 2 if they are identical amounts.
+        if (entries.length < 2) return;
+
+        // Sort by date ascending
+        entries.sort((a, b) => a.date.getTime() - b.date.getTime());
+        
+        // Calc intervals
+        const intervals = [];
+        for (let i = 1; i < entries.length; i++) {
+            const diffTime = Math.abs(entries[i].date.getTime() - entries[i - 1].date.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            if (diffDays > 0) intervals.push(diffDays); 
+        }
+
+        if (intervals.length === 0) return;
+
+        const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+        
+        // Variance (Time)
+        const mean = avgInterval;
+        const variance = intervals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / intervals.length;
+        const stdDevDays = Math.sqrt(variance);
+
+        // FREQUENCY BUCKETS (Strict)
+        // Weekly: ~7 days | Bi-Weekly: ~14 days | Monthly: ~28-31 days | Quarterly: ~90 days | Yearly: ~365 days
+        const isWeekly = Math.abs(avgInterval - 7) < 2;
+        const isBiWeekly = Math.abs(avgInterval - 14) < 3;
+        const isMonthly = Math.abs(avgInterval - 30.5) < 4; 
+        const isQuarterly = Math.abs(avgInterval - 91) < 5;
+        const isYearly = Math.abs(avgInterval - 365) < 10;
+
+        if (!isWeekly && !isBiWeekly && !isMonthly && !isQuarterly && !isYearly) return;
+
+        // AMOUNT CONSISTENCY CHECK
+        // Subscriptions usually have identical amounts. Utilities vary slightly.
+        const amounts = entries.map(e => e.amount);
+        const avgAmt = amounts.reduce((a, b) => a + b, 0) / amounts.length;
+        const amtVariance = amounts.reduce((a, b) => a + Math.pow(b - avgAmt, 2), 0) / amounts.length;
+        const amtStdDev = Math.sqrt(amtVariance);
+        const amtVariationPercent = (amtStdDev / avgAmt);
+
+        // Rules:
+        // 1. If it's a "Subscription" (Netflix), amount variation should be near zero (< 5%).
+        // 2. If it's a "Utility" (Electric), amount variation can be higher (< 50%).
+        // 3. Time consistency must always be high (stdDevDays < 5 for monthly/weekly).
+
+        const isUtilityKeywords = ['bill', 'electricity', 'water', 'gas', 'mobile', 'postpaid'].some(k => key.includes(k));
+        
+        const strictAmountLimit = isUtilityKeywords ? 0.5 : 0.05; // 50% var for utilities, 5% for others
+
+        // STRICT FILTER:
+        if (stdDevDays < 5 && amtVariationPercent <= strictAmountLimit) {
             
-            // Calculate intervals
-            const intervals = [];
-            for (let i = 1; i < dates.length; i++) {
-                const diffTime = Math.abs(dates[i].getTime() - dates[i - 1].getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                intervals.push(diffDays);
+            // Final Sanity Check: If count is only 2, ensure strictly identical amounts or strictly monthly
+            if (entries.length === 2) {
+                if (amtVariationPercent > 0.01 && !isUtilityKeywords) return; // Must be identical amount if only 2 data points
             }
 
-            const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-            
-            // Standard Deviation
-            const mean = avgInterval;
-            const variance = intervals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / intervals.length;
-            const stdDev = Math.sqrt(variance);
+            // Capitalize Name
+            const words = key.split(' ');
+            const name = words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-            // Logic: Must be roughly monthly (25-35) or yearly (360-370) or weekly (6-8)
-            // And low variance
-            const isMonthly = avgInterval > 25 && avgInterval < 35;
-            const isYearly = avgInterval > 350 && avgInterval < 380;
-            const isWeekly = avgInterval > 6 && avgInterval < 8;
-
-            if ((isMonthly || isYearly || isWeekly) && stdDev < 5) {
-                const parts = key.split('_');
-                // Capitalize Name
-                const rawName = parts[0];
-                const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
-
-                results.push({
-                    name: name || 'Subscription',
-                    avgAmount: parseInt(parts[1]),
-                    frequency: Math.round(avgInterval),
-                    confidence: 100 - (stdDev * 5),
-                    lastDate: dates[dates.length - 1].toISOString().split('T')[0]
-                });
-            }
+            results.push({
+                name: name,
+                avgAmount: Math.round(avgAmt),
+                frequency: Math.round(avgInterval),
+                confidence: 100 - (stdDevDays * 5) - (amtVariationPercent * 100),
+                lastDate: entries[entries.length - 1].date.toISOString().split('T')[0]
+            });
         }
     });
 

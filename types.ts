@@ -27,6 +27,11 @@ export interface FileWithOwner {
   owner: string;
 }
 
+export interface FileJob {
+  file: File;
+  owner: string;
+}
+
 export interface FileMapping {
   dateColumn: string;
   dateFormat?: string;
