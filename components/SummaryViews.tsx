@@ -768,27 +768,29 @@ const CategoriesAnalysisTab = ({ data }: { data: Transaction[] }) => {
                 <>
                     {/* Responsive Container: Stack on Mobile, Grid on Large Screens */}
                     <div className="flex flex-col xl:grid xl:grid-cols-5 gap-6 xl:h-[500px]">
-                        <div className="xl:col-span-3 h-[400px] xl:h-full">
-                            <h4 className="text-sm font-semibold text-slate-500 mb-4 text-center uppercase tracking-wide">{selectedType} Distribution (Stacked)</h4>
-                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                    <XAxis type="number" tickFormatter={formatCurrency} tick={{ fill: '#475569', fontSize: 12 }} />
-                                    <YAxis type="category" dataKey="name" width={140} tick={{ fill: '#475569', fontSize: 12 }} interval={0} />
-                                    <Tooltip content={<CategoryStackedTooltip formatCurrency={formatCurrency} />} cursor={{fill: '#f1f5f9'}} />
-                                    {[0, 1, 2, 3, 4, 5].map(i => (
-                                        <Bar key={i} dataKey={`sub${i}`} stackId="a">
-                                            {chartData.map((entry: any, index: number) => (
-                                                <Cell 
-                                                    key={`cell-${index}-${i}`} 
-                                                    fill={entry[`subColor${i}`]} 
-                                                    fillOpacity={entry[`subOpacity${i}`]} 
-                                                />
-                                            ))}
-                                        </Bar>
-                                    ))}
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <div className="xl:col-span-3 h-[400px] xl:h-full overflow-hidden flex flex-col">
+                            <h4 className="text-sm font-semibold text-slate-500 mb-4 text-center uppercase tracking-wide flex-shrink-0">{selectedType} Distribution (Stacked)</h4>
+                            <div className="flex-1 min-h-0">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                        <XAxis type="number" tickFormatter={formatCurrency} tick={{ fill: '#475569', fontSize: 12 }} />
+                                        <YAxis type="category" dataKey="name" width={140} tick={{ fill: '#475569', fontSize: 12 }} interval={0} />
+                                        <Tooltip content={<CategoryStackedTooltip formatCurrency={formatCurrency} />} cursor={{fill: '#f1f5f9'}} />
+                                        {[0, 1, 2, 3, 4, 5].map(i => (
+                                            <Bar key={i} dataKey={`sub${i}`} stackId="a">
+                                                {chartData.map((entry: any, index: number) => (
+                                                    <Cell 
+                                                        key={`cell-${index}-${i}`} 
+                                                        fill={entry[`subColor${i}`]} 
+                                                        fillOpacity={entry[`subOpacity${i}`]} 
+                                                    />
+                                                ))}
+                                            </Bar>
+                                        ))}
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
                         <div className="xl:col-span-2 h-[300px] xl:h-full">
                             <DonutChartCard 
