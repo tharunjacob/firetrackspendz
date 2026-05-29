@@ -6,6 +6,7 @@ import { logEvent, EVENTS } from '@/services/logger';
 import { LIMITS } from '@/config/storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPlanAtLeast } from '@/config/plans';
+import { isCloudEnabled } from '@/services/supabase';
 
 interface FileRow {
   id: string;
@@ -24,7 +25,7 @@ interface FileUploaderProps {
 }
 
 export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUploaderProps) => {
-  const { plan } = useAuth();
+  const { plan, userId, setIsAuthOpen } = useAuth();
   const maxFileSize = isPlanAtLeast(plan, 'pro') ? LIMITS.MAX_FILE_SIZE_PRO : LIMITS.MAX_FILE_SIZE_FREE;
 
   const [rows, setRows] = useState<FileRow[]>([
@@ -104,6 +105,15 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
       .map(r => ({ file: r.file!, owner: r.owner.trim(), password: r.needsPassword ? r.password : undefined }));
 
     if (jobs.length === 0) return;
+
+    // PDF processing requires a session (goes through the AI proxy edge function).
+    // Prompt sign-in instead of letting it fail silently mid-upload.
+    const hasPdf = jobs.some(j => j.file.name.toLowerCase().endsWith('.pdf'));
+    if (hasPdf && !userId && isCloudEnabled()) {
+      setIsAuthOpen(true);
+      return;
+    }
+
     logEvent(EVENTS.UPLOAD_ANALYSIS_STARTED, {
       fileCount: jobs.length,
       fileNames: jobs.map(j => j.file.name),
