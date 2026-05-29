@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
+Sitemap: https://trackspendz.com/sitemap.xml

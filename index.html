@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta -->
+    <title>TrackSpendZ — Track Expenses, Build Wealth, Reach FIRE</title>
+    <meta name="description" content="Upload bank statements, get AI-powered expense categorization, track your net worth, and plan your path to financial independence. Free to start. Works with any bank." />
+    <meta name="keywords" content="expense tracker, personal finance, FIRE calculator, net worth tracker, budget tracker, bank statement upload, financial independence, money management" />
+    <meta name="author" content="TrackSpendZ" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://trackspendz.com/" />
+    <meta property="og:title" content="TrackSpendZ — Track Expenses, Build Wealth, Reach FIRE" />
+    <meta property="og:description" content="Upload bank statements, get AI-powered expense categorization, track your net worth, and plan your path to financial independence." />
+    <meta property="og:image" content="https://trackspendz.com/og-image.png" />
+    <meta property="og:site_name" content="TrackSpendZ" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://trackspendz.com/" />
+    <meta name="twitter:title" content="TrackSpendZ — Track Expenses, Build Wealth, Reach FIRE" />
+    <meta name="twitter:description" content="Upload bank statements, get AI-powered expense categorization, track your net worth, and plan your path to financial independence." />
+    <meta name="twitter:image" content="https://trackspendz.com/og-image.png" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://trackspendz.com/" />
+
+    <!-- PWA -->
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Structured Data: SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "TrackSpendZ",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Personal finance tool with AI-powered expense categorization, FIRE calculator, net worth tracking, and budget management."
+    }
+    </script>
+
+    <!-- Structured Data: Organization (Knowledge Graph eligibility) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "TrackSpendZ",
+      "url": "https://trackspendz.com",
+      "logo": "https://trackspendz.com/icons/icon-512.png",
+      "description": "Personal finance platform with AI-powered expense categorization, FIRE calculator, and net worth tracking.",
+      "foundingDate": "2025",
+      "sameAs": []
+    }
+    </script>
+
+    <!-- Structured Data: BreadcrumbList (improved URL display in SERPs) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://trackspendz.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Features", "item": "https://trackspendz.com/features" },
+        { "@type": "ListItem", "position": 3, "name": "Pricing", "item": "https://trackspendz.com/pricing" },
+        { "@type": "ListItem", "position": 4, "name": "Help", "item": "https://trackspendz.com/help" },
+        { "@type": "ListItem", "position": 5, "name": "FIRE Calculator", "item": "https://trackspendz.com/tools/fire-calculator" },
+        { "@type": "ListItem", "position": 6, "name": "Savings Rate Calculator", "item": "https://trackspendz.com/tools/savings-rate" }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: FAQPage (for pricing page SEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is TrackSpendZ free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes! TrackSpendZ has a free forever plan with up to 500 transactions, basic categorization, and local storage. Pro features start at $49/year." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which banks does TrackSpendZ support?",
+          "acceptedAnswer": { "@type": "Answer", "text": "TrackSpendZ works with any bank. Simply download your statement as CSV, Excel, or PDF and upload it. Our AI automatically detects and categorizes transactions." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my financial data safe?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Your data is encrypted at rest and in transit. Free users store data locally on their device. Pro users get encrypted cloud sync with row-level security." }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://generativelanguage.googleapis.com" />
+  </head>
+  <body class="bg-slate-50">
+    <!-- Noscript fallback for crawlers -->
+    <noscript>
+      <div style="padding:2rem;text-align:center;font-family:system-ui">
+        <h1>TrackSpendZ — Personal Finance & FIRE Calculator</h1>
+        <p>Upload bank statements, track expenses, calculate your path to financial independence.</p>
+        <p>This application requires JavaScript to run. Please enable JavaScript in your browser.</p>
+        <nav>
+          <a href="/features">Features</a> |
+          <a href="/pricing">Pricing</a> |
+          <a href="/privacy">Privacy</a> |
+          <a href="/terms">Terms</a>
+        </nav>
+      </div>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

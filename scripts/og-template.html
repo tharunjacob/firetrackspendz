@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!--
+  OG Image Template — TrackSpendZ
+  ==================================
+  Screenshot this page at exactly 1200x630px and save as public/og-image.png.
+
+  Steps:
+    1. Open this file in Chrome (File > Open File...)
+    2. Open DevTools (F12) → toggle Device Toolbar (Ctrl+Shift+M)
+    3. Set dimensions to 1200 x 630, Device Pixel Ratio = 1
+    4. Right-click the page → "Capture screenshot" (or use a screenshot tool)
+    5. Save the result as: public/og-image.png
+
+  Or use the npm script (requires puppeteer):
+    npm run generate:og
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1200" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #ffffff;
+      display: flex;
+    }
+
+    /* Left accent bar */
+    .accent {
+      width: 12px;
+      background: #4f46e5;
+      flex-shrink: 0;
+    }
+
+    /* Main content */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 56px 64px;
+      background: #ffffff;
+      position: relative;
+    }
+
+    /* Background subtle grid */
+    .content::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(79, 70, 229, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 70, 229, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Brand logo row */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 36px;
+      position: relative;
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+      background: #4f46e5;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo-text {
+      font-size: 32px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span { color: #4f46e5; }
+
+    /* Main headline */
+    h1 {
+      font-size: 58px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: #4f46e5;
+    }
+
+    /* Tagline */
+    .tagline {
+      font-size: 24px;
+      color: #64748b;
+      font-weight: 400;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    /* Feature pills */
+    .pills {
+      display: flex;
+      gap: 12px;
+      position: relative;
+    }
+
+    .pill {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 15px;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .pill.highlight {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+      color: #4f46e5;
+    }
+
+    /* Right side decorative chart mockup */
+    .right-panel {
+      width: 340px;
+      flex-shrink: 0;
+      background: #f8fafc;
+      border-left: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 36px;
+      gap: 16px;
+    }
+
+    .mock-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .mock-label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .mock-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .mock-value.green { color: #16a34a; }
+    .mock-value.red { color: #dc2626; }
+
+    .mock-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .mock-bar-fill {
+      height: 100%;
+      background: #4f46e5;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="accent"></div>
+
+  <div class="content">
+    <div class="brand">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+          <path d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
+        </svg>
+      </div>
+      <div class="logo-text">Track<span>SpendZ</span></div>
+    </div>
+
+    <h1>See exactly where<br>your <em>money goes</em></h1>
+    <p class="tagline">Upload any bank statement. AI does the rest.</p>
+
+    <div class="pills">
+      <div class="pill highlight">Free to start</div>
+      <div class="pill">Works with any bank</div>
+      <div class="pill">AI-powered</div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="mock-card">
+      <div class="mock-label">This Month</div>
+      <div class="mock-value red">−$2,840</div>
+      <div class="mock-bar"><div class="mock-bar-fill" style="width:71%"></div></div>
+    </div>
+    <div class="mock-card">
+      <div class="mock-label">Savings Rate</div>
+      <div class="mock-value green">+28.4%</div>
+      <div class="mock-bar"><div class="mock-bar-fill" style="width:28%; background:#16a34a"></div></div>
+    </div>
+    <div class="mock-card">
+      <div class="mock-label">FIRE Number</div>
+      <div class="mock-value" style="color:#4f46e5">$840K</div>
+      <div class="mock-bar"><div class="mock-bar-fill" style="width:44%; background:#4f46e5"></div></div>
+    </div>
+  </div>
+</body>
+</html>

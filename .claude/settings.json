@@ -1,0 +1,49 @@
+{
+  "project": {
+    "name": "TrackSpendZ v2",
+    "type": "web-app",
+    "language": "typescript",
+    "framework": "react",
+    "buildTool": "vite"
+  },
+  "context": {
+    "entryFiles": [
+      "CLAUDE.md",
+      "ARCHITECTURE.md",
+      "SETUP.md",
+      "CHANGELOG.md"
+    ],
+    "importantPaths": [
+      "src/types/index.ts",
+      "src/config/",
+      "src/contexts/",
+      "src/services/transformer.ts",
+      "src/services/learningRules.ts",
+      "src/services/analysis.ts",
+      "src/services/gemini.ts",
+      "src/components/dashboard/DashboardShell.tsx"
+    ]
+  },
+  "conventions": {
+    "naming": {
+      "components": "PascalCase",
+      "services": "camelCase functions, no classes",
+      "types": "PascalCase interfaces",
+      "constants": "UPPER_SNAKE_CASE"
+    },
+    "imports": {
+      "pathAlias": "@/ maps to src/",
+      "configStrings": "Always import from src/config/ — never hardcode route paths, table names, localStorage keys, or plan names"
+    },
+    "stateManagement": {
+      "preferred": "useAuth(), useData(), useUI() — specific context hooks",
+      "legacy": "useApp() — compatibility wrapper combining all 3 contexts"
+    },
+    "errorHandling": "Always log with [FileName] prefix. Never empty catch. Use getUserMessage() from utils/errors.ts",
+    "styling": "Tailwind CSS utility classes. Brand color: indigo. See tailwind.config.js"
+  },
+  "testing": {
+    "framework": "none — tests not yet set up",
+    "recommendation": "Vitest + React Testing Library"
+  }
+}
