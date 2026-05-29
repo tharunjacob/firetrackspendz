@@ -36,11 +36,20 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
       };
       if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
 
-      const res = await fetch(SUPABASE_FUNCTIONS_URL, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ action: 'generate', payload }),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 s max
+
+      let res: Response;
+      try {
+        res = await fetch(SUPABASE_FUNCTIONS_URL, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ action: 'generate', payload }),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -65,11 +74,19 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
   const body: Record<string, unknown> = { contents: payload.contents };
   if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  const devController = new AbortController();
+  const devTimeoutId = setTimeout(() => devController.abort(), 20000);
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: devController.signal,
+    });
+  } finally {
+    clearTimeout(devTimeoutId);
+  }
   if (!res.ok) throw new Error(`Gemini API error ${res.status}`);
   const data = await res.json();
   return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
