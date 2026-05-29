@@ -61,8 +61,7 @@ export const formatCompact = (value: number, currency: Currency): string => {
 
 // Chart colors
 export const COLORS = {
-  brand: '#4f46e5',
-  purple: '#8b5cf6',
+  brand: '#2563eb',
   income: {
     light: '#A8D8A8',
     medium: '#78B482',

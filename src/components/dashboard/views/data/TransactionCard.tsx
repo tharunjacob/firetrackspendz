@@ -34,7 +34,7 @@ export const TransactionCard = ({
     <div className="flex-1 min-w-0">
       <div className="flex justify-between items-center mb-0.5">
         <span className="text-xs text-slate-500 dark:text-slate-400">{t.date}</span>
-        <span className={`text-sm font-semibold ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-blue-500'}`}>
+        <span className={`text-sm font-semibold ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
           {formatAmount(t.amount, currency)}
         </span>
       </div>
@@ -48,7 +48,7 @@ export const TransactionCard = ({
           onClose={onCloseCategory}
           onChange={onInlineCategoryChange}
         />
-        <span className={`text-xs font-medium ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-blue-500'}`}>
+        <span className={`text-xs font-medium ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
           {t.type}
         </span>
       </div>

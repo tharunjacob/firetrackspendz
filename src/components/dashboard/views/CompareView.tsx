@@ -169,7 +169,7 @@ export const CompareView = ({ data }: { data?: Transaction[] }) => {
                 setPeriod2(newOptions.length > 0 ? newOptions[0] : '');
                 setExpandedCategories([]);
               }}
-              className="px-3 py-1.5 bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded-md text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded-md text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option>Yearly</option>
               <option>Monthly</option>
@@ -178,12 +178,12 @@ export const CompareView = ({ data }: { data?: Transaction[] }) => {
         </div>
 
         {/* Period Selectors */}
-        <div className="flex items-center justify-center gap-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
-          <select value={period1} onChange={e => setPeriod1(e.target.value)} className="px-4 py-2 bg-white dark:bg-slate-700 border border-blue-200 dark:border-blue-700 rounded-lg font-medium text-slate-700 dark:text-slate-200 shadow-sm">
+        <div className="flex items-center justify-center gap-4 bg-brand-50 dark:bg-brand-900/20 p-4 rounded-xl border border-brand-100 dark:border-brand-800">
+          <select value={period1} onChange={e => setPeriod1(e.target.value)} className="px-4 py-2 bg-white dark:bg-slate-700 border border-brand-200 dark:border-brand-700 rounded-lg font-medium text-slate-700 dark:text-slate-200 shadow-sm">
             {options.map(o => <option key={`p1-${o}`} value={o}>{formatLabel(o)}</option>)}
           </select>
-          <span className="text-blue-400 font-bold text-xl">VS</span>
-          <select value={period2} onChange={e => setPeriod2(e.target.value)} className="px-4 py-2 bg-white dark:bg-slate-700 border border-blue-200 dark:border-blue-700 rounded-lg font-medium text-slate-700 dark:text-slate-200 shadow-sm">
+          <span className="text-brand-400 font-bold text-xl">VS</span>
+          <select value={period2} onChange={e => setPeriod2(e.target.value)} className="px-4 py-2 bg-white dark:bg-slate-700 border border-brand-200 dark:border-brand-700 rounded-lg font-medium text-slate-700 dark:text-slate-200 shadow-sm">
             {options.map(o => <option key={`p2-${o}`} value={o}>{formatLabel(o)}</option>)}
           </select>
         </div>

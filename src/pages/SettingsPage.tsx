@@ -85,7 +85,7 @@ const SettingsPage = () => {
             <span className="text-slate-500 dark:text-slate-400">Plan</span>
             <span className={`font-bold px-2 py-0.5 rounded text-xs ${
               plan === 'pro' ? 'bg-brand-100 text-brand-700' :
-              plan === 'enterprise' ? 'bg-purple-100 text-purple-700' :
+              plan === 'enterprise' ? 'bg-brand-100 text-brand-700' :
               'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
             }`}>
               {plan.charAt(0).toUpperCase() + plan.slice(1)}

@@ -15,13 +15,13 @@ const ctx = canvas.getContext('2d');
 ctx.fillStyle = '#ffffff';
 ctx.fillRect(0, 0, W, H);
 
-// Left accent bar (brand indigo)
-ctx.fillStyle = '#4f46e5';
+// Left accent bar (brand — Classic Blue)
+ctx.fillStyle = '#2563eb';
 ctx.fillRect(0, 0, 12, H);
 
 // Top gradient band
 const grad = ctx.createLinearGradient(0, 0, W, 0);
-grad.addColorStop(0, '#eef2ff');   // indigo-50
+grad.addColorStop(0, '#eff6ff');   // brand-50
 grad.addColorStop(1, '#ffffff');
 ctx.fillStyle = grad;
 ctx.fillRect(12, 0, W - 12, 160);
@@ -32,7 +32,7 @@ ctx.font = 'bold 80px sans-serif';
 ctx.fillText('TrackSpendZ', 72, 108);
 
 // Accent dot on the Z
-ctx.fillStyle = '#4f46e5';
+ctx.fillStyle = '#2563eb';
 ctx.beginPath();
 ctx.arc(W - 80, 80, 18, 0, Math.PI * 2);
 ctx.fill();
@@ -79,7 +79,7 @@ features.forEach(f => {
 });
 
 // Bottom strip
-ctx.fillStyle = '#4f46e5';
+ctx.fillStyle = '#2563eb';
 ctx.fillRect(0, H - 80, W, 80);
 
 // Bottom text
@@ -89,7 +89,7 @@ ctx.fillText('Free to start  ·  Works with any bank  ·  AI-powered insights', 
 
 // URL hint (right-aligned)
 ctx.font = '24px sans-serif';
-ctx.fillStyle = '#c7d2fe';         // indigo-200
+ctx.fillStyle = '#bfdbfe';         // brand-200
 const urlText = 'trackspendz.com';
 const urlW = ctx.measureText(urlText).width;
 ctx.fillText(urlText, W - urlW - 60, H - 28);

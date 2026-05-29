@@ -30,16 +30,16 @@ export const FeedbackTab = ({ feedbackItems, resolveFeedback }: Props) => {
         <div key={fb.id} className={`card p-4 border-l-4 ${
           fb.status === 'resolved' ? 'border-l-green-400 opacity-60' :
           fb.category === 'bug' ? 'border-l-red-400' :
-          fb.category === 'feature' ? 'border-l-purple-400' :
-          'border-l-blue-400'
+          fb.category === 'feature' ? 'border-l-brand-400' :
+          'border-l-brand-400'
         }`}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
                   fb.category === 'bug' ? 'bg-red-50 text-red-600' :
-                  fb.category === 'feature' ? 'bg-purple-50 text-purple-600' :
-                  fb.category === 'question' ? 'bg-blue-50 text-blue-600' :
+                  fb.category === 'feature' ? 'bg-brand-50 text-brand-600' :
+                  fb.category === 'question' ? 'bg-brand-50 text-brand-600' :
                   'bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                 }`}>{fb.category}</span>
                 <span className={`text-xs font-medium ${fb.status === 'open' ? 'text-amber-600' : 'text-green-600'}`}>

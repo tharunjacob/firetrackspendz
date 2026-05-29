@@ -33,8 +33,8 @@ const categoriseEvent = (event: string): EventCategory => {
 };
 
 const CATEGORY_STYLES: Record<EventCategory, { dot: string; icon: string; label: string }> = {
-  auth:    { dot: 'bg-blue-500',   icon: 'ðŸ”', label: 'Auth' },
-  upload:  { dot: 'bg-purple-500', icon: 'ðŸ“¤', label: 'Upload' },
+  auth:    { dot: 'bg-brand-500',   icon: 'ðŸ”', label: 'Auth' },
+  upload:  { dot: 'bg-brand-500', icon: 'ðŸ“¤', label: 'Upload' },
   feature: { dot: 'bg-teal-500',   icon: 'âœ¨', label: 'Feature' },
   error:   { dot: 'bg-red-500',    icon: 'âš ï¸', label: 'Error' },
   admin:   { dot: 'bg-amber-500',  icon: 'ðŸ›¡ï¸', label: 'Admin' },
@@ -230,7 +230,7 @@ export const UserDetailPanel = ({
                   <td className="px-3 py-2">
                     <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${
                       t.type === 'Income' ? 'bg-green-100 text-green-700' :
-                      t.type === 'Transfer' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'
+                      t.type === 'Transfer' ? 'bg-brand-100 text-brand-700' : 'bg-red-100 text-red-700'
                     }`}>{t.type}</span>
                   </td>
                   <td className="px-3 py-2 text-right font-mono">{t.amount?.toLocaleString()}</td>
@@ -286,7 +286,7 @@ export const UserDetailPanel = ({
             Mimic This User
           </button>
           <button onClick={() => { setLogSearch(selectedUser.email || ''); setActiveTab('logs'); }}
-            className="text-sm px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium">
+            className="text-sm px-4 py-2 bg-brand-50 text-brand-700 rounded-lg hover:bg-brand-100 font-medium">
             View All Logs
           </button>
         </div>

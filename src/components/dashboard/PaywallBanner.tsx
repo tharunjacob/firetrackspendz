@@ -69,10 +69,10 @@ export const PaywallBanner = ({ totalCount, visibleCount, transactions = [], var
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6 shadow-sm animate-fade-in">
+    <div className="bg-white dark:bg-slate-800 border border-brand-200 dark:border-brand-800 rounded-xl p-4 mb-6 shadow-sm animate-fade-in">
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center shrink-0">
-          <Icon name="shield" className="w-4 h-4 text-blue-600" />
+        <div className="w-8 h-8 bg-brand-100 dark:bg-brand-900/40 rounded-lg flex items-center justify-center shrink-0">
+          <Icon name="shield" className="w-4 h-4 text-brand-600" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm text-slate-700 dark:text-slate-200">
@@ -87,7 +87,7 @@ export const PaywallBanner = ({ totalCount, visibleCount, transactions = [], var
         </div>
         <button
           onClick={handleCta}
-          className="shrink-0 text-sm font-semibold text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+          className="shrink-0 text-sm font-semibold text-brand-600 dark:text-brand-400 border border-brand-300 dark:border-brand-700 px-4 py-2 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors"
         >
           {ctaLabel}
         </button>

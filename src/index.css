@@ -61,6 +61,6 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-brand-600 to-violet-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent;
   }
 }

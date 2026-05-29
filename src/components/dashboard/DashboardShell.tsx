@@ -250,7 +250,7 @@ export const DashboardShell = () => {
   return (
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 overflow-hidden relative">
       {import.meta.env.DEV && devPlan && (
-        <div className="flex-shrink-0 bg-purple-500 text-white px-4 py-1 text-xs font-bold text-center">
+        <div className="flex-shrink-0 bg-brand-500 text-white px-4 py-1 text-xs font-bold text-center">
           DEV MODE — Plan: {devPlan} | <a href="?dev_plan=free" className="underline">free</a> · <a href="?dev_plan=pro" className="underline">pro</a> · <a href="?dev_plan=enterprise" className="underline">enterprise</a>
         </div>
       )}
@@ -288,7 +288,7 @@ export const DashboardShell = () => {
                 <Icon name="cog" className="w-4 h-4" />
                 <span>Filters</span>
                 {activeFilterCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 bg-blue-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center px-1">
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 bg-brand-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center px-1">
                     {activeFilterCount}
                   </span>
                 )}

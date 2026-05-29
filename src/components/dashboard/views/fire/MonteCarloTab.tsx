@@ -196,9 +196,9 @@ export const MonteCarloTab = ({ fire, currency, multiplier: _multiplier, netWort
           <div className="card p-6">
             <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-4">Portfolio Projection — Percentile Bands</h3>
             <div className="text-xs text-slate-400 mb-2 flex gap-4">
-              <span><span className="inline-block w-3 h-3 bg-blue-100 mr-1 rounded" />10th–90th percentile</span>
-              <span><span className="inline-block w-3 h-3 bg-blue-200 mr-1 rounded" />25th–75th percentile</span>
-              <span><span className="inline-block w-3 h-3 bg-blue-500 mr-1 rounded" />Median (50th)</span>
+              <span><span className="inline-block w-3 h-3 bg-brand-100 mr-1 rounded" />10th–90th percentile</span>
+              <span><span className="inline-block w-3 h-3 bg-brand-200 mr-1 rounded" />25th–75th percentile</span>
+              <span><span className="inline-block w-3 h-3 bg-brand-500 mr-1 rounded" />Median (50th)</span>
               <span className="text-red-400">| Year {params.yearsToRetirement} = Retirement</span>
             </div>
             <ResponsiveContainer width="100%" height={350}>

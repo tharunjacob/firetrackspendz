@@ -46,11 +46,11 @@ const LIABILITY_CATEGORIES = [
 const ASSET_COLORS: Record<string, string> = {
   'Cash / Savings':       'bg-green-100  dark:bg-green-900/30  text-green-700  dark:text-green-400',
   'Fixed Deposit':        'bg-teal-100   dark:bg-teal-900/30   text-teal-700   dark:text-teal-400',
-  'Mutual Funds / ETFs':  'bg-blue-100   dark:bg-blue-900/30   text-blue-700   dark:text-blue-400',
-  'Stocks':               'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+  'Mutual Funds / ETFs':  'bg-brand-100   dark:bg-brand-900/30   text-brand-700   dark:text-brand-400',
+  'Stocks':               'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400',
   'Gold':                 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
   'Real Estate':          'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
-  'Crypto':               'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+  'Crypto':               'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400',
   'Vehicle':              'bg-slate-100  dark:bg-slate-700     text-slate-600  dark:text-slate-300',
   'EPF / PPF':            'bg-cyan-100   dark:bg-cyan-900/30   text-cyan-700   dark:text-cyan-400',
   'Other Asset':          'bg-slate-100  dark:bg-slate-700     text-slate-600  dark:text-slate-300',
@@ -238,7 +238,7 @@ export const NetWorthView = () => {
       </div>
 
       {/* ── Summary card ── */}
-      <div className={`card p-6 bg-gradient-to-br ${isPositive ? 'from-brand-600 to-purple-700' : 'from-red-600 to-red-800'} text-white`}>
+      <div className={`card p-6 bg-gradient-to-br ${isPositive ? 'from-brand-600 to-brand-700' : 'from-red-600 to-red-800'} text-white`}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs text-white/70 uppercase tracking-widest font-semibold">Net Worth</p>
@@ -332,7 +332,7 @@ export const NetWorthView = () => {
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Net Worth Over Time</h3>
             <div className="flex items-center gap-4 text-xs text-slate-400">
               <span className="flex items-center gap-1.5">
-                <span className="w-4 h-0.5 bg-indigo-500 inline-block rounded" />
+                <span className="w-4 h-0.5 bg-brand-500 inline-block rounded" />
                 Actual
               </span>
               <span className="flex items-center gap-1.5">
@@ -543,7 +543,7 @@ export const NetWorthView = () => {
       </div>
 
       {/* ── Link to full tracker ── */}
-      <div className="rounded-2xl p-4 bg-gradient-to-r from-indigo-50 dark:from-indigo-900/20 to-purple-50 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-800 flex items-center justify-between gap-4">
+      <div className="rounded-2xl p-4 bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Need deeper tracking?</p>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">

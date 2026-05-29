@@ -157,7 +157,7 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
       <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm text-center">
         <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Shareable Year Review Card</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Generate a beautiful image of your year in review to share on social media.</p>
-        <div className="inline-block bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl opacity-80">
+        <div className="inline-block bg-brand-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl opacity-80">
           Upgrade to Pro to Unlock
         </div>
       </div>
@@ -168,8 +168,8 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
     <div className="space-y-4">
       {!showPreview ? (
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm text-center">
-          <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-indigo-600">
+          <div className="w-16 h-16 bg-brand-100 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-brand-600">
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
             </svg>
           </div>

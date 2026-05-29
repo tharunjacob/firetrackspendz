@@ -21,7 +21,7 @@ const MultiSelect = ({ label, options, selected, onChange }: {
           <button key={o} onClick={() => toggle(o)}
             className={`px-3 py-1 text-xs font-medium rounded-full transition-all border ${
               selected.includes(o)
-                ? 'bg-blue-500 border-blue-600 text-white'
+                ? 'bg-brand-500 border-brand-600 text-white'
                 : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'
             }`}
           >{o}</button>
@@ -120,7 +120,7 @@ export const DashboardSidebar = ({
                       onClick={() => { setActiveTab(t); setIsOpen(false); }}
                       className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors mb-0.5 ${
                         isActive
-                          ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold border-l-2 border-blue-500'
+                          ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 font-semibold border-l-2 border-brand-500'
                           : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                       }`}
                     >
@@ -147,7 +147,7 @@ export const DashboardSidebar = ({
                 </svg>
                 Filters
                 {activeFilterCount > 0 && (
-                  <span className="min-w-[18px] h-[18px] bg-blue-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center px-1">
+                  <span className="min-w-[18px] h-[18px] bg-brand-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center px-1">
                     {activeFilterCount}
                   </span>
                 )}
@@ -163,11 +163,11 @@ export const DashboardSidebar = ({
             {filtersOpen && (
               <div className="space-y-3 pt-3 px-1 pb-2">
                 {/* Currency */}
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                  <label htmlFor="currency-select" className="block text-xs font-bold text-blue-800 dark:text-blue-300 mb-1.5">Currency</label>
+                <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg border border-brand-100 dark:border-brand-800">
+                  <label htmlFor="currency-select" className="block text-xs font-bold text-brand-800 dark:text-brand-300 mb-1.5">Currency</label>
                   <select id="currency-select" value={currency}
                     onChange={e => setCurrency(e.target.value as Currency)}
-                    className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-700 border border-blue-200 dark:border-blue-700 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 text-slate-800 dark:text-slate-100 font-medium outline-none"
+                    className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-700 border border-brand-200 dark:border-brand-700 rounded-lg text-sm focus:ring-brand-500 focus:border-brand-500 text-slate-800 dark:text-slate-100 font-medium outline-none"
                   >
                     {(Object.keys(CURRENCIES) as Currency[]).map(c => (
                       <option key={c} value={c}>{c} ({CURRENCIES[c].symbol})</option>
@@ -212,8 +212,8 @@ export const DashboardSidebar = ({
 
         {/* Monthly report card notice — Pro/Enterprise only */}
         {showReportCardNotice && (
-          <div className="mx-3 mb-2 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800">
-            <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-snug">
+          <div className="mx-3 mb-2 p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg border border-brand-100 dark:border-brand-800">
+            <p className="text-xs text-brand-700 dark:text-brand-300 leading-snug">
               📊 Monthly report cards are sent on the 1st of each month.
             </p>
           </div>

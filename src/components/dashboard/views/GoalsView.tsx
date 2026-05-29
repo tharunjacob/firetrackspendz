@@ -266,7 +266,7 @@ export const GoalsView = () => {
                       }
                       if (e.key === 'Escape') setCustomInputId(null);
                     }}
-                    className="w-28 text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    className="w-28 text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-brand-400"
                     autoFocus
                   />
                   <button
@@ -275,7 +275,7 @@ export const GoalsView = () => {
                       if (!isNaN(v) && v > 0) updateAmount(g.id, v);
                       setCustomInputId(null);
                     }}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    className="text-xs px-3 py-1.5 rounded-lg bg-brand-500 text-white hover:bg-brand-600 transition-colors"
                   >
                     Add
                   </button>

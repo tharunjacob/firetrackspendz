@@ -27,6 +27,9 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
     try {
       const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('PDF upload requires a free account. Sign in or create an account to upload PDFs.');
+      }
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',

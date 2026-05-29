@@ -25,6 +25,9 @@ export const ROUTES = {
   FEATURES: '/features',
   PRIVACY: '/privacy',
   TERMS: '/terms',
+  REFUND: '/refund-policy',
+  SHIPPING: '/shipping-policy',
+  CONTACT: '/contact',
   HELP: '/help',
   AUTH_CALLBACK: '/auth/callback',
 

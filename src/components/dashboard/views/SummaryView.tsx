@@ -33,7 +33,7 @@ const DonutTooltip = ({ active, payload, formatCurrency, total }: any) => {
       </div>
       <div className="space-y-1.5">
         <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Amount:</span><span className="font-mono font-semibold text-slate-700 dark:text-slate-200">{formatCurrency(d.value)}</span></div>
-        <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Percentage:</span><span className="font-mono font-semibold text-blue-600">{formatPercent(pct)}</span></div>
+        <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Percentage:</span><span className="font-mono font-semibold text-brand-600">{formatPercent(pct)}</span></div>
       </div>
     </div>
   );
@@ -171,13 +171,13 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
           <p className="text-xl font-bold text-red-500">{(fire.personalInflation * 100).toFixed(1)}%</p>
         </div>
         <div
-          className="stat-card cursor-pointer hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 transition-shadow"
+          className="stat-card cursor-pointer hover:ring-2 hover:ring-brand-400 hover:ring-offset-2 transition-shadow"
           onClick={() => setActiveTab('FIRE Calculator')}
         >
           <p className="text-xs text-slate-400 uppercase">FIRE Number</p>
           <p className="text-xl font-bold text-brand-600">{fmtCurrency(fire.fireNumberCurrent)}</p>
           <p className="text-xs text-slate-400 mt-0.5">Based on {multiplier}× annual expenses</p>
-          <p className="text-xs text-blue-500 hover:text-blue-600 mt-1 font-medium">→ Full Analysis</p>
+          <p className="text-xs text-brand-500 hover:text-brand-600 mt-1 font-medium">→ Full Analysis</p>
         </div>
       </div>
 

@@ -95,14 +95,14 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
             <div className="bg-slate-700/50 rounded-xl p-4 min-w-[160px]">
               <p className="text-xs text-slate-400 uppercase font-bold mb-1">Avg Monthly Spend</p>
               <input type="number" value={Math.round(effectiveMonthly)} onChange={e => setEditableMonthly(Number(e.target.value))}
-                className="bg-transparent text-2xl font-bold text-white w-full outline-none border-b border-slate-600 focus:border-blue-400 transition" />
+                className="bg-transparent text-2xl font-bold text-white w-full outline-none border-b border-slate-600 focus:border-brand-400 transition" />
               <p className="text-xs text-slate-500 mt-1">Estimated Living Cost</p>
             </div>
             <div className="bg-slate-700/50 rounded-xl p-4 min-w-[160px]">
               <p className="text-xs text-slate-400 uppercase font-bold mb-1">Personal Inflation</p>
               <div className="flex items-baseline">
                 <input type="number" step="0.1" value={effectiveInflation.toFixed(1)} onChange={e => setEditableInflation(Number(e.target.value))}
-                  className="bg-transparent text-2xl font-bold text-white w-20 outline-none border-b border-slate-600 focus:border-blue-400 transition" />
+                  className="bg-transparent text-2xl font-bold text-white w-20 outline-none border-b border-slate-600 focus:border-brand-400 transition" />
                 <span className="text-xl text-slate-400 ml-1">%</span>
               </div>
               <p className="text-xs text-slate-500 mt-1">Affects future projections</p>
@@ -113,7 +113,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
                 <div className="flex items-baseline">
                   <span className="text-xl text-slate-400 mr-1">{currency === 'INR' ? '₹' : '$'}</span>
                   <input type="number" value={editableNetWorth ?? ''} placeholder="0" onChange={e => setEditableNetWorth(e.target.value ? Number(e.target.value) : null)}
-                    className="bg-transparent text-2xl font-bold text-white w-24 outline-none border-b border-slate-600 focus:border-blue-400 transition" />
+                    className="bg-transparent text-2xl font-bold text-white w-24 outline-none border-b border-slate-600 focus:border-brand-400 transition" />
                 </div>
                 <p className="text-xs text-slate-500 mt-1">Manual corpus</p>
               </div>
@@ -128,10 +128,10 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {effectiveProjections.map(p => (
               <div key={p.year} className="bg-slate-700/40 rounded-xl p-4 border border-slate-600/50">
-                <p className="text-sm font-bold text-blue-300">{p.year} Year{p.year > 1 ? 's' : ''}</p>
+                <p className="text-sm font-bold text-brand-300">{p.year} Year{p.year > 1 ? 's' : ''}</p>
                 <p className="text-xl font-bold mt-1">{formatAmount(Math.round(p.value + bigTicketCorpus), currency)}</p>
                 <p className="text-xs text-slate-500 mt-1">nominal</p>
-                <p className="text-xs text-blue-400/70 mt-0.5">
+                <p className="text-xs text-brand-400/70 mt-0.5">
                   {formatAmount(Math.round(effectiveFireNumber + bigTicketCorpus), currency)} real
                 </p>
               </div>
@@ -168,10 +168,10 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
                 const fv = computeFutureValue(bt.currentValue, bt.yearsFromNow, bt.expectedInflation);
                 return (
                   <tr key={bt.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">
-                    <td className="px-4 py-3"><input type="text" value={bt.name} placeholder="e.g. Home Down Payment" onChange={e => updateBigTicket(bt.id, 'name', e.target.value)} className="w-full bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-blue-400 outline-none py-1 text-sm dark:text-slate-200 dark:placeholder:text-slate-500" /></td>
-                    <td className="px-4 py-3 text-right"><input type="number" value={bt.currentValue} onChange={e => updateBigTicket(bt.id, 'currentValue', Number(e.target.value))} className="w-24 bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-blue-400 outline-none text-right py-1 text-sm dark:text-slate-200" /></td>
-                    <td className="px-4 py-3 text-right"><input type="number" value={bt.yearsFromNow} onChange={e => updateBigTicket(bt.id, 'yearsFromNow', Number(e.target.value))} className="w-16 bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-blue-400 outline-none text-right py-1 text-sm dark:text-slate-200" /></td>
-                    <td className="px-4 py-3 text-right"><input type="number" step="0.5" value={bt.expectedInflation} onChange={e => updateBigTicket(bt.id, 'expectedInflation', Number(e.target.value))} className="w-16 bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-blue-400 outline-none text-right py-1 text-sm dark:text-slate-200" /></td>
+                    <td className="px-4 py-3"><input type="text" value={bt.name} placeholder="e.g. Home Down Payment" onChange={e => updateBigTicket(bt.id, 'name', e.target.value)} className="w-full bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-brand-400 outline-none py-1 text-sm dark:text-slate-200 dark:placeholder:text-slate-500" /></td>
+                    <td className="px-4 py-3 text-right"><input type="number" value={bt.currentValue} onChange={e => updateBigTicket(bt.id, 'currentValue', Number(e.target.value))} className="w-24 bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-brand-400 outline-none text-right py-1 text-sm dark:text-slate-200" /></td>
+                    <td className="px-4 py-3 text-right"><input type="number" value={bt.yearsFromNow} onChange={e => updateBigTicket(bt.id, 'yearsFromNow', Number(e.target.value))} className="w-16 bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-brand-400 outline-none text-right py-1 text-sm dark:text-slate-200" /></td>
+                    <td className="px-4 py-3 text-right"><input type="number" step="0.5" value={bt.expectedInflation} onChange={e => updateBigTicket(bt.id, 'expectedInflation', Number(e.target.value))} className="w-16 bg-transparent border-b border-slate-200 dark:border-slate-600 focus:border-brand-400 outline-none text-right py-1 text-sm dark:text-slate-200" /></td>
                     <td className="px-4 py-3 text-right font-mono text-slate-700 dark:text-slate-200">{formatAmount(Math.round(fv), currency)}</td>
                     <td className="px-4 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-100">{formatAmount(Math.round(fv / 0.04), currency)}</td>
                     <td className="px-4 py-3 text-center"><button onClick={() => removeBigTicket(bt.id)} className="text-red-400 hover:text-red-600 text-lg">✕</button></td>
@@ -181,7 +181,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
             </tbody>
           </table>
         </div>
-        <button onClick={addBigTicket} className="mt-4 px-4 py-2 text-sm font-medium text-blue-600 border border-blue-300 dark:border-blue-700 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition">+ Add Expense</button>
+        <button onClick={addBigTicket} className="mt-4 px-4 py-2 text-sm font-medium text-brand-600 border border-brand-300 dark:border-brand-700 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/20 transition">+ Add Expense</button>
         <p className="text-xs text-slate-400 mt-4 text-right">* Future Value uses {RETURN_ON_CAPITAL}% return. Corpus Needed assumes 4% Safe Withdrawal Rate (25× rule).</p>
       </div>
 
@@ -189,7 +189,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Recurring Commitments</h3>
-            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-bold">{recurring.length} Found</span>
+            <span className="text-xs bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 px-2 py-1 rounded-full font-bold">{recurring.length} Found</span>
           </div>
           <p className="text-3xl font-black text-slate-800 dark:text-slate-100">{formatAmount(recurringTotal, currency)}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">/ month estimated fixed cost</p>

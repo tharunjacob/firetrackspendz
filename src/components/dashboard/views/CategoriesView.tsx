@@ -29,7 +29,7 @@ export const CategoriesView = ({ data }: { data?: import('@/types').Transaction[
           <button
             onClick={() => setShowShareCard(!showShareCard)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
-              showShareCard ? 'bg-indigo-600 text-white' : 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/50'
+              showShareCard ? 'bg-brand-600 text-white' : 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 hover:bg-brand-100 dark:hover:bg-brand-900/50'
             }`}
           >
             <Icon name="share" className="w-4 h-4" /> Share

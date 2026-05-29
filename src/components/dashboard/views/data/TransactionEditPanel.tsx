@@ -63,7 +63,7 @@ export const TransactionEditPanel = ({
         <input type="text" value={editData.notes} onChange={e => setEditData(p => ({ ...p, notes: e.target.value }))} className="input-field text-xs py-1.5 w-full" />
       </div>
     </div>
-    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-indigo-100 dark:border-indigo-900">
+    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-brand-100 dark:border-brand-900">
       <button onClick={onSave} className="btn-primary text-xs px-4 py-1.5">
         <Icon name="check" className="w-3.5 h-3.5 inline mr-1" /> Save Changes
       </button>

@@ -1,6 +1,32 @@
 # TrackSpendZ — Changelog
 
-## v2.1.0 — March 2026 (Latest)
+## v2.2.0 — May 2026 (Latest) — Launch Prep
+
+### Payments
+- **Razorpay is now the active payment provider** (replaces Stripe for the launch). `paymentProvider.ts` is the facade the UI imports; `razorpay.ts` is the client; 5 `razorpay-*` Supabase edge functions handle subscriptions + webhook. `stripe.ts` remains only as a deprecated stub for a possible future USD revival.
+- **API access removed from Enterprise** — it was advertised pre-launch but never built. Removed from `config/plans.ts`, PricingPage, HelpPage, and the `APIAccessPanel` component was deleted. `canAccessFeature(plan, 'api_access')` now returns `false` everywhere (asserted in `plans.test.ts`).
+
+### Razorpay Compliance — Legal Pages
+- New **Cancellation & Refund Policy** (`/refund-policy`), **Shipping & Delivery Policy** (`/shipping-policy`), and **Contact Us** (`/contact`) pages.
+- Privacy & Terms updated to reference Razorpay (not Stripe) as the payment processor.
+- All business details (legal name, address, phone, support email, refund window) centralized in `config/legal.ts` — every policy page reads from it. Footer + sitemap updated.
+
+### Security
+- **Server-side AI proxy** — all Gemini calls route through the `ai-proxy` Supabase edge function in production; the API key never ships in the client bundle. `VITE_GEMINI_API_KEY` is a local-dev-only fallback.
+- PDF upload now requires a signed-in session (the proxy enforces auth) with a clear user-facing message instead of a silent failure.
+
+### Bug Fixes
+- **Checkout lockout** — an abandoned Razorpay checkout no longer permanently blocks a user from paying.
+- **Auth race** — returning logged-in users no longer briefly see an empty dashboard or write to the wrong storage backend.
+- **Duplicate transactions** — fixed for free users with 500+ rows (dedup now runs against the full dataset, not just the visible 500).
+
+### UI Polish
+- Dark-mode fixes for the OnboardingGuide card and the encrypted-PDF password prompt (previously unreadable light boxes in dark mode).
+- Error toasts now persist 6s (was 3s) so failure messages aren't missed.
+
+---
+
+## v2.1.0 — March 2026
 
 ### New Features
 

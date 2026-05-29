@@ -106,7 +106,7 @@ const FeaturesPage = () => {
                 ))}
               </ul>
             </div>
-            <div className="flex-shrink-0 w-48 h-48 bg-gradient-to-br from-brand-50 dark:from-brand-950 to-purple-50 dark:to-purple-900/30 rounded-2xl flex items-center justify-center">
+            <div className="flex-shrink-0 w-48 h-48 bg-brand-50 dark:bg-brand-950 rounded-2xl flex items-center justify-center">
               <span className="text-7xl">{s.visual}</span>
             </div>
           </div>

@@ -239,7 +239,7 @@ const FamilyDashboard = () => {
 
           {/* Section A — Household Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="card p-4 bg-gradient-to-br from-brand-600 to-purple-600 text-white">
+            <div className="card p-4 bg-brand-600 text-white">
               <p className="text-xs text-brand-200 uppercase tracking-wide">Members</p>
               <p className="text-3xl font-black mt-1">
                 {activeMembers.length}

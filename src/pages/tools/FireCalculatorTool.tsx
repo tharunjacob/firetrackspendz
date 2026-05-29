@@ -326,10 +326,10 @@ const FireCalculatorTool: React.FC = () => {
                     {formatAmount(results.regularFire, currency)}
                   </p>
                 </div>
-                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-purple-200 dark:border-purple-800 p-6 text-center">
+                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-brand-200 dark:border-brand-800 p-6 text-center">
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Fat FIRE</p>
                   <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">Comfortable cushion (33x)</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-2xl font-bold text-brand-600">
                     {formatAmount(results.fatFire, currency)}
                   </p>
                 </div>
@@ -339,7 +339,7 @@ const FireCalculatorTool: React.FC = () => {
         )}
 
         {/* CTA */}
-        <div className="mt-12 bg-gradient-to-br from-brand-50 dark:from-brand-950 to-purple-50 dark:to-purple-900/20 rounded-2xl border border-brand-200 dark:border-brand-800 p-8 text-center">
+        <div className="mt-12 bg-brand-50 dark:bg-brand-950 rounded-2xl border border-brand-200 dark:border-brand-800 p-8 text-center">
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
             Want AI-powered analysis from your actual bank statements?
           </h2>

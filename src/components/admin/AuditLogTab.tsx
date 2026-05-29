@@ -8,8 +8,8 @@ import type { AdminAuditEntry } from '@/types';
 // ============================================================
 
 const ACTION_STYLES: Record<string, { bg: string; text: string; icon: string }> = {
-  toggle_flag:    { bg: 'bg-blue-100',   text: 'text-blue-700',   icon: 'ðŸš©' },
-  plan_changed:   { bg: 'bg-purple-100', text: 'text-purple-700', icon: 'ðŸ’³' },
+  toggle_flag:    { bg: 'bg-brand-100',   text: 'text-brand-700',   icon: 'ðŸš©' },
+  plan_changed:   { bg: 'bg-brand-100', text: 'text-brand-700', icon: 'ðŸ’³' },
   rule_promoted:  { bg: 'bg-green-100',  text: 'text-green-700',  icon: 'â¬†ï¸' },
   rule_deleted:   { bg: 'bg-red-100',    text: 'text-red-700',    icon: 'ðŸ—‘ï¸' },
   mimic_started:  { bg: 'bg-amber-100',  text: 'text-amber-700',  icon: 'ðŸ‘ï¸' },

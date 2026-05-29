@@ -1,5 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { LEGAL } from '@/config/legal';
 
 const TermsPage = () => {
   usePageMeta({ title: 'Terms of Service | TrackSpendZ', description: 'TrackSpendZ terms of service. Usage conditions, subscription terms, and data handling policies.', canonical: '/terms' });
@@ -10,7 +11,7 @@ const TermsPage = () => {
       <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-8">Terms of Service</h1>
 
       <div className="prose prose-slate max-w-none space-y-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-        <p><strong>Last updated:</strong> March 2026</p>
+        <p><strong>Last updated:</strong> {LEGAL.lastUpdated}</p>
 
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Acceptance of Terms</h2>
         <p>
@@ -36,11 +37,13 @@ const TermsPage = () => {
           financial data without their consent, or for any illegal purpose.
         </p>
 
-        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Subscriptions & Payments</h2>
+        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Subscriptions &amp; Payments</h2>
         <p>
-          Free accounts have usage limits. Paid subscriptions are billed annually via Stripe.
-          You can cancel anytime â€” access continues until the end of your billing period.
-          Refunds are handled on a case-by-case basis.
+          Free accounts have usage limits. Paid subscriptions (Pro and Enterprise) are billed
+          on a monthly or yearly basis via Razorpay, our payment processor. You can cancel anytime
+          from Settings — access continues until the end of your current billing period.
+          Cancellations and refunds are governed by our{' '}
+          <Link to="/refund-policy" className="text-brand-600 hover:underline">Cancellation &amp; Refund Policy</Link>.
         </p>
 
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Limitation of Liability</h2>
@@ -58,7 +61,9 @@ const TermsPage = () => {
 
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Contact</h2>
         <p>
-          Questions? Email us at support@trackspendz.com.
+          Questions? Email us at{' '}
+          <a href={`mailto:${LEGAL.supportEmail}`}>{LEGAL.supportEmail}</a>, or see our{' '}
+          <Link to="/contact" className="text-brand-600 hover:underline">Contact page</Link>.
         </p>
       </div>
 

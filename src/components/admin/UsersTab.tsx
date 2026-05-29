@@ -168,7 +168,7 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
                       <p className="text-xs text-slate-400">
                         {u.full_name || 'â€”'} Â· {u.id.substring(0, 8)}...
                         {isNewUser(u) && (
-                          <span className="ml-1.5 px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700">NEW</span>
+                          <span className="ml-1.5 px-1.5 py-0.5 rounded text-xs font-bold bg-brand-100 text-brand-700">NEW</span>
                         )}
                       </p>
                     </td>

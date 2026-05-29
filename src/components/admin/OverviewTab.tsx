@@ -13,7 +13,7 @@ export const OverviewTab = ({ stats, logs }: { stats: AdminStats; logs: AppLog[]
       <StatCard label="Total Users" value={stats.totalUsers} />
       <StatCard label="Active (30d)" value={stats.activeUsers} color="text-brand-600" />
       <StatCard label="New This Week" value={stats.newUsersThisWeek} color="text-green-600" />
-      <StatCard label="Pro Users" value={stats.proUsers} color="text-purple-600" />
+      <StatCard label="Pro Users" value={stats.proUsers} color="text-brand-600" />
       <StatCard label="Enterprise" value={stats.enterpriseUsers} color="text-amber-600" />
     </div>
 
@@ -27,9 +27,9 @@ export const OverviewTab = ({ stats, logs }: { stats: AdminStats; logs: AppLog[]
     <div className="card p-5">
       <h3 className="text-sm font-bold text-slate-700 mb-3">Revenue Breakdown</h3>
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-purple-50 rounded-lg p-4 text-center">
-          <p className="text-2xl font-black text-purple-700">${stats.proUsers * 49}</p>
-          <p className="text-xs text-purple-500 mt-1">{stats.proUsers} Pro Ã— $49/yr</p>
+        <div className="bg-brand-50 rounded-lg p-4 text-center">
+          <p className="text-2xl font-black text-brand-700">${stats.proUsers * 49}</p>
+          <p className="text-xs text-brand-500 mt-1">{stats.proUsers} Pro Ã— $49/yr</p>
         </div>
         <div className="bg-amber-50 rounded-lg p-4 text-center">
           <p className="text-2xl font-black text-amber-700">${stats.enterpriseUsers * 149}</p>

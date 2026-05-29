@@ -22,7 +22,7 @@ const ChartTooltip = ({ active, payload, label }: any) => {
   return (
     <div className="bg-white dark:bg-slate-800 p-3 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 text-sm">
       <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">{label}</p>
-      <p className="text-indigo-600 font-mono">{payload[0].value.toFixed(1)}%</p>
+      <p className="text-brand-600 font-mono">{payload[0].value.toFixed(1)}%</p>
     </div>
   );
 };
@@ -51,9 +51,9 @@ export const WrappedSlides = ({ stats, isPro, fmt }: Props) => {
     </div>
 
     {!isPro && (
-      <div className="bg-gradient-to-br from-indigo-50 dark:from-indigo-900/20 to-purple-50 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl p-8 text-center">
-        <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-indigo-600">
+      <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 rounded-2xl p-8 text-center">
+        <div className="w-16 h-16 bg-brand-100 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-brand-600">
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
@@ -64,7 +64,7 @@ export const WrappedSlides = ({ stats, isPro, fmt }: Props) => {
         </p>
         <button
           onClick={() => logEvent(EVENTS.PAYWALL_CTA_CLICKED, { source: 'wrapped_view' })}
-          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm"
+          className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm"
         >
           Upgrade to Pro
         </button>
@@ -146,12 +146,12 @@ export const WrappedSlides = ({ stats, isPro, fmt }: Props) => {
             label="Recurring Annual"
             value={fmt(stats.recurringTotal)}
             sub="Auto-pay & subscriptions"
-            accent="text-purple-600"
+            accent="text-brand-600"
           />
           <StatCard
             label="Total Transactions"
             value={stats.totalTransactions.toLocaleString()}
-            accent="text-indigo-600"
+            accent="text-brand-600"
           />
           <StatCard
             label="Unique Merchants"

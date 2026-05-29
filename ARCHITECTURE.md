@@ -22,7 +22,8 @@ src/
 │   ├── routes.ts        ← All URL paths (/dashboard, /help, etc.)
 │   ├── database.ts      ← Supabase table names and RPC function names
 │   ├── storage.ts       ← localStorage keys and free tier limits
-│   └── plans.ts         ← Subscription plan names, features, pricing
+│   ├── plans.ts         ← Subscription plan names, features, pricing
+│   └── legal.ts         ← Business details for policy pages (Razorpay compliance)
 │
 ├── contexts/            ← STATE MANAGEMENT (3 focused contexts + 1 wrapper)
 │   ├── AuthContext.tsx   ← User identity: userId, email, profile, plan, login/logout
@@ -35,37 +36,47 @@ src/
 │   ├── index.ts         ← Core types: Transaction, UserProfile, DashboardTab, etc.
 │   └── assets.ts        ← Net asset types: AssetSnapshot, NetAssetConfig, etc.
 │
-├── services/            ← BUSINESS LOGIC (no UI, no React) — 20 files
+├── services/            ← BUSINESS LOGIC (no UI, no React) — 29 files
 │   ├── auth.ts          ← Supabase auth: login, logout, getProfile
+│   ├── supabase.ts      ← Supabase client initialization
 │   ├── transformer.ts   ← File parsing: Excel/CSV/PDF → Transaction[]
+│   ├── parser.ts        ← Low-level CSV/Excel parsing helpers
+│   ├── categorizer.ts   ← 150+ keyword→category mappings + field synonyms
+│   ├── deduplicator.ts  ← Duplicate detection + inter-account transfer ID
+│   ├── formatLibrary.ts ← Known-bank statement format presets
 │   ├── storage.ts       ← Transaction storage orchestration (local + cloud)
 │   ├── cloudStorage.ts  ← Supabase CRUD for transactions
-│   ├── localStorage.ts  ← Browser localStorage for transactions
+│   ├── localStorage.ts  ← Browser IndexedDB for transactions
+│   ├── userSettings.ts  ← Per-user key/value (local for free, Supabase for Pro)
 │   ├── assetStorage.ts  ← IndexedDB + Supabase for net assets + Excel parsing
 │   ├── learningRules.ts ← Category rules: load, save, apply, createRuleFromEdit
 │   ├── notifications.ts ← Smart notification generation
 │   ├── analysis.ts      ← FIRE metrics, anomaly detection, deep insights
-│   ├── gemini.ts        ← AI advisor, file mapping, asset file detection
-│   ├── logger.ts        ← Event logging to Supabase app_logs table
-│   ├── stripe.ts        ← Payment processing via Stripe
-│   ├── supabase.ts      ← Supabase client initialization
-│   ├── exportService.ts ← CSV/JSON export helpers
 │   ├── monteCarlo.ts    ← Monte Carlo simulations for FIRE
+│   ├── debtPayoff.ts    ← Snowball/Avalanche debt payoff calculations
+│   ├── gemini.ts        ← AI advisor, file mapping, PDF extraction
+│   ├── aiProxy.ts       ← Routes AI calls (edge function in prod, direct in dev)
+│   ├── paymentProvider.ts ← Provider-agnostic payment facade (UI imports this)
+│   ├── razorpay.ts      ← Razorpay Subscriptions client (ACTIVE payment path)
+│   ├── stripe.ts        ← DEPRECATED stub — kept for future USD revival only
+│   ├── exportService.ts ← CSV/JSON export helpers
 │   ├── referral.ts      ← Referral program (create/claim codes)
 │   ├── achievements.ts  ← User achievement/gamification tracking
 │   ├── analytics.ts     ← App analytics tracking
+│   ├── logger.ts        ← Event logging to Supabase app_logs table
 │   ├── adminAudit.ts    ← Admin audit logging
 │   └── featureFlags.ts  ← Feature flag management
 │
 ├── components/          ← UI COMPONENTS
-│   ├── common/          ← Shared: Icons, Toast, ErrorBoundary
+│   ├── common/          ← Shared: Icons, Toast, ErrorBoundary, ConsentBanner
 │   ├── layout/          ← Navbar
 │   ├── upload/          ← FileUploader
 │   ├── auth/            ← AuthModal
 │   ├── dashboard/       ← DashboardShell, NotificationCenter, PaywallBanner, OnboardingGuide
-│   │   └── views/       ← 14 dashboard tab views (Summary, FIRE, Monthly, etc.)
+│   │   └── views/       ← 15 dashboard tab views (Summary, FIRE, Monthly, etc.)
 │   ├── assets/          ← AssetDashboard, AssetEntryForm, AssetCSVImport, etc.
-│   └── enterprise/      ← APIAccessPanel
+│   ├── settings/        ← SubscriptionManager and account settings panels
+│   └── admin/           ← Admin panel tabs (Users, Logs, Rules, Analytics, etc.)
 │
 ├── pages/               ← ROUTE-LEVEL PAGES (one per URL)
 │   ├── LandingPage.tsx
@@ -77,8 +88,13 @@ src/
 │   ├── PricingPage.tsx
 │   ├── FeaturesPage.tsx
 │   ├── NetAssetPage.tsx
+│   ├── FeedbackPage.tsx
 │   ├── PrivacyPage.tsx
 │   ├── TermsPage.tsx
+│   ├── RefundPolicyPage.tsx     ← Razorpay-compliance legal pages
+│   ├── ShippingPolicyPage.tsx
+│   ├── ContactPage.tsx
+│   ├── tools/           ← Public SEO tools (FireCalculatorTool, SavingsRateTool)
 │   └── AuthCallback.tsx
 │
 ├── utils/               ← PURE UTILITIES (no side effects)
@@ -264,7 +280,7 @@ Users can upload files and see results WITHOUT signing up. This is controlled by
 - Admin can promote user rules to system-wide via the Rules tab in admin panel
 
 ### 5. Net Asset Tracker (Excel + AI)
-- Separate from dashboard — lives at `/net-assets` (auth-required)
+- Separate from dashboard — lives at `/assets` (auth-required; see `ROUTES.ASSETS`)
 - Supports CSV template format AND arbitrary Excel files (.xlsx/.xls)
 - AI-powered column detection via `detectAssetFileStructure()` in gemini.ts
 - Multi-sheet Excel workbooks show a sheet selector UI
@@ -351,6 +367,4 @@ catch (e: unknown) {
 
 ---
 
-## File Count: 143 source files | Last updated: May 2026
-
-Last updated: March 2026
+## File Count: 149 source files (138 excluding tests) | Last updated: May 2026

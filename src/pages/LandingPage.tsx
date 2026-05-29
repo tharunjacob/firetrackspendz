@@ -73,7 +73,7 @@ const LandingPage = () => {
 
             {/* Right — dashboard mockup */}
             <div id="demo" className="relative mx-auto w-full max-w-lg">
-              <div className="absolute -inset-4 bg-gradient-to-r from-brand-100 to-purple-100 rounded-3xl blur-2xl opacity-60" />
+              <div className="absolute -inset-4 bg-brand-100 rounded-3xl blur-2xl opacity-60" />
               <div className="relative rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden bg-white dark:bg-slate-800">
                 {/* Browser chrome */}
                 <div className="bg-slate-800 px-4 py-2.5 flex items-center gap-2">
@@ -244,7 +244,7 @@ const LandingPage = () => {
               },
               {
                 icon: 'chart',
-                color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600',
+                color: 'bg-brand-50 dark:bg-brand-900/20 text-brand-600',
                 title: 'Multiple accounts, one view',
                 desc: 'Merge statements from all your banks and cards. See your complete financial picture in a single dashboard.',
               },
@@ -265,7 +265,7 @@ const LandingPage = () => {
             ))}
 
             {/* CTA card */}
-            <div className="card p-6 bg-gradient-to-br from-brand-600 to-purple-600 text-white flex flex-col justify-between">
+            <div className="card p-6 bg-brand-600 text-white flex flex-col justify-between">
               <div>
                 <p className="text-sm font-semibold text-brand-200 mb-2">And much more</p>
                 <p className="text-base font-bold mb-2">15 dashboards total</p>
@@ -439,7 +439,7 @@ const LandingPage = () => {
       {/* ── BOTTOM CTA ───────────────────────────────────────────────── */}
       <section className="bg-white dark:bg-slate-900 py-16 border-t border-slate-100 dark:border-slate-800">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="bg-gradient-to-r from-brand-600 to-purple-600 rounded-2xl p-10 text-white text-center">
+          <div className="bg-brand-600 rounded-2xl p-10 text-white text-center">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">Stop guessing. Start knowing.</h2>
             <p className="text-brand-100 mb-7 max-w-md mx-auto">
               Upload your first statement in under 2 minutes and see your spending instantly — no account required.
@@ -465,6 +465,9 @@ const LandingPage = () => {
               <Link to="/help" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Help</Link>
               <Link to="/privacy" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Privacy</Link>
               <Link to="/terms" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Terms</Link>
+              <Link to="/refund-policy" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Refunds</Link>
+              <Link to="/shipping-policy" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Delivery</Link>
+              <Link to="/contact" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Contact</Link>
             </div>
             <div className="text-xs text-slate-400 text-center">
               <span>Built by </span>

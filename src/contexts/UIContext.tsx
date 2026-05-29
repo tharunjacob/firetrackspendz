@@ -56,9 +56,10 @@ export const UIProvider = ({ children }: { children: ReactNode }) => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   }, []);
 
-  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success', duration = 3000) => {
+  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success', duration?: number) => {
+    const ms = duration ?? (type === 'error' ? 6000 : 3000);
     setToast({ message, visible: true, type });
-    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), duration);
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), ms);
   }, []);
 
   const hideToast = useCallback(() => {

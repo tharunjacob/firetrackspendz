@@ -10,7 +10,7 @@
 // HOW TO USE:
 // import { PLAN_NAMES, canAccessFeature, getPlanPrice } from '@/config/plans';
 // if (plan === PLAN_NAMES.ENTERPRISE) { ... }
-// if (canAccessFeature(plan, 'api_access')) { ... }
+// if (canAccessFeature(plan, 'family_dashboard')) { ... }
 // const { label, period } = getPlanPrice('pro', 'INR', 'monthly');
 //
 // WHEN TO EDIT:

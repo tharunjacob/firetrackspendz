@@ -40,8 +40,8 @@ interface FeedbackForm {
 
 const CATEGORIES: { key: FeedbackCategory; label: string; icon: string; desc: string; color: string }[] = [
   { key: 'bug', label: 'Bug Report', icon: 'warning', desc: 'Something isn\'t working right', color: 'text-red-600 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' },
-  { key: 'feature', label: 'Feature Request', icon: 'flash', desc: 'I wish TrackSpendZ could...', color: 'text-purple-600 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800' },
-  { key: 'question', label: 'Question', icon: 'search', desc: 'I need help with something', color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' },
+  { key: 'feature', label: 'Feature Request', icon: 'flash', desc: 'I wish TrackSpendZ could...', color: 'text-brand-600 bg-brand-50 dark:bg-brand-900/20 border-brand-200 dark:border-brand-800' },
+  { key: 'question', label: 'Question', icon: 'search', desc: 'I need help with something', color: 'text-brand-600 bg-brand-50 dark:bg-brand-900/20 border-brand-200 dark:border-brand-800' },
   { key: 'other', label: 'Other', icon: 'mail', desc: 'General feedback or suggestion', color: 'text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600' },
 ];
 
@@ -296,7 +296,7 @@ const FeedbackPage = () => {
                 <div key={i} className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm">
                   <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
                     s.category === 'bug' ? 'bg-red-50 dark:bg-red-900/20 text-red-600' :
-                    s.category === 'feature' ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600' :
+                    s.category === 'feature' ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600' :
                     'bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                   }`}>{s.category}</span>
                   <span className="text-slate-700 dark:text-slate-200 flex-1 truncate">{s.subject}</span>

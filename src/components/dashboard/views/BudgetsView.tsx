@@ -76,7 +76,7 @@ export const BudgetsView = () => {
         </button>
       </div>
       {!canSave && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-sm text-blue-700 dark:text-blue-300">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 text-sm text-brand-700 dark:text-brand-300">
           <Icon name="flash" className="w-4 h-4 shrink-0" />
           <span>Upgrade to Pro to save budgets across sessions and devices.</span>
         </div>

@@ -39,7 +39,7 @@ export const FilterPanel = ({
           <div className="flex items-center gap-2">
             <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Filters &amp; Settings</h3>
             {activeFilterCount > 0 && (
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+              <span className="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs font-bold rounded-full">
                 {activeFilterCount} active
               </span>
             )}
@@ -53,12 +53,12 @@ export const FilterPanel = ({
         </div>
 
         <div className="p-4 space-y-5 pb-10">
-          <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-            <label className="block text-sm font-bold text-blue-800 mb-2">Currency</label>
+          <div className="p-4 bg-brand-50 rounded-xl border border-brand-100">
+            <label className="block text-sm font-bold text-brand-800 mb-2">Currency</label>
             <select
               value={currency}
               onChange={e => setCurrency(e.target.value as Currency)}
-              className="w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-blue-200 dark:border-blue-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 font-medium outline-none min-h-[44px]"
+              className="w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-brand-200 dark:border-brand-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 font-medium outline-none min-h-[44px]"
             >
               {(Object.keys(CURRENCIES) as Currency[]).map(c => (
                 <option key={c} value={c}>{c} ({CURRENCIES[c].symbol})</option>
@@ -81,7 +81,7 @@ export const FilterPanel = ({
                     }}
                     className={`px-4 py-2 text-sm font-medium rounded-full border min-h-[44px] transition-all ${
                       filters.owners.includes(o)
-                        ? 'bg-blue-500 border-blue-600 text-white'
+                        ? 'bg-brand-500 border-brand-600 text-white'
                         : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200'
                     }`}
                   >{o}</button>
@@ -104,7 +104,7 @@ export const FilterPanel = ({
                   }}
                   className={`px-4 py-2 text-sm font-medium rounded-full border min-h-[44px] transition-all ${
                     filters.types.includes(o)
-                      ? 'bg-blue-500 border-blue-600 text-white'
+                      ? 'bg-brand-500 border-brand-600 text-white'
                       : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200'
                   }`}
                 >{o}</button>

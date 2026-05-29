@@ -5,7 +5,7 @@
 
 ## What Is TrackSpendZ?
 
-A personal finance web app that lets users upload bank/credit card statements (Excel, CSV, PDF), auto-categorizes transactions using 150+ built-in merchant patterns + user-trained AI rules, and provides 14 interactive dashboard views for financial analysis, FIRE planning, net worth tracking, and budgeting.
+A personal finance web app that lets users upload bank/credit card statements (Excel, CSV, PDF), auto-categorizes transactions using 150+ built-in merchant patterns + user-trained AI rules, and provides 15 interactive dashboard views for financial analysis, FIRE planning, net worth tracking, and budgeting.
 
 **Tech stack:** React 18 + TypeScript + Vite + Tailwind CSS + Supabase (auth + DB) + Google Gemini 2.0 Flash (AI) + Recharts + XLSX + PDF.js
 
@@ -51,12 +51,16 @@ A personal finance web app that lets users upload bank/credit card statements (E
 - **Free:** 500 transactions, local storage, basic categorization
 - **Pro:** Unlimited transactions, AI advisor, FIRE calculator, cloud sync, budgets
   - India: ₹199/mo or ₹1,499/yr — International: $4.99/mo or $49/yr
-- **Enterprise:** Family accounts (5 members), API access (coming soon), custom rules
+- **Enterprise:** Family accounts (5 members), custom categories, tax-ready CSV/PDF export reports, dedicated support
   - India: ₹499/mo or ₹3,999/yr — International: $14.99/mo or $149/yr
+  - NOTE: API access is NOT offered — it was advertised pre-launch but never built, and was removed everywhere (plans, pricing, settings, help) in May 2026. Do not re-add without a real backend.
 - Plan gating: `canAccessFeature(plan, feature)` in `config/plans.ts`
 - **Payments: Razorpay** via `services/paymentProvider.ts` → `services/razorpay.ts`.
   Stripe (`services/stripe.ts`) is a deprecated stub kept for future USD revival.
   See `RAZORPAY_SETUP.md` for the activation checklist.
+- **Legal/compliance pages** (required by Razorpay): Privacy, Terms, Cancellation & Refund,
+  Shipping & Delivery, and Contact. All business details (name, address, phone, support email,
+  refund window) live in ONE place — `config/legal.ts`. Every policy page reads from it.
 
 ---
 
@@ -153,6 +157,9 @@ AppProvider
 | original_description | `transformer.ts`, `DataView.tsx` |
 | Currency-aware tool placeholders | `FireCalculatorTool.tsx`, `SavingsRateTool.tsx` |
 | Referral claim on signup | `AuthContext.tsx`, `referral.ts`, `LandingPage.tsx` |
+| Razorpay subscriptions | `razorpay.ts`, `paymentProvider.ts`, `supabase/functions/razorpay-*` |
+| Server-side AI proxy (Gemini key never ships to client) | `aiProxy.ts`, `supabase/functions/ai-proxy` |
+| Razorpay-compliance legal pages | `config/legal.ts`, `RefundPolicyPage.tsx`, `ShippingPolicyPage.tsx`, `ContactPage.tsx`, `PrivacyPage.tsx`, `TermsPage.tsx` |
 
 ---
 
@@ -184,6 +191,9 @@ Defined in `config/routes.ts`, rendered in `App.tsx`:
 | `/help` | No | HelpPage |
 | `/privacy` | No | PrivacyPage |
 | `/terms` | No | TermsPage |
+| `/refund-policy` | No | RefundPolicyPage |
+| `/shipping-policy` | No | ShippingPolicyPage |
+| `/contact` | No | ContactPage |
 | `/feedback` | No | FeedbackPage |
 | `/tools/fire-calculator` | No | FireCalculatorTool |
 | `/tools/savings-rate` | No | SavingsRateTool |
@@ -226,14 +236,14 @@ Defined in `config/routes.ts`, rendered in `App.tsx`:
 
 ## Known Issues & Technical Debt
 
-1. **Test coverage is thin** — Vitest is wired up (`vitest.config.ts`, `npx vitest run`). Existing tests: `deduplicator.test.ts`, `storage.test.ts`, `categorizer.test.ts` (placeholder only), `learningRules.test.ts`, `analysis.test.ts`, `config/__tests__/plans.test.ts`. Happy path + a few edge cases are covered; snapshot/integration coverage is absent.
+1. **Test coverage is unit-level only** — Vitest is wired up (`vitest.config.ts`, `npx vitest run`); 167 tests pass across 9 files: `analysis`, `categorizer`, `deduplicator`, `learningRules`, `parser`, `storage`, `transformer`, `userSettings` (all under `services/__tests__/`) and `config/__tests__/plans.test.ts`. Business logic is covered; component/snapshot/integration (E2E) coverage is absent.
 2. **`VITE_GEMINI_API_KEY` dev fallback has no client-side rate limiting.** In production, all AI calls route through the Supabase Edge Function (`/functions/v1/ai-proxy`) which holds the server-side key — the client-side `VITE_GEMINI_API_KEY` is only used when no Supabase URL is configured (local dev fallback). For production safety: restrict the dev key to localhost in the Google Cloud Console, and ensure the edge function enforces per-user rate limits. The production path is already secure.
-3. **API access is "coming soon"** — Enterprise plan lists API access but no backend exists. The `APIAccessPanel` shows a Coming Soon card.
-4. **No CI/CD pipeline** — deploys manually via Vercel. No automated linting, type-checking, or testing.
-5. **Family Dashboard** is minimal — basic multi-member view, needs more household features.
-6. **Achievements system** is scaffolded but not fully wired into UI.
+3. **No CI/CD pipeline** — deploys manually via Vercel. No automated linting, type-checking, or testing.
+4. **Family Dashboard** is minimal — basic multi-member view, needs more household features.
+5. **Achievements system** is scaffolded but not fully wired into UI.
 
 ### ✅ Resolved (May 2026)
+- **API access removed** — Enterprise once advertised "API access (coming soon)" but no backend was ever built. It was removed from `config/plans.ts`, PricingPage, HelpPage, and the `APIAccessPanel` component was deleted. `canAccessFeature(plan, 'api_access')` now returns `false` for all plans (asserted in `config/__tests__/plans.test.ts`).
 - **GoalsView cloud sync** — Now uses the `userSettings` service (`src/services/userSettings.ts`). Free users get localStorage; Pro/Enterprise users get automatic Supabase cloud sync via the `user_settings` table. Goals persist across page refreshes for all users.
 - **BudgetsView persistence** — Same fix as GoalsView. Budgets are saved via `setUserSetting(STORAGE_KEYS.BUDGETS, budgets)` on every change, with a hydration guard to prevent saving before initial load. No longer lost on refresh.
 
@@ -285,8 +295,8 @@ See `SETUP.md` for full Supabase schema SQL, auth config, and deployment instruc
 - Or the user is still in anonymous preview (`isAnonymousPreview: true`). Promotion happens on sign-in via `syncLocalToCloud()` — check for a failure there in console.
 
 ### "Tests pass locally but not in CI"
-- There is no CI yet (known issue #5). Until then, run `npx vitest run` manually before pushing.
+- There is no CI yet (known issue #3). Until then, run `npx vitest run` manually before pushing.
 
 ---
 
-## File Count: 143 source files | Last updated: May 2026
+## File Count: 149 source files (138 excluding tests) | Last updated: May 2026

@@ -67,7 +67,7 @@ const DebtForm = ({ initial, onSave, onCancel }: DebtFormProps) => {
     });
   };
 
-  const inputCls = 'w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const inputCls = 'w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500';
   const labelCls = 'block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1';
 
   return (
@@ -99,7 +99,7 @@ const DebtForm = ({ initial, onSave, onCancel }: DebtFormProps) => {
         </div>
       </div>
       <div className="flex gap-2 pt-1">
-        <button type="submit" disabled={!valid} className="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+        <button type="submit" disabled={!valid} className="px-4 py-2 text-sm font-semibold rounded-lg bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
           {initial ? 'Save changes' : 'Add debt'}
         </button>
         <button type="button" onClick={onCancel} className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
@@ -256,7 +256,7 @@ export const DebtPayoffView = () => {
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors"
+            className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-xl transition-colors"
           >
             Add your first debt
           </button>
@@ -284,7 +284,7 @@ export const DebtPayoffView = () => {
           {!isAdding && (
             <button
               onClick={() => { setIsAdding(true); setEditingId(null); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors"
             >
               <Icon name="plus" className="w-4 h-4" />
               Add debt
@@ -315,7 +315,7 @@ export const DebtPayoffView = () => {
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => { setEditingId(debt.id); setIsAdding(false); }}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors"
                   >
                     <Icon name="edit" className="w-3.5 h-3.5" />
                   </button>
@@ -369,7 +369,7 @@ export const DebtPayoffView = () => {
                   value={extraPayment}
                   onChange={e => setExtraPayment(e.target.value)}
                   placeholder="0"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div>
@@ -383,7 +383,7 @@ export const DebtPayoffView = () => {
                       onClick={() => setMethod(m)}
                       className={`flex-1 py-2 transition-colors ${
                         method === m
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-brand-600 text-white'
                           : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600'
                       }`}
                     >
@@ -421,10 +421,10 @@ export const DebtPayoffView = () => {
               </div>
             ) : (
               <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-center">
-                  <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">Debt-free by</p>
-                  <p className="text-2xl font-extrabold text-blue-700 dark:text-blue-300 mt-1">{formatDate(activeResult.debtFreeDate)}</p>
-                  <p className="text-sm text-blue-500 dark:text-blue-400 mt-0.5">{formatMonths(activeResult.totalMonths)} from now</p>
+                <div className="flex-1 bg-brand-50 dark:bg-brand-900/20 rounded-xl p-4 text-center">
+                  <p className="text-xs font-medium text-brand-600 dark:text-brand-400 uppercase tracking-wide">Debt-free by</p>
+                  <p className="text-2xl font-extrabold text-brand-700 dark:text-brand-300 mt-1">{formatDate(activeResult.debtFreeDate)}</p>
+                  <p className="text-sm text-brand-500 dark:text-brand-400 mt-0.5">{formatMonths(activeResult.totalMonths)} from now</p>
                 </div>
                 <div className="flex-1 bg-red-50 dark:bg-red-900/20 rounded-xl p-4 text-center">
                   <p className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide">Total interest you'll pay</p>
@@ -451,9 +451,9 @@ export const DebtPayoffView = () => {
                     {([['Avalanche', avalancheResult], ['Snowball', snowballResult]] as const).map(([label, r]) => (
                       <tr
                         key={label}
-                        className={`${r.method === method ? 'font-semibold text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-400'}`}
+                        className={`${r.method === method ? 'font-semibold text-brand-700 dark:text-brand-300' : 'text-slate-600 dark:text-slate-400'}`}
                       >
-                        <td className="py-2">{label} {r.method === method && <span className="ml-1 text-xs text-blue-500">(active)</span>}</td>
+                        <td className="py-2">{label} {r.method === method && <span className="ml-1 text-xs text-brand-500">(active)</span>}</td>
                         <td className="py-2 text-right">{r.neverPaysOff ? 'Never' : formatMonths(r.totalMonths)}</td>
                         <td className="py-2 text-right">{formatAmount(r.totalInterestPaid, currency)}</td>
                         <td className="py-2 text-right">{r.neverPaysOff ? '—' : formatDate(r.debtFreeDate)}</td>

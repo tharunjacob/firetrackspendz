@@ -2,7 +2,7 @@
 export const PlanBadge = ({ plan }: { plan: string }) => (
   <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
     plan === 'enterprise' ? 'bg-amber-100 text-amber-700' :
-    plan === 'pro' ? 'bg-purple-100 text-purple-700' :
+    plan === 'pro' ? 'bg-brand-100 text-brand-700' :
     'bg-slate-100 text-slate-600'
   }`}>
     {plan || 'free'}
@@ -21,7 +21,7 @@ export const LevelBadge = ({ level }: { level: string }) => (
   <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
     level === 'error' ? 'bg-red-100 text-red-700' :
     level === 'warn' ? 'bg-amber-100 text-amber-700' :
-    'bg-blue-100 text-blue-700'
+    'bg-brand-100 text-brand-700'
   }`}>{level.toUpperCase()}</span>
 );
 

@@ -82,7 +82,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
 
       {/* Hero Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="card p-4 col-span-2 lg:col-span-1 bg-gradient-to-br from-brand-600 to-purple-600 text-white">
+        <div className="card p-4 col-span-2 lg:col-span-1 bg-brand-600 text-white">
           <p className="text-xs text-brand-200 uppercase tracking-wider">Net Worth</p>
           <p className="text-2xl font-extrabold mt-1">{fmt(latest.totalCurrentValue)}</p>
           <p className="text-xs text-brand-200 mt-1">{fmtDate(latest.date)}</p>
@@ -233,7 +233,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
                   <span className="w-32 truncate text-slate-600">{cr.category}</span>
                   <div className="flex-1 flex gap-4 items-center">
                     {principalDelta !== 0 && (
-                      <span className="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-600">
+                      <span className="text-xs px-2 py-0.5 rounded bg-brand-50 text-brand-600">
                         New money: {principalDelta >= 0 ? '+' : ''}{fmt(principalDelta)}
                       </span>
                     )}

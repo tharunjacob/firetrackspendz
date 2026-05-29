@@ -68,7 +68,7 @@ export const TransactionTable = ({
       <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
         {paginated.map(t => (
           <React.Fragment key={t.id}>
-            <tr className={`hover:bg-slate-50 dark:hover:bg-slate-700 ${selectedIds.has(t.id) ? 'bg-brand-50 dark:bg-brand-950/30' : ''} ${editId === t.id ? 'bg-indigo-50/50 dark:bg-indigo-900/20' : ''}`}>
+            <tr className={`hover:bg-slate-50 dark:hover:bg-slate-700 ${selectedIds.has(t.id) ? 'bg-brand-50 dark:bg-brand-950/30' : ''} ${editId === t.id ? 'bg-brand-50/50 dark:bg-brand-900/20' : ''}`}>
               <td className="px-3 py-2.5">
                 <input type="checkbox" checked={selectedIds.has(t.id)} onChange={() => onToggleSelect(t.id)} className="rounded" />
               </td>
@@ -94,11 +94,11 @@ export const TransactionTable = ({
                 <span className="text-xs text-slate-400">{t.subCategory && t.subCategory !== 'General' ? t.subCategory : '—'}</span>
               </td>
               <td className="px-3 py-2.5">
-                <span className={`text-xs font-medium ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-blue-500'}`}>
+                <span className={`text-xs font-medium ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
                   {t.type}
                 </span>
               </td>
-              <td className={`px-3 py-2.5 text-right font-semibold ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-blue-500'}`}>
+              <td className={`px-3 py-2.5 text-right font-semibold ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
                 {formatAmount(t.amount, currency)}
               </td>
               <td className="px-3 py-2.5">
@@ -115,7 +115,7 @@ export const TransactionTable = ({
             </tr>
             {editId === t.id && (
               <tr>
-                <td colSpan={9} className="px-4 py-4 bg-indigo-50/30 dark:bg-indigo-900/20 border-b-2 border-indigo-200 dark:border-indigo-800">
+                <td colSpan={9} className="px-4 py-4 bg-brand-50/30 dark:bg-brand-900/20 border-b-2 border-brand-200 dark:border-brand-800">
                   <TransactionEditPanel
                     editData={editData}
                     setEditData={setEditData}

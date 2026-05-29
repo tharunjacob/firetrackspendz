@@ -36,7 +36,7 @@ export const NotificationCenter = () => {
     warning:     { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10', icon: 'warning' },
     anomaly:     { color: 'text-red-600 dark:text-red-400',     bg: 'bg-red-500/10',   icon: 'flash' },
     achievement: { color: 'text-green-600 dark:text-green-400', bg: 'bg-green-500/10', icon: 'check' },
-    tip:         { color: 'text-blue-600 dark:text-blue-400',   bg: 'bg-blue-500/10',  icon: 'ai' },
+    tip:         { color: 'text-brand-600 dark:text-brand-400',   bg: 'bg-brand-500/10',  icon: 'ai' },
   };
 
   return (

@@ -196,15 +196,15 @@ export const DataView = () => {
   return (
     <div className="space-y-4 animate-fade-in">
       {showEditHint && (
-        <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3">
-          <Icon name="pencil" className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
-          <p className="flex-1 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
+        <div className="flex items-start gap-3 bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-xl px-4 py-3">
+          <Icon name="pencil" className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" />
+          <p className="flex-1 text-xs text-brand-800 dark:text-brand-300 leading-relaxed">
             Tap any category to edit it. Your corrections automatically apply to future uploads.
           </p>
           <button
             onClick={dismissEditHint}
             aria-label="Dismiss"
-            className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200 shrink-0 p-0.5"
+            className="text-brand-500 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-200 shrink-0 p-0.5"
           >
             <Icon name="close" className="w-4 h-4" />
           </button>
@@ -275,7 +275,7 @@ export const DataView = () => {
               onDelete={onDelete}
             />
             {editId === t.id && (
-              <div className="bg-indigo-50/30 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg px-4 py-4 -mt-1">
+              <div className="bg-brand-50/30 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-lg px-4 py-4 -mt-1">
                 <TransactionEditPanel
                   editData={editData}
                   setEditData={setEditData}

@@ -326,7 +326,9 @@ No markdown fences. No column headers in output. Only the pipe-delimited transac
         category: parts[4] || 'Unclassified',
       };
     }).filter(Boolean);
-  } catch (e) {
+  } catch (e: any) {
+    // Re-throw auth/account errors so the user sees a clear message
+    if (e?.message?.includes('Sign in') || e?.message?.includes('account')) throw e;
     console.error('PDF Extraction Error', e);
     return [];
   }

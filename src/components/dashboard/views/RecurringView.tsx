@@ -12,10 +12,10 @@ import { UpgradePrompt } from '@/components/common/UpgradePrompt';
 // ============================================================
 
 const getFrequencyLabel = (days: number): { label: string; color: string; badgeColor: string } => {
-  if (Math.abs(days - 7) < 2) return { label: 'Weekly', color: 'text-blue-600', badgeColor: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800' };
-  if (Math.abs(days - 30.5) < 5) return { label: 'Monthly', color: 'text-indigo-600', badgeColor: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' };
+  if (Math.abs(days - 7) < 2) return { label: 'Weekly', color: 'text-brand-600', badgeColor: 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800' };
+  if (Math.abs(days - 30.5) < 5) return { label: 'Monthly', color: 'text-brand-600', badgeColor: 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800' };
   if (Math.abs(days - 91) < 10) return { label: 'Quarterly', color: 'text-amber-600', badgeColor: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800' };
-  if (Math.abs(days - 365) < 15) return { label: 'Yearly', color: 'text-purple-600', badgeColor: 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800' };
+  if (Math.abs(days - 365) < 15) return { label: 'Yearly', color: 'text-brand-600', badgeColor: 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800' };
   return { label: `Every ${days}d`, color: 'text-slate-600', badgeColor: 'bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600' };
 };
 
@@ -164,8 +164,8 @@ export const RecurringView = () => {
       </div>
 
       {/* Insight Footer */}
-      <div className="card p-4 bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800">
-        <p className="text-sm text-indigo-700 dark:text-indigo-300">
+      <div className="card p-4 bg-brand-50 dark:bg-brand-900/20 border-brand-100 dark:border-brand-800">
+        <p className="text-sm text-brand-700 dark:text-brand-300">
           <strong>Tip:</strong> Your recurring expenses account for approximately{' '}
           <strong>
             {formatAmount(Math.round(totalMonthlyBurn), currency)}/month

@@ -1,5 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { LEGAL } from '@/config/legal';
 
 const PrivacyPage = () => {
   usePageMeta({ title: 'Privacy Policy | TrackSpendZ', description: 'How TrackSpendZ protects your financial data. No Plaid, no screen-scraping, bank-level encryption, and full data deletion on request.', canonical: '/privacy' });
@@ -10,7 +11,7 @@ const PrivacyPage = () => {
       <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-8">Privacy Policy</h1>
 
       <div className="prose prose-slate max-w-none space-y-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-        <p><strong>Last updated:</strong> March 2026</p>
+        <p><strong>Last updated:</strong> {LEGAL.lastUpdated}</p>
 
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Your Data, Your Control</h2>
         <p>
@@ -46,7 +47,9 @@ const PrivacyPage = () => {
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Third-Party Services</h2>
         <p>
           We use Supabase for authentication and database, Google Gemini for AI features,
-          and Stripe for payment processing. Each service has its own privacy policy.
+          and Razorpay for payment processing. Each service has its own privacy policy.
+          We never receive or store your full card details — payment information is handled
+          directly by Razorpay, a PCI-DSS compliant payment provider.
         </p>
 
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Your Rights</h2>
@@ -57,7 +60,10 @@ const PrivacyPage = () => {
 
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-8">Contact</h2>
         <p>
-          Questions about privacy? Email us at privacy@trackspendz.com.
+          Questions about privacy? Email us at{' '}
+          <a href={`mailto:${LEGAL.privacyEmail}`}>{LEGAL.privacyEmail}</a>, or see our{' '}
+          <Link to="/contact" className="text-brand-600 hover:underline">Contact page</Link>{' '}
+          for full business details.
         </p>
       </div>
 

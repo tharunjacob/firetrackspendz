@@ -58,7 +58,7 @@ export const MetricCards = ({ totalIncome, totalExpenses, netSavings, currency, 
           title={`Net Savings ${yearSuffix}`}
           value={formatAmount(netSavings, currency)}
           accentColor={netSavings >= 0 ? COLORS.income.dark : COLORS.expense.dark}
-          label="Savings" labelColor="text-blue-600"
+          label="Savings" labelColor="text-brand-600"
         />
       </div>
     </div>

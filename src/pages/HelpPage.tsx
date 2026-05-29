@@ -28,8 +28,8 @@ const sections: HelpSection[] = [
         <p><strong className="text-slate-800 dark:text-slate-200">2. Name the account</strong> — Enter a label like &ldquo;HDFC Savings&rdquo; or &ldquo;Amex Credit Card&rdquo; so you can filter by account later.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">3. Add more files</strong> — Click &ldquo;Add Another File&rdquo; to upload statements from multiple banks or accounts in one go.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">4. Hit Analyze</strong> — TrackSpendZ will parse every row, categorise transactions, detect inter-account transfers, and take you straight to your Summary dashboard.</p>
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mt-2">
-          <p className="text-blue-800 dark:text-blue-300 text-xs font-medium">Tip: You can try the dashboard without signing up. Upload a file and explore — sign up only when you want to save your data.</p>
+        <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-xl p-4 mt-2">
+          <p className="text-brand-800 dark:text-brand-300 text-xs font-medium">Tip: You can try the dashboard without signing up. Upload a file and explore — sign up only when you want to save your data.</p>
         </div>
       </div>
     ),
@@ -184,7 +184,7 @@ const sections: HelpSection[] = [
     content: (
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <p>Go to <strong className="text-slate-800 dark:text-slate-200">Settings → Export Data</strong> to download all your transactions as a CSV or JSON file.</p>
-        <p>Enterprise users can also use the API to pull data programmatically — see the API section below.</p>
+        <p>Enterprise users get additional tax-ready CSV/PDF export reports for sharing with an accountant or for record-keeping.</p>
       </div>
     ),
   },
@@ -238,7 +238,7 @@ const HelpPage = () => {
 
   usePageMeta({ title: 'Help Center — Guides & FAQ | TrackSpendZ', description: 'Learn how to upload bank statements, set budgets, use the FIRE calculator, and get the most out of TrackSpendZ. Step-by-step guides and FAQ.', canonical: '/help' });
 
-  // Handle anchor links (e.g. /help#api)
+  // Handle anchor links (e.g. /help#fire)
   useEffect(() => {
     const hash = location.hash.replace('#', '');
     if (hash) {

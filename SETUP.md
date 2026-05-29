@@ -241,7 +241,7 @@ src/
 │   ├── common/          # Icons, Toast, ErrorBoundary
 │   ├── layout/          # Navbar
 │   ├── upload/          # File uploader
-│   └── dashboard/       # Dashboard shell + 14 view tabs + notifications
+│   └── dashboard/       # Dashboard shell + 15 view tabs + notifications
 └── pages/               # Route pages
     ├── LandingPage       # Marketing homepage
     ├── PricingPage       # Plans & FAQ
@@ -253,7 +253,7 @@ src/
     └── ...
 ```
 
-## File Count: 143 source files, 10 config files, 5 public assets | Last updated: May 2026
+## File Count: 149 source files (138 excluding tests) | Last updated: May 2026
 
 ## New in v2.1 (March 2026)
 
@@ -270,7 +270,7 @@ src/
 - **Help Center** (`/help`) — Searchable documentation with 13 topic sections covering every feature
 - **Upload-First Experience** — Dashboard is now public; anonymous users can upload files and see 500 most recent transactions, rest behind signup paywall
 - **Family Dashboard** (`/family`) — Enterprise feature for household finance management (up to 5 members)
-- **API Access Panel** — Enterprise feature in Settings (marked "Coming Soon")
+- ~~**API Access Panel**~~ — Was an Enterprise "Coming Soon" panel; **removed in May 2026** (never built, no backend). Not a current feature.
 - **Paywall Banner** — Shown to anonymous users who exceed the 500 transaction free preview
 - **Password-Protected Files** — Improved UI with lock icon, inline messaging, and auto-focus
 - **Smart Notifications** — Bell icon in navbar with bill reminders, budget alerts, anomaly detection, achievements

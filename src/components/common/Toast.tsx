@@ -1,7 +1,7 @@
 ﻿
 export const Toast = ({ message, type = 'success', onClose }: { message: string; type?: 'success' | 'error' | 'info'; onClose: () => void }) => {
-  const bg = type === 'error' ? 'bg-red-900 border-red-700' : type === 'info' ? 'bg-blue-900 border-blue-700' : 'bg-slate-900 border-slate-700';
-  const dot = type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-blue-400' : 'bg-green-500';
+  const bg = type === 'error' ? 'bg-red-900 border-red-700' : type === 'info' ? 'bg-brand-900 border-brand-700' : 'bg-slate-900 border-slate-700';
+  const dot = type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-brand-400' : 'bg-green-500';
   return (
   <div className="fixed bottom-6 right-6 z-[100] animate-fade-in">
     <div className={`text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 border ${bg}`}>

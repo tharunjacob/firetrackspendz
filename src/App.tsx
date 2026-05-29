@@ -26,6 +26,9 @@ const AdminPage = lazy(() => import('@/pages/AdminPage'));
 const NetAssetPage = lazy(() => import('@/pages/NetAssetPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const TermsPage = lazy(() => import('@/pages/TermsPage'));
+const RefundPolicyPage = lazy(() => import('@/pages/RefundPolicyPage'));
+const ShippingPolicyPage = lazy(() => import('@/pages/ShippingPolicyPage'));
+const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
 const FamilyDashboard = lazy(() => import('@/pages/FamilyDashboard'));
@@ -58,6 +61,9 @@ function App() {
           <Route path={ROUTES.FEATURES} element={<FeaturesPage />} />
           <Route path={ROUTES.PRIVACY} element={<PrivacyPage />} />
           <Route path={ROUTES.TERMS} element={<TermsPage />} />
+          <Route path={ROUTES.REFUND} element={<RefundPolicyPage />} />
+          <Route path={ROUTES.SHIPPING} element={<ShippingPolicyPage />} />
+          <Route path={ROUTES.CONTACT} element={<ContactPage />} />
           <Route path={ROUTES.HELP} element={<HelpPage />} />
           <Route path={ROUTES.FEEDBACK} element={<FeedbackPage />} />
           <Route path={ROUTES.AUTH_CALLBACK} element={<AuthCallback />} />

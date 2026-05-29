@@ -135,7 +135,7 @@ const FunnelSection = ({ steps }: { steps: FunnelStep[] }) => {
       <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-3 gap-3">
         <KPI label="Top of Funnel" value={(steps[0]?.users || 0).toLocaleString()} sub="sessions" />
         <KPI label="Reached Upload" value={`${steps[2]?.pct_of_top || 0}%`} sub="of sessions" color="text-brand-600" />
-        <KPI label="Upgrade Intent" value={`${steps[5]?.pct_of_top || 0}%`} sub="clicked upgrade" color="text-purple-600" />
+        <KPI label="Upgrade Intent" value={`${steps[5]?.pct_of_top || 0}%`} sub="clicked upgrade" color="text-brand-600" />
       </div>
     </div>
   );
@@ -236,7 +236,7 @@ const AdoptionSection = ({ rows }: { rows: FeatureAdoptionRow[] }) => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
         {rows.slice(0, 4).map(r => (
           <KPI key={r.feature} label={r.feature.replace(/_/g, ' ')}
-            value={r.unique_users} sub={`${r.adoption_pct}% adoption`} color="text-indigo-600" />
+            value={r.unique_users} sub={`${r.adoption_pct}% adoption`} color="text-brand-600" />
         ))}
       </div>
     </div>
@@ -260,7 +260,7 @@ const SessionSection = ({
       <KPI label="Total Sessions"   value={stats.total_sessions.toLocaleString()} />
       <KPI label="Unique Users"     value={stats.total_users.toLocaleString()} color="text-brand-600" />
       <KPI label="Avg Duration"     value={fmtDuration(stats.avg_duration_seconds)} color="text-green-600" />
-      <KPI label="Pages / Session"  value={stats.avg_pages_per_session.toFixed(1)} color="text-purple-600" />
+      <KPI label="Pages / Session"  value={stats.avg_pages_per_session.toFixed(1)} color="text-brand-600" />
     </div>
 
     {dau.length > 0 ? (
@@ -294,7 +294,7 @@ const RevenueSection = ({ metrics }: { metrics: RevenueMetrics }) => (
       <KPI label="MRR"             value={`$${metrics.mrr.toLocaleString()}`} color="text-green-600" sub="Monthly Recurring" />
       <KPI label="ARR"             value={`$${metrics.arr.toLocaleString()}`} color="text-green-600" sub="Annual Recurring" />
       <KPI label="ARPU"            value={`$${metrics.arpu.toFixed(2)}`}     color="text-brand-600" sub="per paying user" />
-      <KPI label="Conversion Rate" value={`${metrics.conversion_rate}%`}     color="text-purple-600" sub="free → paid" />
+      <KPI label="Conversion Rate" value={`${metrics.conversion_rate}%`}     color="text-brand-600" sub="free → paid" />
       <KPI label="LTV Estimate"    value={`$${metrics.ltv_estimate.toFixed(0)}`} color="text-amber-600" sub="2.5× ARR/user" />
     </div>
 
@@ -303,9 +303,9 @@ const RevenueSection = ({ metrics }: { metrics: RevenueMetrics }) => (
         <p className="text-3xl font-black text-slate-800">{metrics.total_users}</p>
         <p className="text-xs text-slate-400 mt-1">Total Users</p>
       </div>
-      <div className="bg-purple-50 rounded-xl p-4 text-center">
-        <p className="text-3xl font-black text-purple-700">{metrics.pro_users}</p>
-        <p className="text-xs text-purple-400 mt-1">Pro × $49/yr</p>
+      <div className="bg-brand-50 rounded-xl p-4 text-center">
+        <p className="text-3xl font-black text-brand-700">{metrics.pro_users}</p>
+        <p className="text-xs text-brand-400 mt-1">Pro × $49/yr</p>
       </div>
       <div className="bg-amber-50 rounded-xl p-4 text-center">
         <p className="text-3xl font-black text-amber-700">{metrics.enterprise_users}</p>
@@ -320,13 +320,13 @@ const RevenueSection = ({ metrics }: { metrics: RevenueMetrics }) => (
         <div className="w-full h-5 rounded-full overflow-hidden flex">
           <div className="bg-slate-300 transition-all" title="Free"
             style={{ width: `${((metrics.total_users - metrics.paying_users) / metrics.total_users) * 100}%` }} />
-          <div className="bg-purple-400 transition-all" title="Pro"
+          <div className="bg-brand-400 transition-all" title="Pro"
             style={{ width: `${(metrics.pro_users / metrics.total_users) * 100}%` }} />
           <div className="bg-amber-400 transition-all" title="Enterprise"
             style={{ width: `${(metrics.enterprise_users / metrics.total_users) * 100}%` }} />
         </div>
         <div className="flex gap-4 mt-1.5">
-          {[['bg-slate-300','Free'], ['bg-purple-400','Pro'], ['bg-amber-400','Enterprise']].map(([c, l]) => (
+          {[['bg-slate-300','Free'], ['bg-brand-400','Pro'], ['bg-amber-400','Enterprise']].map(([c, l]) => (
             <div key={l} className="flex items-center gap-1">
               <div className={`w-2.5 h-2.5 rounded-full ${c}`} />
               <span className="text-xs text-slate-400">{l}</span>

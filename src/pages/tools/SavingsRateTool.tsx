@@ -271,7 +271,7 @@ const SavingsRateTool: React.FC = () => {
         )}
 
         {/* CTA */}
-        <div className="mt-12 bg-gradient-to-br from-brand-50 dark:from-brand-950 to-purple-50 dark:to-purple-900/20 rounded-2xl border border-brand-200 dark:border-brand-800 p-8 text-center">
+        <div className="mt-12 bg-brand-50 dark:bg-brand-950 rounded-2xl border border-brand-200 dark:border-brand-800 p-8 text-center">
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
             Track your savings rate automatically from bank statements
           </h2>
