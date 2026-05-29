@@ -191,7 +191,6 @@ export const PLAN_FEATURES: Record<SubscriptionPlan, string[]> = {
     'shareable_milestones',
     'debt_payoff',
     'family_dashboard',
-    'api_access',
     'custom_categories',
     'tax_reports',
     'csv_pdf_export',

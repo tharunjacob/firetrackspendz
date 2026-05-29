@@ -1,10 +1,11 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { Transaction } from '@/types';
 
-// Hoisted refs let tests flip the cached _isLoggedIn flag inside storage.ts
-// by triggering the captured onAuthStateChange callback.
+// Hoisted ref lets tests control what supabase.auth.getSession() returns —
+// storage.ts reads the live session on every call (no cached flag) to decide
+// cloud-vs-local routing, so this is what drives that decision.
 const { authRef } = vi.hoisted(() => ({
-  authRef: { handler: null as null | ((event: string, session: any) => void) },
+  authRef: { session: null as any },
 }));
 
 vi.mock('../localStorage', () => ({
@@ -24,10 +25,7 @@ vi.mock('../supabase', () => ({
   isCloudEnabled: vi.fn().mockReturnValue(true),
   getSupabase: () => ({
     auth: {
-      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
-      onAuthStateChange: vi.fn((cb: any) => {
-        authRef.handler = cb;
-      }),
+      getSession: () => Promise.resolve({ data: { session: authRef.session } }),
     },
   }),
 }));
@@ -53,8 +51,8 @@ const mockTx = (id: string): Transaction => ({
 });
 
 const setLoggedIn = (loggedIn: boolean) => {
-  // Trigger the captured auth change to flip the module-level _isLoggedIn cache
-  authRef.handler?.(loggedIn ? 'SIGNED_IN' : 'SIGNED_OUT', loggedIn ? { user: { id: 'u1' } } : null);
+  // storage.ts reads getSession() live, so just set what it will return.
+  authRef.session = loggedIn ? { user: { id: 'u1' } } : null;
 };
 
 const resetMocks = () => {

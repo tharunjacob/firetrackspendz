@@ -7,7 +7,6 @@ import { SubscriptionManager } from '@/components/settings/SubscriptionManager';
 import { getOrCreateReferralCode, getReferralStats } from '@/services/referral';
 import { getSupabase } from '@/services/supabase';
 import { TABLES } from '@/config/database';
-import { APIAccessPanel } from '@/components/enterprise/APIAccessPanel';
 import type { Currency, ReferralStats } from '@/types';
 import { usePageMeta } from '@/hooks/usePageMeta';
 
@@ -129,11 +128,6 @@ const SettingsPage = () => {
             <Icon name="download" className="w-4 h-4" /> Export JSON
           </button>
         </div>
-      </section>
-
-      {/* API Access (Enterprise) */}
-      <section className="mb-6">
-        <APIAccessPanel />
       </section>
 
       {/* Referral Program */}

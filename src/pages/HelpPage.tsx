@@ -197,7 +197,7 @@ const sections: HelpSection[] = [
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <p><strong className="text-slate-800 dark:text-slate-200">Free:</strong> Up to 500 transactions, basic categorization, monthly breakdowns, local storage.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">Pro ($49/year):</strong> Unlimited transactions, AI advisor, FIRE calculator, net worth, budgets, cloud sync, trend analysis, anomaly detection.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">Enterprise ($149/year):</strong> Everything in Pro plus family accounts (5 members), shared budgets &amp; goals, API access, custom categories, advanced tax categorization, CSV/PDF export reports.</p>
+        <p><strong className="text-slate-800 dark:text-slate-200">Enterprise ($149/year):</strong> Everything in Pro plus family accounts (5 members), shared budgets &amp; goals, custom categories, advanced tax categorization, CSV/PDF export reports.</p>
         <p>You can try the app free without signing up — upload a statement and explore all views instantly. <Link to="/pricing" className="text-brand-600 hover:underline">View full pricing →</Link></p>
       </div>
     ),
@@ -212,23 +212,6 @@ const sections: HelpSection[] = [
         <p>Enterprise users can invite up to 5 family members to share a household view.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">What you get:</strong> Combined income/expense overview, per-member contribution breakdown, comparison charts, and shared budget management.</p>
         <p>Navigate to <strong className="text-slate-800 dark:text-slate-200">/family</strong> from the sidebar or settings to manage your family group.</p>
-      </div>
-    ),
-  },
-  {
-    id: 'api',
-    icon: 'cog',
-    title: 'API Access (Enterprise)',
-    summary: 'Programmatic access to your financial data — coming soon.',
-    content: (
-      <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3">
-          <p className="text-amber-800 dark:text-amber-300 font-semibold text-xs uppercase tracking-wide mb-1">Coming Soon</p>
-          <p>The REST API is currently in development. Enterprise subscribers will be the first to receive access when it launches.</p>
-        </div>
-        <p>The planned API will allow Enterprise users to generate API keys in <strong className="text-slate-800 dark:text-slate-200">Settings → API Access</strong> to pull data into their own tools, dashboards, and spreadsheets.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">Planned endpoints:</strong> GET /transactions, GET /analytics/monthly, GET /export — with Bearer token authentication and up to 5 revocable API keys per account.</p>
-        <p>Want early access? <a href="mailto:support@trackspendz.com" className="text-brand-600 hover:underline">Contact us</a> to join the waitlist.</p>
       </div>
     ),
   },

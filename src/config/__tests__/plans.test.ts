@@ -39,6 +39,8 @@ describe('Feature Gating (canAccessFeature)', () => {
     expect(canAccessFeature('enterprise', 'fire_calculator')).toBe(true);
     expect(canAccessFeature('enterprise', 'anomaly_detection')).toBe(true);
     expect(canAccessFeature('enterprise', 'family_dashboard')).toBe(true);
-    expect(canAccessFeature('enterprise', 'api_access')).toBe(true);
+    expect(canAccessFeature('enterprise', 'tax_reports')).toBe(true);
+    // API access was removed (no backend exists) — must NOT be advertised as available.
+    expect(canAccessFeature('enterprise', 'api_access')).toBe(false);
   });
 });

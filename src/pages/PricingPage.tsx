@@ -123,7 +123,6 @@ const PricingPage = () => {
         'Shared budgets & goals',
         'Advanced tax categorization',
         'CSV/PDF export reports',
-        'API access (coming soon)',
         'Dedicated support',
         'Custom categories & rules',
       ],

@@ -193,7 +193,12 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     const isAnon = !userId;
 
     try {
-      let fullDataset = isAnon ? [...allTransactionsRaw] : [...transactions];
+      // Merge/dedup against the FULL set (allRawRef), never the capped visible
+      // `transactions`. For a free user with >500 transactions, deduping only
+      // against the visible 500 let overlapping re-uploads slip duplicate rows of
+      // the hidden transactions into storage. allRawRef holds the complete set
+      // for both anonymous and signed-in users, so this compares against everything.
+      let fullDataset = [...allRawRef.current];
       let completed = 0;
       let totalDuplicates = 0;
       let totalNewTransactions = 0;

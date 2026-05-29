@@ -8,26 +8,27 @@ import { logEvent } from './logger';
 // Storage Gateway - Routes to local or cloud storage
 // ============================================================
 
-// Cached auth state — avoids calling getSession() on every operation
-let _isLoggedIn = false;
-
-/** Initialize auth state cache */
-const initAuthCache = () => {
-  if (!isCloudEnabled()) return;
-  const supabase = getSupabase();
-
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    _isLoggedIn = !!session;
-  }).catch(() => { /* ignore */ });
-
-  supabase.auth.onAuthStateChange((_event, session) => {
-    _isLoggedIn = !!session;
-  });
+/**
+ * Resolve the CURRENT auth state directly from Supabase on every call.
+ *
+ * We deliberately do NOT cache this in a module-level boolean. A cached flag is
+ * populated asynchronously at startup and can still read `false` for a returning
+ * signed-in user during the brief window before the session resolves — which
+ * would route their reads/writes to local IndexedDB instead of the cloud
+ * (empty dashboard on refresh, or an edit saved to the wrong backend that only
+ * self-heals on the next sign-in). getSession() reads the persisted session
+ * locally (no network round-trip), so calling it per-operation is cheap and
+ * always correct.
+ */
+const isUserLoggedIn = async (): Promise<boolean> => {
+  if (!isCloudEnabled()) return false;
+  try {
+    const { data: { session } } = await getSupabase().auth.getSession();
+    return !!session;
+  } catch {
+    return false;
+  }
 };
-
-initAuthCache();
-
-const isUserLoggedIn = (): boolean => _isLoggedIn;
 
 const isMimicMode = (): boolean => {
   const params = new URLSearchParams(window.location.search);
@@ -46,7 +47,7 @@ export const saveToStorage = async (transactions: Transaction[]): Promise<void> 
   }
 
   try {
-    if (isUserLoggedIn()) {
+    if (await isUserLoggedIn()) {
       await cloudSave(transactions);
       logEvent('data_saved_cloud', { count: transactions.length });
     } else {
@@ -74,7 +75,7 @@ export const loadFromStorage = async (): Promise<Transaction[]> => {
       return await cloudLoad(mimicId);
     }
 
-    if (isUserLoggedIn()) {
+    if (await isUserLoggedIn()) {
       return await cloudLoad();
     } else {
       return await localLoad();
@@ -93,7 +94,7 @@ export const deleteFromStorage = async (ids: string[]): Promise<void> => {
   if (isMimicMode()) return;
 
   try {
-    if (isUserLoggedIn()) {
+    if (await isUserLoggedIn()) {
       await cloudDelete(ids);
       logEvent('data_deleted_cloud', { count: ids.length });
     } else {
@@ -120,7 +121,7 @@ export const deleteFromStorage = async (ids: string[]): Promise<void> => {
  * separate from this function.
  */
 export const syncLocalToCloud = async (): Promise<void> => {
-  if (!isUserLoggedIn()) return;
+  if (!(await isUserLoggedIn())) return;
 
   const localData = await localLoad();
   if (localData.length > 0) {
@@ -138,7 +139,7 @@ export const syncLocalToCloud = async (): Promise<void> => {
  */
 export const resetAllData = async (): Promise<void> => {
   await localReset();
-  if (isUserLoggedIn()) {
+  if (await isUserLoggedIn()) {
     try {
       const allCloud = await cloudLoad();
       if (allCloud.length > 0) {
