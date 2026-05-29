@@ -53,7 +53,7 @@ const CategoryTrendChart = ({ data, type, formatCurrency }: {
     return { yearlyData: yearly, topCategories: [...topCats, 'Others'] };
   }, [data, type]);
 
-  const colors = type === 'Income' ? COLORS.income.palette : COLORS.expense.palette;
+  const colors = COLORS.categories;
 
   return (
     <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm">

@@ -151,8 +151,8 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
     <div className="space-y-6 animate-fade-in">
       {/* Donut Charts – matches live version */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <DonutChartCard title="Income Sources" data={categoryData.income} colors={COLORS.income.palette} formatCurrency={fmtCurrency} />
-        <DonutChartCard title="Top Expense Categories" data={categoryData.expense} colors={COLORS.expense.palette} formatCurrency={fmtCurrency} />
+        <DonutChartCard title="Income Sources" data={categoryData.income} colors={COLORS.categories} formatCurrency={fmtCurrency} />
+        <DonutChartCard title="Top Expense Categories" data={categoryData.expense} colors={COLORS.categories} formatCurrency={fmtCurrency} />
       </div>
 
       {/* Key Metrics */}

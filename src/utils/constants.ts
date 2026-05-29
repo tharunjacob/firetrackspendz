@@ -60,26 +60,33 @@ export const formatCompact = (value: number, currency: Currency): string => {
 };
 
 // Chart colors
+//
+// Two distinct roles, kept strictly separate:
+//   · Semantic signals — `income` (green) and `expense` (red). Used ONLY to
+//     mean positive vs negative (income-vs-expense bars/lines). Never reused
+//     as category identity.
+//   · `categories` — a cohesive, slightly desaturated categorical palette
+//     anchored on Classic Blue (#2563EB) for category identity in donuts,
+//     trends and breakdowns. Deliberately avoids signal green/red so the two
+//     roles never collide.
 export const COLORS = {
   brand: '#2563eb',
-  income: {
-    light: '#A8D8A8',
-    medium: '#78B482',
-    dark: '#48905C',
-    palette: ['#A8D8A8', '#90C695', '#78B482', '#60A26F', '#48905C', '#307e47', '#186c31'],
-  },
-  expense: {
-    light: '#fca5a5',
-    medium: '#f87171',
-    dark: '#dc2626',
-    palette: ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#450a0a'],
-  },
+  income:  { medium: '#78B482', dark: '#48905C' },
+  expense: { medium: '#f87171', dark: '#dc2626' },
   categories: [
-    '#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6',
-    '#8b5cf6', '#ef4444', '#14b8a6', '#f97316', '#06b6d4',
-    '#84cc16', '#e879f9', '#22d3ee', '#a3e635', '#fb923c',
+    '#2563eb', // blue (brand)
+    '#0d9488', // teal
+    '#8b5cf6', // violet
+    '#f59e0b', // amber
+    '#db2777', // pink
+    '#0ea5e9', // sky
+    '#6366f1', // indigo
+    '#ea580c', // orange
+    '#0891b2', // cyan
+    '#7c3aed', // deep violet
+    '#64748b', // slate
+    '#c026d3', // fuchsia
   ],
-  pastel: ['#fecaca', '#fed7aa', '#fef08a', '#d9f99d', '#bfdbfe', '#e9d5ff', '#fbcfe8'],
 };
 
 // Category defaults
