@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/UIContext';
 import type { Transaction } from '@/types';
 import { formatAmount, COLORS } from '@/utils/constants';
 import { getMonthlyBreakdown, getDeepInsights, calculateFireMetrics } from '@/services/analysis';
+import { MetricCard, type Tone } from '@/components/dashboard/MetricCard';
 import { FIRE_MULTIPLIER } from './fire/shared';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
@@ -170,29 +171,33 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
           <p className="text-xs text-slate-400 uppercase">Personal Inflation</p>
           <p className="text-xl font-bold text-red-500">{(fire.personalInflation * 100).toFixed(1)}%</p>
         </div>
-        <div
-          className="stat-card cursor-pointer hover:ring-2 hover:ring-brand-400 hover:ring-offset-2 transition-shadow"
+        <button
+          type="button"
+          className="stat-card text-left focus-ring cursor-pointer hover:ring-2 hover:ring-brand-400 hover:ring-offset-2 transition-shadow"
           onClick={() => setActiveTab('FIRE Calculator')}
         >
-          <p className="text-xs text-slate-400 uppercase">FIRE Number</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">FIRE Number</p>
           <p className="text-xl font-bold text-brand-600">{fmtCurrency(fire.fireNumberCurrent)}</p>
-          <p className="text-xs text-slate-400 mt-0.5">Based on {multiplier}× annual expenses</p>
-          <p className="text-xs text-brand-500 hover:text-brand-600 mt-1 font-medium">→ Full Analysis</p>
-        </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Based on {multiplier}× annual expenses</p>
+          <p className="text-xs text-brand-500 mt-1 font-medium">→ Full Analysis</p>
+        </button>
       </div>
 
       {/* Insight Cards */}
       {insights.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {insights.map((insight, i) => (
-            <div key={i} className={`card p-5 border-l-4 transition-transform hover:scale-[1.01] ${insight.trend === 'good' ? 'border-l-green-500' : insight.trend === 'bad' ? 'border-l-red-500' : 'border-l-amber-500'}`}>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{insight.title}</p>
-              <p className={`text-2xl font-bold ${insight.trend === 'good' ? 'text-green-600' : insight.trend === 'bad' ? 'text-red-500' : 'text-amber-600'}`}>
-                {insight.value}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">{insight.description}</p>
-            </div>
-          ))}
+          {insights.map((insight, i) => {
+            const tone: Tone = insight.trend === 'good' ? 'positive' : insight.trend === 'bad' ? 'negative' : 'warning';
+            return (
+              <MetricCard
+                key={i}
+                eyebrow={insight.title}
+                value={insight.value}
+                valueTone={tone}
+                description={insight.description}
+              />
+            );
+          })}
         </div>
       )}
 
