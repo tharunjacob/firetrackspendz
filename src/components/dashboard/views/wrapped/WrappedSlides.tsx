@@ -11,7 +11,7 @@ const StatCard = ({ label, value, sub, accent }: {
   accent?: string;
 }) => (
   <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
-    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</span>
+    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{label}</span>
     <span className={`text-2xl sm:text-3xl font-bold ${accent || 'text-slate-800 dark:text-slate-100'} leading-tight`}>{value}</span>
     {sub && <span className="text-sm text-slate-500 dark:text-slate-400 mt-1">{sub}</span>}
   </div>
@@ -75,14 +75,14 @@ export const WrappedSlides = ({ stats, isPro, fmt }: Props) => {
       <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm flex flex-col items-center justify-center">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Net Savings</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Net Savings</span>
             <span className={`text-4xl font-bold ${stats.netSavings >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
               {fmt(stats.netSavings)}
             </span>
             <span className="text-sm text-slate-500 dark:text-slate-400 mt-1">Income minus Expenses</span>
           </div>
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm flex flex-col items-center justify-center">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Top Spending Category</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Top Spending Category</span>
             <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.topCategory.name}</span>
             <span className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               {fmt(stats.topCategory.amount)} ({stats.topCategory.pct.toFixed(1)}% of expenses)
@@ -118,12 +118,12 @@ export const WrappedSlides = ({ stats, isPro, fmt }: Props) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Best Month</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Best Month</span>
             <p className="text-2xl font-bold text-emerald-600 mt-1">{stats.bestMonth.month}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Saved {fmt(stats.bestMonth.savings)}</p>
           </div>
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Worst Month</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Worst Month</span>
             <p className="text-2xl font-bold text-red-500 mt-1">{stats.worstMonth.month}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
               {stats.worstMonth.savings >= 0 ? `Saved ${fmt(stats.worstMonth.savings)}` : `Overspent by ${fmt(Math.abs(stats.worstMonth.savings))}`}
@@ -133,13 +133,13 @@ export const WrappedSlides = ({ stats, isPro, fmt }: Props) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Biggest Single Expense</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Biggest Single Expense</span>
             <p className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">{fmt(stats.biggestExpense.amount)}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 truncate" title={stats.biggestExpense.notes}>
               {stats.biggestExpense.notes}
             </p>
             {stats.biggestExpense.date && (
-              <p className="text-xs text-slate-400 mt-0.5">{stats.biggestExpense.date}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{stats.biggestExpense.date}</p>
             )}
           </div>
           <StatCard

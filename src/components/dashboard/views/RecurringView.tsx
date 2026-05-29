@@ -53,7 +53,7 @@ export const RecurringView = () => {
 
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-16 text-slate-400">
+      <div className="text-center py-16 text-slate-500">
         <Icon name="chart" className="w-12 h-12 mx-auto mb-4 opacity-50" />
         <p className="text-lg font-medium">No transactions yet</p>
         <p className="text-sm">Upload a statement to detect recurring expenses.</p>
@@ -81,15 +81,15 @@ export const RecurringView = () => {
       {/* Header Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="card p-4 text-center">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Recurring Bills Found</p>
+          <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Recurring Bills Found</p>
           <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{recurring.length}</p>
         </div>
         <div className="card p-4 text-center">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Monthly Recurring</p>
+          <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Monthly Recurring</p>
           <p className="text-2xl font-bold text-red-500">{formatAmount(Math.round(totalMonthlyBurn), currency)}</p>
         </div>
         <div className="card p-4 text-center">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Yearly Recurring</p>
+          <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Yearly Recurring</p>
           <p className="text-2xl font-bold text-red-400">{formatAmount(Math.round(totalYearlyBurn), currency)}</p>
         </div>
       </div>
@@ -117,7 +117,7 @@ export const RecurringView = () => {
         {sorted.map((item, idx) => {
           const freq = getFrequencyLabel(item.frequency);
           const monthlyEq = getMonthlyEquivalent(item.avgAmount, item.frequency);
-          const confidenceColor = item.confidence > 80 ? 'text-green-600' : item.confidence > 50 ? 'text-amber-500' : 'text-slate-400';
+          const confidenceColor = item.confidence > 80 ? 'text-green-600' : item.confidence > 50 ? 'text-amber-500' : 'text-slate-500';
 
           return (
             <div key={idx} className="card p-4 hover:shadow-md transition-shadow">
@@ -129,7 +129,7 @@ export const RecurringView = () => {
                       {freq.label}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-slate-400">
+                  <div className="flex items-center gap-4 text-xs text-slate-500">
                     <span>Last charged: {item.lastDate}</span>
                     <span className={confidenceColor}>
                       {item.confidence.toFixed(0)}% confidence
@@ -139,9 +139,9 @@ export const RecurringView = () => {
                 <div className="text-right shrink-0">
                   <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
                     {formatAmount(item.avgAmount, currency)}
-                    <span className="text-xs text-slate-400 font-normal ml-1">/{freq.label.toLowerCase()}</span>
+                    <span className="text-xs text-slate-500 font-normal ml-1">/{freq.label.toLowerCase()}</span>
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     ~{formatAmount(Math.round(monthlyEq), currency)}/mo
                   </p>
                 </div>
@@ -190,7 +190,7 @@ export const RecurringView = () => {
                 ? 'text-red-500'
                 : c.trend === 'down'
                 ? 'text-green-600'
-                : 'text-slate-400';
+                : 'text-slate-500';
               return (
                 <div key={c.category} className="card p-4">
                   <div className="flex items-start justify-between gap-2">
@@ -201,16 +201,16 @@ export const RecurringView = () => {
                   </div>
                   <p className="text-lg font-bold text-slate-800 dark:text-slate-100 mt-1">
                     ~{formatAmount(c.avgMonthly, currency)}
-                    <span className="text-xs text-slate-400 font-normal">/mo</span>
+                    <span className="text-xs text-slate-500 font-normal">/mo</span>
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">based on {c.monthsOfData} month{c.monthsOfData !== 1 ? 's' : ''}</p>
+                  <p className="text-xs text-slate-500 mt-1">based on {c.monthsOfData} month{c.monthsOfData !== 1 ? 's' : ''}</p>
                 </div>
               );
             })}
           </div>
           <div className="card p-4 bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 flex items-center justify-between">
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Estimated monthly baseline</span>
-            <span className="text-lg font-bold text-slate-800 dark:text-slate-100">{formatAmount(Math.round(monthlyBaseline), currency)}<span className="text-xs text-slate-400 font-normal">/mo</span></span>
+            <span className="text-lg font-bold text-slate-800 dark:text-slate-100">{formatAmount(Math.round(monthlyBaseline), currency)}<span className="text-xs text-slate-500 font-normal">/mo</span></span>
           </div>
         </div>
       )}

@@ -93,7 +93,7 @@ const sections: HelpSection[] = [
           ].map(group => (
             <div key={group.label}>
               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{group.label}</p>
-              <p className="text-xs text-slate-400 mb-2">{group.blurb}</p>
+              <p className="text-xs text-slate-500 mb-2">{group.blurb}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {group.tabs.map(([name, desc]) => (
                   <div key={name} className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
@@ -265,7 +265,7 @@ const HelpPage = () => {
 
         {/* Search */}
         <div className="relative max-w-md mx-auto mb-10">
-          <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
           <input
             type="text"
             placeholder="Search help articles..."
@@ -293,10 +293,10 @@ const HelpPage = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{section.title}</p>
-                  <p className="text-xs text-slate-400 mt-0.5 truncate">{section.summary}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 truncate">{section.summary}</p>
                 </div>
                 <svg
-                  className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200 ${expanded === section.id ? 'rotate-180' : ''}`}
+                  className={`w-5 h-5 text-slate-500 shrink-0 transition-transform duration-200 ${expanded === section.id ? 'rotate-180' : ''}`}
                   fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -312,7 +312,7 @@ const HelpPage = () => {
           ))}
 
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-slate-400">
+            <div className="text-center py-12 text-slate-500">
               <p className="text-sm">No articles match &ldquo;{search}&rdquo;. Try a different search term.</p>
             </div>
           )}

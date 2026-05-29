@@ -58,10 +58,6 @@ const LandingPage = () => {
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <Icon name="shield" className="w-4 h-4 text-green-500" />
-                  No signup required
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Icon name="shield" className="w-4 h-4 text-green-500" />
                   Bank-level encryption
                 </span>
                 <span className="flex items-center gap-1.5">
@@ -82,7 +78,7 @@ const LandingPage = () => {
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
                     <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
                   </div>
-                  <div className="flex-1 mx-3 bg-slate-700 rounded text-xs text-slate-400 px-2 py-0.5">
+                  <div className="flex-1 mx-3 bg-slate-700 rounded text-xs text-slate-500 px-2 py-0.5">
                     trackspendz.com/dashboard
                   </div>
                 </div>
@@ -94,10 +90,10 @@ const LandingPage = () => {
                     {[
                       { label: 'Monthly Spend', value: '₹42,380', sub: '↑ 8% vs last mo', subColor: 'text-red-500' },
                       { label: 'Savings Rate', value: '34%', sub: '↑ On track!', subColor: 'text-green-600' },
-                      { label: 'FIRE Progress', value: '18%', sub: '₹4.2L / ₹23L', subColor: 'text-slate-400' },
+                      { label: 'FIRE Progress', value: '18%', sub: '₹4.2L / ₹23L', subColor: 'text-slate-500' },
                     ].map(m => (
                       <div key={m.label} className="bg-white dark:bg-slate-800 rounded-lg p-2.5 shadow-sm border border-slate-100 dark:border-slate-700">
-                        <p className="text-[10px] text-slate-400 mb-0.5">{m.label}</p>
+                        <p className="text-[10px] text-slate-500 mb-0.5">{m.label}</p>
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{m.value}</p>
                         <p className={`text-[10px] ${m.subColor}`}>{m.sub}</p>
                       </div>
@@ -109,14 +105,14 @@ const LandingPage = () => {
                     <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-2.5">Spending by Category</p>
                     <div className="flex items-center gap-3">
                       <svg viewBox="0 0 36 36" className="w-20 h-20 flex-shrink-0 -rotate-90">
-                        <circle cx="18" cy="18" r="14" fill="none" stroke="#e0e7ff" strokeWidth="4" />
-                        <circle cx="18" cy="14" r="14" fill="none" stroke="#4f46e5" strokeWidth="4"
+                        <circle cx="18" cy="18" r="14" fill="none" stroke="#dbeafe" strokeWidth="4" />
+                        <circle cx="18" cy="14" r="14" fill="none" stroke="#2563eb" strokeWidth="4"
                           strokeDasharray="30.8 57.8" strokeDashoffset="0" />
-                        <circle cx="18" cy="14" r="14" fill="none" stroke="#a5b4fc" strokeWidth="4"
+                        <circle cx="18" cy="14" r="14" fill="none" stroke="#93c5fd" strokeWidth="4"
                           strokeDasharray="17.3 71.3" strokeDashoffset="-30.8" />
                         <circle cx="18" cy="14" r="14" fill="none" stroke="#22c55e" strokeWidth="4"
                           strokeDasharray="12.3 76.3" strokeDashoffset="-48.1" />
-                        <circle cx="18" cy="14" r="14" fill="none" stroke="#f59e0b" strokeWidth="4"
+                        <circle cx="18" cy="14" r="14" fill="none" stroke="#fbbf24" strokeWidth="4"
                           strokeDasharray="9.7 78.9" strokeDashoffset="-60.4" />
                       </svg>
                       <div className="space-y-1.5 flex-1 min-w-0">
@@ -149,7 +145,7 @@ const LandingPage = () => {
                       <div key={i} className="flex items-center px-3 py-1.5 border-b border-slate-50 dark:border-slate-700 last:border-0">
                         <div className="flex-1 min-w-0">
                           <p className="text-[11px] font-medium text-slate-800 dark:text-slate-100">{tx.name}</p>
-                          <p className="text-[10px] text-slate-400">{tx.cat}</p>
+                          <p className="text-[10px] text-slate-500">{tx.cat}</p>
                         </div>
                         <p className={`text-[11px] font-semibold ${tx.amtColor}`}>{tx.amt}</p>
                       </div>
@@ -284,37 +280,16 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">
-              "Why not just use free AI models?"
+              Built for your finances, not a blank chat box
             </h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
-              Fair question. Here's the honest difference.
+              AI chat is great for quick questions. TrackSpendZ remembers every
+              statement and turns it into a system you can act on.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-5 mb-10">
-            {/* ChatGPT side */}
-            <div className="rounded-2xl border-2 border-slate-200 dark:border-slate-700 p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-base">🤖</div>
-                <span className="font-bold text-slate-700 dark:text-slate-200">Free AI Models</span>
-              </div>
-              <ul className="space-y-3">
-                {[
-                  'Paste your data manually every single time',
-                  "No memory of last month's conversation",
-                  'No charts, no visual breakdowns',
-                  'Generic advice, not based on your patterns',
-                  'Starts from zero each session',
-                ].map(item => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-500 dark:text-slate-400">
-                    <Icon name="close" className="w-4 h-4 text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* TrackSpendZ side */}
+            {/* TrackSpendZ side — lead with what we do */}
             <div className="rounded-2xl border-2 border-brand-500 p-6 relative">
               <div className="absolute -top-3 left-6 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                 Built for this
@@ -332,6 +307,30 @@ const LandingPage = () => {
                 ].map(item => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200">
                     <Icon name="check" className="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Generic AI chat side */}
+            <div className="rounded-2xl border-2 border-slate-200 dark:border-slate-700 p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+                  <Icon name="ai" className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                </div>
+                <span className="font-bold text-slate-700 dark:text-slate-200">A generic AI chat</span>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  'Paste your data manually every single time',
+                  "No memory of last month's conversation",
+                  'No charts, no visual breakdowns',
+                  'Generic advice, not based on your patterns',
+                  'Starts from zero each session',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-500 dark:text-slate-400">
+                    <Icon name="close" className="w-4 h-4 text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -357,9 +356,9 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
             {/* Free */}
             <div className="card p-6">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Free</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Free</p>
               <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">₹0</div>
-              <p className="text-xs text-slate-400 mb-5">Forever free</p>
+              <p className="text-xs text-slate-500 mb-5">Forever free</p>
               <ul className="space-y-2 mb-6">
                 {['Up to 500 transactions', 'Unlimited file uploads', 'Core dashboards (5 views)', 'Local storage only'].map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
@@ -379,8 +378,8 @@ const LandingPage = () => {
                 Most popular
               </div>
               <p className="text-xs font-bold text-brand-500 uppercase tracking-widest mb-3">Pro</p>
-              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.pro.price}<span className="text-base font-normal text-slate-400">{pricing.pro.period}</span></div>
-              <p className="text-xs text-slate-400 mb-5">{pricing.isIndia ? 'Billed monthly' : 'Billed annually'}</p>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.pro.price}<span className="text-base font-normal text-slate-500">{pricing.pro.period}</span></div>
+              <p className="text-xs text-slate-500 mb-5">{pricing.isIndia ? 'Billed monthly' : 'Billed annually'}</p>
               <ul className="space-y-2 mb-6">
                 {[
                   'Unlimited transactions',
@@ -403,9 +402,9 @@ const LandingPage = () => {
 
             {/* Enterprise */}
             <div className="card p-6">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Enterprise</p>
-              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.enterprise.price}<span className="text-base font-normal text-slate-400">{pricing.enterprise.period}</span></div>
-              <p className="text-xs text-slate-400 mb-5">Up to 5 family members</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Enterprise</p>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.enterprise.price}<span className="text-base font-normal text-slate-500">{pricing.enterprise.period}</span></div>
+              <p className="text-xs text-slate-500 mb-5">Up to 5 family members</p>
               <ul className="space-y-2 mb-6">
                 {[
                   'Everything in Pro',
@@ -467,7 +466,7 @@ const LandingPage = () => {
               <Link to="/shipping-policy" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Delivery</Link>
               <Link to="/contact" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Contact</Link>
             </div>
-            <div className="text-xs text-slate-400 text-center">
+            <div className="text-xs text-slate-500 text-center">
               <span>Built by </span>
               <a href="https://krexo.in" target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:text-brand-600 font-medium">
                 Krexo

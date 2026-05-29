@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { AssetSnapshot, NetAssetConfig } from '@/types/assets';
 import { computeMonthlyNetWorth, computeCategoryReturns } from '@/services/assetStorage';
-import { formatAmount } from '@/utils/constants';
+import { formatAmount, COLORS } from '@/utils/constants';
 import type { Currency } from '@/types';
 
-const CHART_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#14b8a6'];
+const CHART_COLORS = COLORS.categories;
 
 interface Props {
   snapshots: AssetSnapshot[];
@@ -30,7 +30,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
 
   if (!latest) {
     return (
-      <div className="text-center py-16 text-slate-400">
+      <div className="text-center py-16 text-slate-500">
         <p className="text-lg mb-2">No asset data yet</p>
         <p className="text-sm">Add your first monthly snapshot to see your dashboard</p>
       </div>
@@ -92,7 +92,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
           <p className={`text-xl font-bold ${momChange >= 0 ? 'text-green-600' : 'text-red-500'}`}>
             {momChange >= 0 ? '+' : ''}{fmt(momChange)}
           </p>
-          <p className="text-xs text-slate-400">{pct(latest.momChange)}</p>
+          <p className="text-xs text-slate-500">{pct(latest.momChange)}</p>
         </div>
         <div className="stat-card">
           <p className="text-xs text-slate-500 uppercase tracking-wider">Total Invested</p>
@@ -103,14 +103,14 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
           <p className={`text-xl font-bold ${latest.totalGain >= 0 ? 'text-green-600' : 'text-red-500'}`}>
             {latest.totalGain >= 0 ? '+' : ''}{fmt(latest.totalGain)}
           </p>
-          <p className="text-xs text-slate-400">Return: {pct(latest.gainPercent)}</p>
+          <p className="text-xs text-slate-500">Return: {pct(latest.gainPercent)}</p>
         </div>
         <div className="stat-card">
           <p className="text-xs text-slate-500 uppercase tracking-wider">Since Inception</p>
           <p className={`text-xl font-bold ${sinceInception >= 0 ? 'text-green-600' : 'text-red-500'}`}>
             {pct(sinceInception)}
           </p>
-          <p className="text-xs text-slate-400">from {fmtDate(first.date)}</p>
+          <p className="text-xs text-slate-500">from {fmtDate(first.date)}</p>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
             <div key={name} className="card p-4">
               <p className="text-xs text-slate-500">{name}</p>
               <p className="text-lg font-bold text-slate-800">{fmt(vals.currentValue)}</p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 {pct(vals.currentValue / latest.totalCurrentValue)} of household
               </p>
             </div>
@@ -139,7 +139,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
             <YAxis tick={{ fontSize: 11 }} tickFormatter={v => v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : v >= 1e3 ? (v / 1e3).toFixed(0) + 'K' : v} />
             <Tooltip formatter={(v: number) => fmt(v)} />
             <Legend />
-            <Area type="monotone" dataKey="total" name="Current Value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.15} strokeWidth={2} />
+            <Area type="monotone" dataKey="total" name="Current Value" stroke={COLORS.brand} fill={COLORS.brand} fillOpacity={0.15} strokeWidth={2} />
             <Area type="monotone" dataKey="principal" name="Invested" stroke="#94a3b8" fill="#94a3b8" fillOpacity={0.08} strokeWidth={1.5} strokeDasharray="4 4" />
           </AreaChart>
         </ResponsiveContainer>
@@ -201,7 +201,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="text-slate-600 truncate">{cr.category}</span>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-slate-400">{fmt(cr.currentValue)}</span>
+                      <span className="text-xs text-slate-500">{fmt(cr.currentValue)}</span>
                       <span className={`text-xs font-bold min-w-[60px] text-right ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
                         {isPositive ? '+' : ''}{pct(cr.returnPercent)}
                       </span>
@@ -221,7 +221,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
       {prev && (
         <div className="card p-5">
           <h3 className="text-sm font-bold text-slate-700 mb-1">Gains Attribution — Last Month</h3>
-          <p className="text-xs text-slate-400 mb-4">Where did the {momChange >= 0 ? 'growth' : 'change'} come from?</p>
+          <p className="text-xs text-slate-500 mb-4">Where did the {momChange >= 0 ? 'growth' : 'change'} come from?</p>
           <div className="space-y-2">
             {catReturns.map(cr => {
               const prevEntry = computeCategoryReturns(filtered, prev.date).find(p => p.category === cr.category);

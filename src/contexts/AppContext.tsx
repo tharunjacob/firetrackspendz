@@ -51,12 +51,15 @@ interface AppState {
   isAnonymousPreview: boolean;
   loadError: string | null;
   lastImportHeaders: string[] | null;
+  isDemoMode: boolean;
   processFiles: (jobs: FileJob[], ownerOverride?: string) => Promise<void>;
   updateTransactions: (updated: Transaction[]) => Promise<void>;
   deleteTransactions: (ids: string[]) => Promise<void>;
   clearAllData: () => Promise<void>;
   refreshData: () => Promise<void>;
   clearLastImportHeaders: () => void;
+  loadDemoData: () => void;
+  clearDemoData: () => void;
 
   // UI (from UIContext)
   currency: Currency;
@@ -99,12 +102,15 @@ export const useApp = (): AppState => {
     isAnonymousPreview: data.isAnonymousPreview,
     loadError: data.loadError,
     lastImportHeaders: data.lastImportHeaders,
+    isDemoMode: data.isDemoMode,
     processFiles: data.processFiles,
     updateTransactions: data.updateTransactions,
     deleteTransactions: data.deleteTransactions,
     clearAllData: data.clearAllData,
     refreshData: data.refreshData,
     clearLastImportHeaders: data.clearLastImportHeaders,
+    loadDemoData: data.loadDemoData,
+    clearDemoData: data.clearDemoData,
 
     // UI
     currency: ui.currency,

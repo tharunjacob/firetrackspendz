@@ -57,7 +57,7 @@ export const AIAdvisorView = () => {
         <Icon name="ai" className="w-12 h-12 text-slate-300 mx-auto mb-4" />
         <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-2">AI Advisor Unavailable</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400">Please configure your Gemini API key in the environment variables to enable AI features.</p>
-        <p className="text-xs text-slate-400 mt-2">Set VITE_GEMINI_API_KEY in your .env file</p>
+        <p className="text-xs text-slate-500 mt-2">Set VITE_GEMINI_API_KEY in your .env file</p>
       </div>
     );
   }
@@ -79,7 +79,7 @@ export const AIAdvisorView = () => {
         {insights ? (
           <div className="prose prose-sm max-w-none text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{insights}</div>
         ) : (
-          <p className="text-sm text-slate-400">Click "Generate Insights" to get personalized financial advice based on your data.</p>
+          <p className="text-sm text-slate-500">Click "Generate Insights" to get personalized financial advice based on your data.</p>
         )}
       </div>
 
@@ -87,14 +87,14 @@ export const AIAdvisorView = () => {
       <div className="card flex flex-col" style={{ height: '500px' }}>
         <div className="p-4 border-b border-slate-100 dark:border-slate-700">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ask Your AI CFO</h3>
-          <p className="text-xs text-slate-400">Ask questions about your spending, savings, or financial strategy</p>
+          <p className="text-xs text-slate-500">Ask questions about your spending, savings, or financial strategy</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-8">
               <Icon name="ai" className="w-10 h-10 text-brand-200 mx-auto mb-3" />
-              <p className="text-sm text-slate-400">Try asking:</p>
+              <p className="text-sm text-slate-500">Try asking:</p>
               <div className="flex flex-wrap gap-2 justify-center mt-3">
                 {['How can I improve my savings rate?', 'What are my biggest spending leaks?', 'Am I on track for FIRE?', 'How to reduce subscriptions?'].map(q => (
                   <button key={q} onClick={() => { setInput(q); }} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs hover:bg-slate-200 dark:hover:bg-slate-600">

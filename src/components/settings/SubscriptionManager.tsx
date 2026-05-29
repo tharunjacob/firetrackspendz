@@ -107,21 +107,21 @@ export const SubscriptionManager = () => {
 
       <div className="grid grid-cols-2 gap-3 text-sm mb-4">
         <div>
-          <p className="text-xs text-slate-400">Billing</p>
+          <p className="text-xs text-slate-500">Billing</p>
           <p className="font-medium text-slate-700 dark:text-slate-200">{periodLabel}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-400">Status</p>
+          <p className="text-xs text-slate-500">Status</p>
           <p className="font-medium text-slate-700 dark:text-slate-200 capitalize">{details.status}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-400">{isCancelled ? 'Ended on' : 'Next charge'}</p>
+          <p className="text-xs text-slate-500">{isCancelled ? 'Ended on' : 'Next charge'}</p>
           <p className="font-medium text-slate-700 dark:text-slate-200">
             {formatDate(details.charge_at ?? details.current_end)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-slate-400">Cycles paid</p>
+          <p className="text-xs text-slate-500">Cycles paid</p>
           <p className="font-medium text-slate-700 dark:text-slate-200">
             {details.paid_count} / {details.total_count}
           </p>

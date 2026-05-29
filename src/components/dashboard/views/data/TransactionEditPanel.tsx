@@ -68,7 +68,7 @@ export const TransactionEditPanel = ({
         <Icon name="check" className="w-3.5 h-3.5 inline mr-1" /> Save Changes
       </button>
       <button onClick={onCancel} className="btn-secondary text-xs px-4 py-1.5">Cancel</button>
-      {hint && <span className="text-[10px] text-slate-400 ml-auto">Changes are saved to your data immediately.</span>}
+      {hint && <span className="text-[10px] text-slate-500 ml-auto">Changes are saved to your data immediately.</span>}
     </div>
   </>
 );

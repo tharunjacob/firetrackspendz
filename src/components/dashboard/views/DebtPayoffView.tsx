@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useTheme } from '@/contexts/UIContext';
-import { formatAmount } from '@/utils/constants';
+import { formatAmount, COLORS } from '@/utils/constants';
 import { Icon } from '@/components/common/Icons';
 import { canAccessFeature } from '@/config/plans';
 import { UpgradePrompt } from '@/components/common/UpgradePrompt';
@@ -17,7 +17,7 @@ import type { Debt, DebtPayoffMethod } from '@/types';
 // Debt Payoff View
 // ============================================================
 
-const DEBT_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+const DEBT_COLORS = COLORS.categories;
 
 const DEBT_TYPE_LABELS: Record<Debt['type'], string> = {
   credit_card: 'Credit Card',
@@ -315,13 +315,13 @@ export const DebtPayoffView = () => {
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => { setEditingId(debt.id); setIsAdding(false); }}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors"
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors"
                   >
                     <Icon name="edit" className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(debt.id)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                   >
                     <Icon name="trash" className="w-3.5 h-3.5" />
                   </button>
@@ -391,7 +391,7 @@ export const DebtPayoffView = () => {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
+                <p className="text-xs text-slate-500 dark:text-slate-500 mt-1.5">
                   {method === 'avalanche'
                     ? 'Avalanche: pay highest interest rate first — saves the most money overall.'
                     : 'Snowball: pay smallest balance first — fastest early wins for motivation.'}

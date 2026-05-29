@@ -21,7 +21,7 @@ export const RulesTab = ({ rules, promoteRule, deleteRule }: Props) => {
       <div className="flex gap-3 items-center">
         <input type="text" value={ruleSearch} onChange={e => setRuleSearch(e.target.value)}
           placeholder="Search rules by keyword or category..." className="input-field flex-1" />
-        <div className="text-sm text-slate-400 whitespace-nowrap">
+        <div className="text-sm text-slate-500 whitespace-nowrap">
           {filteredRules.length} rule{filteredRules.length !== 1 ? 's' : ''} Â·{' '}
           {rules.filter(r => r.scope === 'system').length} system
         </div>
@@ -47,7 +47,7 @@ export const RulesTab = ({ rules, promoteRule, deleteRule }: Props) => {
                   <td className="px-4 py-3 font-medium text-slate-700">{r.value}</td>
                   <td className="px-4 py-3 text-xs text-slate-500">{r.target_field}</td>
                   <td className="px-4 py-3"><ScopeBadge scope={r.scope || r.source} /></td>
-                  <td className="px-4 py-3 text-slate-400 text-xs font-mono">{r.user_id?.substring(0, 8) || 'â€”'}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs font-mono">{r.user_id?.substring(0, 8) || 'â€”'}</td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-2">
                       {r.scope !== 'system' && r.source !== 'system' && (
@@ -61,7 +61,7 @@ export const RulesTab = ({ rules, promoteRule, deleteRule }: Props) => {
             </tbody>
           </table>
           {filteredRules.length === 0 && (
-            <p className="text-center text-sm text-slate-400 py-8">No rules found.</p>
+            <p className="text-center text-sm text-slate-500 py-8">No rules found.</p>
           )}
         </div>
       </div>

@@ -31,7 +31,7 @@ export const BottomTabBar = ({ activeTab, setActiveTab, moreSheetOpen, setMoreSh
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 transition-colors ${
-                isActive ? 'text-brand-600' : 'text-slate-400 active:text-slate-600'
+                isActive ? 'text-brand-600' : 'text-slate-500 active:text-slate-600'
               }`}
             >
               <Icon name={icon} className="w-5 h-5" />
@@ -42,7 +42,7 @@ export const BottomTabBar = ({ activeTab, setActiveTab, moreSheetOpen, setMoreSh
         <button
           onClick={() => setMoreSheetOpen(true)}
           className={`flex flex-col items-center justify-center gap-0.5 flex-1 transition-colors ${
-            !isBottomTabActive ? 'text-brand-600' : 'text-slate-400 active:text-slate-600'
+            !isBottomTabActive ? 'text-brand-600' : 'text-slate-500 active:text-slate-600'
           }`}
         >
           <Icon name="menu" className="w-5 h-5" />
@@ -69,7 +69,7 @@ export const BottomTabBar = ({ activeTab, setActiveTab, moreSheetOpen, setMoreSh
             <div className="p-3 grid grid-cols-2 gap-2 pb-8">
               {TAB_GROUPS.map(group => (
                 <div key={group.label} className="contents">
-                  <div className="col-span-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-2 mb-1 px-1">
+                  <div className="col-span-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-2 mb-1 px-1">
                     {group.label}
                   </div>
                   {group.tabs.map(tab => {

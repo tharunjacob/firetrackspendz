@@ -26,7 +26,7 @@ export const AssetFireBridge: React.FC<Props> = ({ snapshots, config: _config, c
 
   if (!latest) {
     return (
-      <div className="card p-8 text-center text-slate-400">
+      <div className="card p-8 text-center text-slate-500">
         <p className="text-lg mb-2">No asset data yet</p>
         <p className="text-sm">Add monthly snapshots to see FIRE projections with real asset data</p>
       </div>
@@ -116,7 +116,7 @@ export const AssetFireBridge: React.FC<Props> = ({ snapshots, config: _config, c
           <div className="h-full bg-gradient-to-r from-orange-400 to-green-500 rounded-full transition-all"
             style={{ width: `${Math.min(fireProgress, 100)}%` }} />
         </div>
-        <div className="flex justify-between mt-2 text-xs text-slate-400">
+        <div className="flex justify-between mt-2 text-xs text-slate-500">
           <span>0%</span>
           <span>25% — Coast FIRE</span>
           <span>50% — Lean FIRE</span>
@@ -129,17 +129,17 @@ export const AssetFireBridge: React.FC<Props> = ({ snapshots, config: _config, c
         <div className="card p-4 border-l-4 border-green-500">
           <p className="text-xs text-slate-500 uppercase">Liquid Assets</p>
           <p className="text-xl font-bold text-slate-800">{fmt(liquid.currentValue)}</p>
-          <p className="text-xs text-slate-400">Emergency fund + cash — immediate access</p>
+          <p className="text-xs text-slate-500">Emergency fund + cash — immediate access</p>
         </div>
         <div className="card p-4 border-l-4 border-brand-500">
           <p className="text-xs text-slate-500 uppercase">Investment Assets</p>
           <p className="text-xl font-bold text-slate-800">{fmt(investment.currentValue)}</p>
-          <p className="text-xs text-slate-400">Accessible with effort — drives FIRE</p>
+          <p className="text-xs text-slate-500">Accessible with effort — drives FIRE</p>
         </div>
         <div className="card p-4 border-l-4 border-amber-500">
           <p className="text-xs text-slate-500 uppercase">Retirement Assets</p>
           <p className="text-xl font-bold text-slate-800">{fmt(retirement.currentValue)}</p>
-          <p className="text-xs text-slate-400">Locked — bonus at retirement age</p>
+          <p className="text-xs text-slate-500">Locked — bonus at retirement age</p>
         </div>
       </div>
 
@@ -178,13 +178,13 @@ export const AssetFireBridge: React.FC<Props> = ({ snapshots, config: _config, c
               <Tooltip formatter={(v: number) => fmt(v)} />
               <Bar dataKey="assets" name="Projected Assets" radius={[4, 4, 0, 0]}>
                 {projections.filter((_, i) => i % 2 === 0 || i < 10).map((p, i) => (
-                  <Cell key={i} fill={p.reached ? '#22c55e' : '#6366f1'} />
+                  <Cell key={i} fill={p.reached ? '#22c55e' : '#2563eb'} />
                 ))}
               </Bar>
               <Bar dataKey="freedom" name="Freedom Number" fill="#f59e0b" fillOpacity={0.3} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-xs text-slate-400 mt-2 text-center">
+          <p className="text-xs text-slate-500 mt-2 text-center">
             Green bars = FIRE achieved. Projection uses {pct(Math.max(assetGrowthRate * 12, 0.06))} annual return and {pct(personalInflation)} inflation.
           </p>
         </div>

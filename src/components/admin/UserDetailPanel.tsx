@@ -96,11 +96,11 @@ export const UserDetailPanel = ({
 
         {/* Health Score */}
         <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
-          <p className="text-xs text-slate-400 uppercase font-bold mb-3">Health Score</p>
+          <p className="text-xs text-slate-500 uppercase font-bold mb-3">Health Score</p>
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-baseline gap-2">
               <span className={`text-3xl font-bold ${scoreColor(hs.score)}`}>{hs.score}</span>
-              <span className="text-slate-400 text-sm">/ 100</span>
+              <span className="text-slate-500 text-sm">/ 100</span>
             </div>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-full capitalize ${churnRiskColor(hs.churnRisk)}`}>
               {hs.churnRisk} churn risk
@@ -113,7 +113,7 @@ export const UserDetailPanel = ({
               { label: 'Data Freshness', value: hs.dataFreshness, max: 30 },
             ].map(({ label, value, max }) => (
               <div key={label}>
-                <p className="text-xs text-slate-400 mb-1">{label} <span className="text-slate-600 font-medium">{value}/{max}</span></p>
+                <p className="text-xs text-slate-500 mb-1">{label} <span className="text-slate-600 font-medium">{value}/{max}</span></p>
                 <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-brand-500 rounded-full transition-all"
@@ -161,7 +161,7 @@ export const UserDetailPanel = ({
           <h3 className="text-sm font-bold text-slate-700">Activity Timeline</h3>
           <button
             onClick={() => setShowTimeline(v => !v)}
-            className="text-xs text-slate-400 hover:text-slate-600"
+            className="text-xs text-slate-500 hover:text-slate-600"
           >
             {showTimeline ? 'Hide' : 'Show'}
           </button>
@@ -169,7 +169,7 @@ export const UserDetailPanel = ({
         {showTimeline && (
           <div className="p-4 max-h-80 overflow-y-auto">
             {timelineLogs.length === 0 ? (
-              <p className="text-center text-sm text-slate-400 py-4">No activity recorded.</p>
+              <p className="text-center text-sm text-slate-500 py-4">No activity recorded.</p>
             ) : (
               <div className="relative">
                 {/* Vertical line */}
@@ -188,7 +188,7 @@ export const UserDetailPanel = ({
                         {/* Content */}
                         <div className="flex-1 min-w-0 pb-1">
                           <p className="text-xs font-semibold text-slate-700 leading-tight">{log.event}</p>
-                          {meta && <p className="text-xs text-slate-400 mt-0.5 truncate">{meta}</p>}
+                          {meta && <p className="text-xs text-slate-500 mt-0.5 truncate">{meta}</p>}
                           <p className="text-xs text-slate-300 mt-0.5">
                             {new Date(log.created_at).toLocaleString()}
                           </p>
@@ -234,13 +234,13 @@ export const UserDetailPanel = ({
                     }`}>{t.type}</span>
                   </td>
                   <td className="px-3 py-2 text-right font-mono">{t.amount?.toLocaleString()}</td>
-                  <td className="px-3 py-2 text-slate-400">{t.owner}</td>
+                  <td className="px-3 py-2 text-slate-500">{t.owner}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           {selectedUserTxns.length === 0 && (
-            <p className="text-center text-sm text-slate-400 py-8">No transactions found.</p>
+            <p className="text-center text-sm text-slate-500 py-8">No transactions found.</p>
           )}
         </div>
       </div>
@@ -266,13 +266,13 @@ export const UserDetailPanel = ({
                   <td className="px-3 py-2 whitespace-nowrap">{new Date(log.created_at).toLocaleString()}</td>
                   <td className="px-3 py-2 font-medium">{log.event}</td>
                   <td className="px-3 py-2"><LevelBadge level={log.level} /></td>
-                  <td className="px-3 py-2 text-slate-400 truncate max-w-[250px]">{JSON.stringify(log.metadata || {})}</td>
+                  <td className="px-3 py-2 text-slate-500 truncate max-w-[250px]">{JSON.stringify(log.metadata || {})}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           {recentLogs.length === 0 && (
-            <p className="text-center text-sm text-slate-400 py-6">No activity logs.</p>
+            <p className="text-center text-sm text-slate-500 py-6">No activity logs.</p>
           )}
         </div>
       </div>

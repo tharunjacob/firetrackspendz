@@ -191,7 +191,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
             2025-01-01,Me,Stocks,Investment,30000,42000
           </code>
           {isAIAvailable() && (
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="text-xs text-slate-500 mt-2">
               Or upload any Excel/CSV — AI will try to detect your columns automatically.
             </p>
           )}
@@ -209,7 +209,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
         >
           <Icon name="upload" className="w-8 h-8 text-slate-300 mx-auto mb-2" />
           <p className="text-sm text-slate-500">Drop your file here or click to browse</p>
-          <p className="text-xs text-slate-400 mt-1">Supports CSV, TSV, XLSX, XLS</p>
+          <p className="text-xs text-slate-500 mt-1">Supports CSV, TSV, XLSX, XLS</p>
           <input ref={fileRef} type="file" accept=".csv,.tsv,.xlsx,.xls" className="hidden"
             onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
         </div>
@@ -229,7 +229,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
                 className="text-left p-4 rounded-lg border border-slate-200 hover:border-brand-400 hover:bg-brand-50 transition-colors"
               >
                 <p className="font-medium text-slate-700">{sheet.name}</p>
-                <p className="text-xs text-slate-400 mt-1">{sheet.rows.length} rows</p>
+                <p className="text-xs text-slate-500 mt-1">{sheet.rows.length} rows</p>
               </button>
             ))}
           </div>
@@ -241,7 +241,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
         <div className="card p-8 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-3" />
           <p className="text-sm font-medium text-slate-600">AI is analyzing your file structure...</p>
-          <p className="text-xs text-slate-400 mt-1">Detecting columns, dates, and values</p>
+          <p className="text-xs text-slate-500 mt-1">Detecting columns, dates, and values</p>
         </div>
       )}
 
@@ -251,7 +251,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-bold text-slate-700">Preview: {preview.length} entries</h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 {uniqueDates.length} date(s), {uniqueOwners.length} owner(s)
               </p>
             </div>
@@ -281,7 +281,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
                     <td className="px-3 py-1.5">{p.date}</td>
                     <td className="px-3 py-1.5">{p.owner}</td>
                     <td className="px-3 py-1.5">{p.category}</td>
-                    <td className="px-3 py-1.5 text-xs text-slate-400">{p.accessibility_tier}</td>
+                    <td className="px-3 py-1.5 text-xs text-slate-500">{p.accessibility_tier}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-xs">{(p.principal || 0).toLocaleString()}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-xs font-medium">{(p.current_value || 0).toLocaleString()}</td>
                   </tr>
@@ -289,7 +289,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
               </tbody>
             </table>
             {preview.length > 100 && (
-              <p className="text-xs text-slate-400 text-center py-2">Showing first 100 of {preview.length}</p>
+              <p className="text-xs text-slate-500 text-center py-2">Showing first 100 of {preview.length}</p>
             )}
           </div>
         </div>

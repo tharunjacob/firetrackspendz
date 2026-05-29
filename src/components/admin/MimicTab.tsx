@@ -34,7 +34,7 @@ export const MimicTab = ({ users, mimicEmail, setMimicEmail, startMimic }: Props
           </datalist>
           <button onClick={startMimic} className="btn-primary px-6">Mimic</button>
         </div>
-        <p className="text-xs text-slate-400 mt-3">
+        <p className="text-xs text-slate-500 mt-3">
           Mimic mode is read-only. Target user's data loads in a new browser tab.
         </p>
 
@@ -59,7 +59,7 @@ export const MimicTab = ({ users, mimicEmail, setMimicEmail, startMimic }: Props
 
         {/* Quick pick */}
         <div className="mt-4 border-t border-slate-100 pt-4">
-          <p className="text-xs text-slate-400 mb-2">Quick pick:</p>
+          <p className="text-xs text-slate-500 mb-2">Quick pick:</p>
           <div className="flex flex-wrap gap-2">
             {users.slice(0, 8).map(u => (
               <button key={u.id} onClick={() => setMimicEmail(u.email || '')}

@@ -86,32 +86,32 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Financial Freedom</span>
-              <span className="text-slate-400 text-sm">Target Corpus ({multiplier}x Living + Liabilities)</span>
+              <span className="text-slate-500 text-sm">Target Corpus ({multiplier}x Living + Liabilities)</span>
             </div>
             <p className="text-5xl font-bold mb-2">{formatAmount(effectiveFireNumber + bigTicketCorpus, currency)}</p>
-            <p className="text-slate-400">Your "Freedom Number" to retire today.</p>
+            <p className="text-slate-500">Your "Freedom Number" to retire today.</p>
           </div>
           <div className="flex gap-4">
             <div className="bg-slate-700/50 rounded-lg p-4 min-w-[160px]">
-              <p className="text-xs text-slate-400 uppercase font-bold mb-1">Avg Monthly Spend</p>
+              <p className="text-xs text-slate-500 uppercase font-bold mb-1">Avg Monthly Spend</p>
               <input type="number" value={Math.round(effectiveMonthly)} onChange={e => setEditableMonthly(Number(e.target.value))}
                 className="bg-transparent text-2xl font-bold text-white w-full outline-none border-b border-slate-600 focus:border-brand-400 transition" />
               <p className="text-xs text-slate-500 mt-1">Estimated Living Cost</p>
             </div>
             <div className="bg-slate-700/50 rounded-lg p-4 min-w-[160px]">
-              <p className="text-xs text-slate-400 uppercase font-bold mb-1">Personal Inflation</p>
+              <p className="text-xs text-slate-500 uppercase font-bold mb-1">Personal Inflation</p>
               <div className="flex items-baseline">
                 <input type="number" step="0.1" value={effectiveInflation.toFixed(1)} onChange={e => setEditableInflation(Number(e.target.value))}
                   className="bg-transparent text-2xl font-bold text-white w-20 outline-none border-b border-slate-600 focus:border-brand-400 transition" />
-                <span className="text-xl text-slate-400 ml-1">%</span>
+                <span className="text-xl text-slate-500 ml-1">%</span>
               </div>
               <p className="text-xs text-slate-500 mt-1">Affects future projections</p>
             </div>
             {netWorthTotal === null && (
               <div className="bg-slate-700/50 rounded-lg p-4 min-w-[160px]">
-                <p className="text-xs text-slate-400 uppercase font-bold mb-1">Starting Net Worth</p>
+                <p className="text-xs text-slate-500 uppercase font-bold mb-1">Starting Net Worth</p>
                 <div className="flex items-baseline">
-                  <span className="text-xl text-slate-400 mr-1">{currency === 'INR' ? '₹' : '$'}</span>
+                  <span className="text-xl text-slate-500 mr-1">{currency === 'INR' ? '₹' : '$'}</span>
                   <input type="number" value={editableNetWorth ?? ''} placeholder="0" onChange={e => setEditableNetWorth(e.target.value ? Number(e.target.value) : null)}
                     className="bg-transparent text-2xl font-bold text-white w-24 outline-none border-b border-slate-600 focus:border-brand-400 transition" />
                 </div>
@@ -121,7 +121,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
           </div>
         </div>
         <div className="mt-8">
-          <p className="text-sm text-slate-400 uppercase font-bold tracking-wider mb-4">
+          <p className="text-sm text-slate-500 uppercase font-bold tracking-wider mb-4">
             Required Capital if Retiring in...
             <InfoTooltip text="Nominal = future money needed. 'Today's money' shows the same figure in current purchasing power (discounted by inflation)." />
           </p>
@@ -163,7 +163,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
             </thead>
             <tbody>
               {bigTickets.length === 0 ? (
-                <tr><td colSpan={7} className="text-center py-8 text-slate-400">No big expenses added yet. Add items like a home down payment or wedding.</td></tr>
+                <tr><td colSpan={7} className="text-center py-8 text-slate-500">No big expenses added yet. Add items like a home down payment or wedding.</td></tr>
               ) : bigTickets.map(bt => {
                 const fv = computeFutureValue(bt.currentValue, bt.yearsFromNow, bt.expectedInflation);
                 return (
@@ -182,7 +182,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
           </table>
         </div>
         <button onClick={addBigTicket} className="mt-4 px-4 py-2 text-sm font-medium text-brand-600 border border-brand-300 dark:border-brand-700 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/20 transition">+ Add Expense</button>
-        <p className="text-xs text-slate-400 mt-4 text-right">* Future Value uses {RETURN_ON_CAPITAL}% return. Corpus Needed assumes 4% Safe Withdrawal Rate (25× rule).</p>
+        <p className="text-xs text-slate-500 mt-4 text-right">* Future Value uses {RETURN_ON_CAPITAL}% return. Corpus Needed assumes 4% Safe Withdrawal Rate (25× rule).</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -232,7 +232,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
               {realIncomeGrowth >= 0 ? 'Positive' : 'Losing'}
             </span>
           )}
-          <p className="text-xs uppercase text-slate-400 font-bold tracking-wider">Real Income Growth</p>
+          <p className="text-xs uppercase text-slate-500 font-bold tracking-wider">Real Income Growth</p>
           <p className={`text-4xl font-bold ${realIncomeGrowth !== null && realIncomeGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {realIncomeGrowth !== null ? `${realIncomeGrowth.toFixed(1)}%` : 'N/A'}
           </p>
@@ -248,7 +248,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
           <span className={`text-xs font-bold px-3 py-1 rounded-full mb-2 ${balancedSpender === 'Stable' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : balancedSpender === 'Moderate' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
             {balancedSpender === 'Stable' ? 'Positive' : balancedSpender === 'Moderate' ? 'Moderate' : 'Warning'}
           </span>
-          <p className="text-xs uppercase text-slate-400 font-bold tracking-wider">Balanced Spender</p>
+          <p className="text-xs uppercase text-slate-500 font-bold tracking-wider">Balanced Spender</p>
           <p className={`text-4xl font-bold ${balancedSpender === 'Stable' ? 'text-green-600' : balancedSpender === 'Moderate' ? 'text-amber-600' : 'text-red-600'}`}>
             {balancedSpender}
           </p>

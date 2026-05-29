@@ -43,7 +43,7 @@ export const LogsTab = ({ logs, initialSearch = '' }: { logs: AppLog[]; initialS
             </button>
           ))}
         </div>
-        <span className="text-sm text-slate-400 self-center">{filteredLogs.length} entries</span>
+        <span className="text-sm text-slate-500 self-center">{filteredLogs.length} entries</span>
       </div>
 
       <div className="card overflow-hidden">
@@ -68,7 +68,7 @@ export const LogsTab = ({ logs, initialSearch = '' }: { logs: AppLog[]; initialS
                   <td className="px-4 py-3"><LevelBadge level={log.level} /></td>
                   <td className="px-4 py-3 font-medium text-slate-700">{log.event}</td>
                   <td className="px-4 py-3 text-xs text-slate-500 truncate max-w-[150px]">{log.email || 'System'}</td>
-                  <td className="px-4 py-3 text-xs text-slate-400">{log.path || 'â€”'}</td>
+                  <td className="px-4 py-3 text-xs text-slate-500">{log.path || 'â€”'}</td>
                   <td className="px-4 py-3">
                     <button onClick={() => alert(JSON.stringify(log.metadata, null, 2))}
                       className="text-xs text-brand-600 hover:underline">View</button>
@@ -78,14 +78,14 @@ export const LogsTab = ({ logs, initialSearch = '' }: { logs: AppLog[]; initialS
             </tbody>
           </table>
           {filteredLogs.length === 0 && (
-            <p className="text-center text-sm text-slate-400 py-8">No matching logs.</p>
+            <p className="text-center text-sm text-slate-500 py-8">No matching logs.</p>
           )}
         </div>
         {filteredLogs.length > PAGE_SIZE && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
             <button disabled={logPage === 0} onClick={() => setLogPage(p => p - 1)}
               className="text-sm text-brand-600 disabled:text-slate-300">â† Previous</button>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500">
               Page {logPage + 1} of {Math.ceil(filteredLogs.length / PAGE_SIZE)}
             </span>
             <button disabled={(logPage + 1) * PAGE_SIZE >= filteredLogs.length} onClick={() => setLogPage(p => p + 1)}

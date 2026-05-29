@@ -116,7 +116,7 @@ export const AssetEntryForm: React.FC<Props> = ({ config, onSave, onConfigChange
           <div className="bg-slate-50 dark:bg-slate-700 px-4 py-3 border-b border-slate-100 dark:border-slate-600 flex items-center justify-between">
             <div>
               <span className="font-semibold text-slate-700">{owner.name}</span>
-              <span className="text-xs text-slate-400 ml-2">{owner.relation}</span>
+              <span className="text-xs text-slate-500 ml-2">{owner.relation}</span>
             </div>
           </div>
 
@@ -136,7 +136,7 @@ export const AssetEntryForm: React.FC<Props> = ({ config, onSave, onConfigChange
                 {Array.from(tierGroups.entries()).map(([tierName, cats]) => (
                   <React.Fragment key={tierName}>
                     <tr className="bg-slate-50/30 dark:bg-slate-700/30">
-                      <td colSpan={6} className="px-4 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">{tierName}</td>
+                      <td colSpan={6} className="px-4 py-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">{tierName}</td>
                     </tr>
                     {cats.map(cat => {
                       const e = currentEntries[owner.name]?.[cat.name] || { principal: '', currentValue: '', notes: '' };
@@ -148,7 +148,7 @@ export const AssetEntryForm: React.FC<Props> = ({ config, onSave, onConfigChange
                           <td className="px-4 py-2 font-medium text-slate-700">
                             <span className="mr-2">{cat.icon}</span>{cat.name}
                           </td>
-                          <td className="px-4 py-2 text-xs text-slate-400">{cat.tier}</td>
+                          <td className="px-4 py-2 text-xs text-slate-500">{cat.tier}</td>
                           <td className="px-4 py-2">
                             <input
                               type="number" step="0.01" placeholder="0.00"
@@ -165,7 +165,7 @@ export const AssetEntryForm: React.FC<Props> = ({ config, onSave, onConfigChange
                               className="w-full text-right text-sm py-1 px-2 border border-slate-200 rounded-lg focus:border-brand-400 focus:ring-1 focus:ring-brand-200 outline-none"
                             />
                           </td>
-                          <td className={`px-4 py-2 text-right text-xs font-medium ${gain > 0 ? 'text-green-600' : gain < 0 ? 'text-red-500' : 'text-slate-400'}`}>
+                          <td className={`px-4 py-2 text-right text-xs font-medium ${gain > 0 ? 'text-green-600' : gain < 0 ? 'text-red-500' : 'text-slate-500'}`}>
                             {p > 0 || c > 0 ? (gain >= 0 ? '+' : '') + gain.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '—'}
                           </td>
                           <td className="px-4 py-2">
@@ -234,7 +234,7 @@ const ConfigPanel: React.FC<{ config: NetAssetConfig; onChange: (c: NetAssetConf
     const id = newTierName.trim().toLowerCase().replace(/\s+/g, '-');
     onChange({
       ...config,
-      tiers: [...config.tiers, { id, name: newTierName.trim(), description: '', color: '#6366f1', sortOrder: config.tiers.length + 1 }],
+      tiers: [...config.tiers, { id, name: newTierName.trim(), description: '', color: '#2563eb', sortOrder: config.tiers.length + 1 }],
     });
     setNewTierName('');
   };
@@ -247,7 +247,7 @@ const ConfigPanel: React.FC<{ config: NetAssetConfig; onChange: (c: NetAssetConf
     <div className="card p-5 space-y-6 border-2 border-brand-100">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold text-slate-700">Customize Your Tracker</h3>
-        <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+        <button onClick={onClose} className="text-slate-500 hover:text-slate-600">
           <Icon name="close" className="w-5 h-5" />
         </button>
       </div>
@@ -300,7 +300,7 @@ const ConfigPanel: React.FC<{ config: NetAssetConfig; onChange: (c: NetAssetConf
         <div className="flex flex-wrap gap-2 mb-2">
           {config.categories.map(c => (
             <span key={c.id} className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs flex items-center gap-1.5">
-              {c.icon} {c.name} <span className="text-slate-400">({c.tier})</span>
+              {c.icon} {c.name} <span className="text-slate-500">({c.tier})</span>
               <button onClick={() => removeCategory(c.id)} className="text-slate-300 hover:text-red-500">&times;</button>
             </span>
           ))}

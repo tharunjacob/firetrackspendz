@@ -142,7 +142,7 @@ export const DashboardSidebar = ({
               className="focus-ring w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-lg transition-colors"
             >
               <span className="flex items-center gap-2">
-                <Icon name="filter" className="w-4 h-4 text-slate-400 shrink-0" />
+                <Icon name="filter" className="w-4 h-4 text-slate-500 shrink-0" />
                 Filters
                 {activeFilterCount > 0 && (
                   <span className="min-w-[18px] h-[18px] bg-brand-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center px-1">
@@ -152,7 +152,7 @@ export const DashboardSidebar = ({
               </span>
               <Icon
                 name="chevronDown"
-                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -233,7 +233,7 @@ export const DashboardSidebar = ({
             </button>
           )}
           <button onClick={() => setIsOpen(false)}
-            className="w-full text-center text-xs py-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition lg:hidden">
+            className="w-full text-center text-xs py-2 text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition lg:hidden">
             ← Back to Dashboard
           </button>
         </div>

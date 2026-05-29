@@ -81,7 +81,7 @@ export const PaywallBanner = ({ totalCount, visibleCount, transactions = [], var
               <span className="text-slate-500 dark:text-slate-400"> — from <strong>{dateRange.from}</strong> to <strong>{dateRange.to}</strong></span>
             )}
           </p>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             {subtext}
           </p>
         </div>

@@ -63,7 +63,7 @@ export const AssetDataTable: React.FC<Props> = ({ snapshots, currency, onDelete,
       {/* Filters */}
       <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px]">
-          <Icon name="search" className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Icon name="search" className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search categories, owners..."
             className="input-field pl-9 text-sm" />
         </div>
@@ -80,7 +80,7 @@ export const AssetDataTable: React.FC<Props> = ({ snapshots, currency, onDelete,
       {/* Delete by month */}
       {dates.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs text-slate-400">Delete entire month:</span>
+          <span className="text-xs text-slate-500">Delete entire month:</span>
           {dates.slice(0, 12).map(d => (
             <button key={d} onClick={() => { if (confirm(`Delete all entries for ${fmtDate(d)}?`)) onDeleteMonth(d); }}
               className="text-xs px-2 py-1 bg-slate-100 text-slate-500 rounded hover:bg-red-50 hover:text-red-600 transition-colors">
@@ -129,7 +129,7 @@ export const AssetDataTable: React.FC<Props> = ({ snapshots, currency, onDelete,
                     <td className="px-3 py-2 text-slate-600 whitespace-nowrap">{fmtDate(s.date)}</td>
                     <td className="px-3 py-2 font-medium text-slate-700">{s.owner}</td>
                     <td className="px-3 py-2">{s.category}</td>
-                    <td className="px-3 py-2 text-xs text-slate-400">{s.accessibility_tier}</td>
+                    <td className="px-3 py-2 text-xs text-slate-500">{s.accessibility_tier}</td>
                     <td className="px-3 py-2 text-right font-mono text-xs">{fmt(s.principal)}</td>
                     <td className="px-3 py-2 text-right font-mono text-xs font-medium">{fmt(s.current_value)}</td>
                     <td className={`px-3 py-2 text-right text-xs font-medium ${gain >= 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -138,17 +138,17 @@ export const AssetDataTable: React.FC<Props> = ({ snapshots, currency, onDelete,
                     <td className={`px-3 py-2 text-right text-xs ${ret >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                       {s.principal > 0 ? (ret * 100).toFixed(1) + '%' : '—'}
                     </td>
-                    <td className="px-3 py-2 text-xs text-slate-400 max-w-[150px] truncate">{s.notes || '—'}</td>
+                    <td className="px-3 py-2 text-xs text-slate-500 max-w-[150px] truncate">{s.notes || '—'}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
           {filtered.length === 0 && (
-            <p className="text-center text-sm text-slate-400 py-8">No entries found.</p>
+            <p className="text-center text-sm text-slate-500 py-8">No entries found.</p>
           )}
           {filtered.length > 300 && (
-            <p className="text-center text-xs text-slate-400 py-3">Showing 300 of {filtered.length} entries</p>
+            <p className="text-center text-xs text-slate-500 py-3">Showing 300 of {filtered.length} entries</p>
           )}
         </div>
       </div>

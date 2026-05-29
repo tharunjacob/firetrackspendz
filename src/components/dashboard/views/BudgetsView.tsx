@@ -106,7 +106,7 @@ export const BudgetsView = () => {
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Set monthly limits for your spending categories to track your progress.</p>
           {topCategories.length > 0 && (
             <div>
-              <p className="text-xs text-slate-400 mb-2">Suggested budgets based on your spending:</p>
+              <p className="text-xs text-slate-500 mb-2">Suggested budgets based on your spending:</p>
               <div className="flex flex-wrap gap-2 justify-center">
                 {topCategories.slice(0, 4).map(([cat, spent]) => (
                   <button key={cat} onClick={() => { setBudgets(prev => [...prev, {
@@ -132,17 +132,17 @@ export const BudgetsView = () => {
               <div key={b.id} className={`card p-5 border-l-4 ${isOver ? 'border-l-red-500' : isWarning ? 'border-l-amber-500' : 'border-l-green-500'}`}>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{b.category}</p>
-                  <button onClick={() => removeBudget(b.id)} className="text-slate-400 hover:text-red-500"><Icon name="trash" className="w-4 h-4" /></button>
+                  <button onClick={() => removeBudget(b.id)} className="text-slate-500 hover:text-red-500"><Icon name="trash" className="w-4 h-4" /></button>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className={isOver ? 'text-red-600 font-bold' : 'text-slate-600 dark:text-slate-400'}>{formatAmount(spent, currency)}</span>
-                  <span className="text-slate-400">of {formatAmount(b.monthly_limit, currency)}</span>
+                  <span className="text-slate-500">of {formatAmount(b.monthly_limit, currency)}</span>
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
                   <div className={`h-3 rounded-full transition-all ${isOver ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-green-500'}`}
                     style={{ width: `${Math.min(pct, 100)}%` }} />
                 </div>
-                <p className={`text-xs mt-2 ${isOver ? 'text-red-500 font-semibold' : 'text-slate-400'}`}>
+                <p className={`text-xs mt-2 ${isOver ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
                   {isOver ? `Over budget by ${formatAmount(spent - b.monthly_limit, currency)}!` : `${formatAmount(b.monthly_limit - spent, currency)} remaining`}
                 </p>
               </div>

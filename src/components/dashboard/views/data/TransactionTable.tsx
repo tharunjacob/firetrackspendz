@@ -77,7 +77,7 @@ export const TransactionTable = ({
               <td className="px-3 py-2.5 max-w-[200px] text-slate-700 dark:text-slate-200" title={t.original_description || t.notes}>
                 <span className="block truncate">{t.notes}</span>
                 {t.original_description && t.original_description !== t.notes && (
-                  <span className="block text-[10px] text-slate-400 truncate mt-0.5">{t.original_description}</span>
+                  <span className="block text-[10px] text-slate-500 truncate mt-0.5">{t.original_description}</span>
                 )}
               </td>
               <td className="px-3 py-2.5">
@@ -91,7 +91,7 @@ export const TransactionTable = ({
                 />
               </td>
               <td className="px-3 py-2.5">
-                <span className="text-xs text-slate-400">{t.subCategory && t.subCategory !== 'General' ? t.subCategory : '—'}</span>
+                <span className="text-xs text-slate-500">{t.subCategory && t.subCategory !== 'General' ? t.subCategory : '—'}</span>
               </td>
               <td className="px-3 py-2.5">
                 <span className={`text-xs font-medium ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
@@ -103,11 +103,11 @@ export const TransactionTable = ({
               </td>
               <td className="px-3 py-2.5">
                 {editId === t.id ? (
-                  <button onClick={onCancelEdit} className="text-slate-400 hover:text-red-500" title="Cancel edit">
+                  <button onClick={onCancelEdit} className="text-slate-500 hover:text-red-500" title="Cancel edit">
                     <Icon name="close" className="w-4 h-4" />
                   </button>
                 ) : (
-                  <button onClick={() => onStartEdit(t)} className="text-slate-400 hover:text-brand-600" title="Edit transaction">
+                  <button onClick={() => onStartEdit(t)} className="text-slate-500 hover:text-brand-600" title="Edit transaction">
                     <Icon name="pencil" className="w-4 h-4" />
                   </button>
                 )}

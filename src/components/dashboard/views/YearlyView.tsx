@@ -21,7 +21,7 @@ const YearlyTooltip = ({ active, payload, label, formatCurrency }: any) => {
             </div>
             {breakdown.length > 0 && (
               <div className="pl-2 border-l-2 border-slate-100 dark:border-slate-700 space-y-1">
-                <p className="text-xs text-slate-400 uppercase font-semibold mb-1">Top Categories</p>
+                <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Top Categories</p>
                 {breakdown.slice(0, 5).map((item: any, i: number) => (
                   <div key={i} className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
                     <span>{item.name}</span>

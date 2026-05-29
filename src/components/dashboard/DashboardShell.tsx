@@ -35,6 +35,7 @@ export const DashboardShell = () => {
     processFiles, isProcessing, processingProgress, clearAllData,
     lastImportHeaders, clearLastImportHeaders, showToast,
     plan, userId,
+    isDemoMode, loadDemoData, clearDemoData,
   } = useApp();
 
   const devPlan = import.meta.env.DEV
@@ -198,6 +199,16 @@ export const DashboardShell = () => {
     if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
   }, [activeTab]);
 
+  // Ref-based scroll within the dashboard scroll container — avoids the page
+  // hijacking that element.scrollIntoView() can cause on the whole window.
+  const scrollToUploader = useCallback(() => {
+    const container = scrollContainerRef.current;
+    const target = uploaderRef.current;
+    if (!container || !target) return;
+    const top = target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+    container.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }, []);
+
   const uniqueValues = useMemo(() => {
     const projects = [...new Set(transactions.map(t => t.project).filter((p): p is string => !!p && p.trim() !== ''))].sort();
     return {
@@ -298,6 +309,21 @@ export const DashboardShell = () => {
 
           <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div className="w-full max-w-7xl mx-auto pb-24 lg:pb-4">
+              {isDemoMode && (
+                <div className="mb-4 p-3 rounded-lg bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-300">
+                    <Icon name="eye" className="w-4 h-4 shrink-0" />
+                    Sample data — this is a synthetic example, not your own data.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearDemoData}
+                    className="focus-ring shrink-0 text-sm font-semibold text-brand-700 dark:text-brand-300 border border-brand-300 dark:border-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
               {filteredData.length > 0 && (
                 <MetricCards
                   totalIncome={ytdStats.totalIncome}
@@ -381,19 +407,40 @@ export const DashboardShell = () => {
                     </div>
                   )}
                   <FileUploader onStartAnalysis={processFilesForMember} isProcessing={isProcessing} progress={processingProgress} />
+
+                  {/* Activation: explore the product with realistic sample data
+                      (in-memory only — nothing is written to storage). */}
+                  <div className="max-w-4xl mx-auto px-4 mt-5 flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-3 w-full text-xs text-slate-500 dark:text-slate-400">
+                      <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+                      <span>or</span>
+                      <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={loadDemoData}
+                      className="btn-secondary inline-flex items-center gap-2"
+                    >
+                      <Icon name="eye" className="w-4 h-4" />
+                      See it with sample data
+                    </button>
+                    <p className="text-footnote text-center">No file needed — explore every view with a synthetic example account.</p>
+                  </div>
                 </div>
               ) : (
                 <div className="fade-in min-h-[500px]">
                   {renderView()}
                 </div>
               )}
-              <div className="mt-8">
-                <OnboardingGuide
-                  hasTransactions={transactions.length > 0}
-                  hasAssets={false}
-                  onStartUpload={() => uploaderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                />
-              </div>
+              {!isDemoMode && (
+                <div className="mt-8">
+                  <OnboardingGuide
+                    hasTransactions={transactions.length > 0}
+                    hasAssets={false}
+                    onStartUpload={scrollToUploader}
+                  />
+                </div>
+              )}
             </div>
           </div>
 

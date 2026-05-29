@@ -27,7 +27,7 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
 
     const bgGrad = ctx.createLinearGradient(0, 0, W, H);
     bgGrad.addColorStop(0, '#0f172a');
-    bgGrad.addColorStop(0.5, '#1e1b4b');
+    bgGrad.addColorStop(0.5, '#172554');
     bgGrad.addColorStop(1, '#0f172a');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
@@ -46,7 +46,7 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
     ctx.arc(W / 2, -180, 480, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#e0e7ff';
+    ctx.fillStyle = '#dbeafe';
     ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`MY ${stats.year} FINANCIAL WRAPPED`, W / 2, 100);
@@ -67,7 +67,7 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
     const rateAngle = (Math.max(0, Math.min(100, stats.savingsRate)) / 100) * Math.PI * 2;
     ctx.beginPath();
     ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + rateAngle);
-    ctx.strokeStyle = '#818cf8';
+    ctx.strokeStyle = '#60a5fa';
     ctx.lineWidth = 12;
     ctx.lineCap = 'round';
     ctx.stroke();
@@ -115,7 +115,7 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
     ctx.lineTo(W - 100, footerY);
     ctx.stroke();
 
-    ctx.fillStyle = '#818cf8';
+    ctx.fillStyle = '#60a5fa';
     ctx.font = 'bold 22px -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';

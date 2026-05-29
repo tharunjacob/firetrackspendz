@@ -236,7 +236,7 @@ export const DataView = () => {
 
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Icon name="search" className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Icon name="search" className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input type="text" placeholder="Search transactions..." value={search} onChange={e => setSearch(e.target.value)} className="input-field pl-9" />
         </div>
         <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="input-field w-auto">
@@ -251,7 +251,7 @@ export const DataView = () => {
         </select>
       </div>
 
-      <div className="text-xs text-slate-400 flex items-center gap-2">
+      <div className="text-xs text-slate-500 flex items-center gap-2">
         <Icon name="pencil" className="w-3.5 h-3.5" />
         Click any category pill to change it instantly. Use the pencil icon for full edits (date, amount, account).
       </div>

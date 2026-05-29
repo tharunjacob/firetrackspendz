@@ -110,9 +110,9 @@ export const FormatPresetsTab = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-slate-400">Loading format presets…</div>
+        <div className="text-center py-12 text-slate-500">Loading format presets…</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-slate-400">No {statusFilter !== 'all' ? statusFilter : ''} presets found.</div>
+        <div className="text-center py-12 text-slate-500">No {statusFilter !== 'all' ? statusFilter : ''} presets found.</div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
           <table className="w-full text-sm">
@@ -137,7 +137,7 @@ export const FormatPresetsTab = () => {
                         </span>
                       ))}
                       {preset.sample_headers?.length > 4 && (
-                        <span className="px-1.5 py-0.5 text-xs text-slate-400">+{preset.sample_headers.length - 4} more</span>
+                        <span className="px-1.5 py-0.5 text-xs text-slate-500">+{preset.sample_headers.length - 4} more</span>
                       )}
                     </div>
                   </td>

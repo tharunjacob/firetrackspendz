@@ -182,7 +182,7 @@ const FeedbackPage = () => {
                   className={`p-3 rounded-lg border-2 text-center transition-all ${
                     form.category === cat.key
                       ? cat.color + ' border-current shadow-sm'
-                      : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-600'
+                      : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-600'
                   }`}
                 >
                   <Icon name={cat.icon} className="w-5 h-5 mx-auto mb-1" />
@@ -204,7 +204,7 @@ const FeedbackPage = () => {
               className="input-field w-full"
               required
             />
-            <p className="text-xs text-slate-400 mt-1">So we can respond to you. We never share your email.</p>
+            <p className="text-xs text-slate-500 mt-1">So we can respond to you. We never share your email.</p>
           </div>
 
           {/* Subject */}
@@ -248,7 +248,7 @@ const FeedbackPage = () => {
               required
               maxLength={5000}
             />
-            <p className="text-xs text-slate-400 mt-1 text-right">{form.message.length}/5000</p>
+            <p className="text-xs text-slate-500 mt-1 text-right">{form.message.length}/5000</p>
           </div>
 
           {/* Auto-collected context info */}
@@ -300,7 +300,7 @@ const FeedbackPage = () => {
                     'bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                   }`}>{s.category}</span>
                   <span className="text-slate-700 dark:text-slate-200 flex-1 truncate">{s.subject}</span>
-                  <span className="text-xs text-slate-400">{new Date(s.date).toLocaleDateString()}</span>
+                  <span className="text-xs text-slate-500">{new Date(s.date).toLocaleDateString()}</span>
                 </div>
               ))}
             </div>
@@ -309,7 +309,7 @@ const FeedbackPage = () => {
 
         {/* Alternative: Email directly */}
         <div className="text-center mt-8 pt-6 border-t border-slate-100 dark:border-slate-700">
-          <p className="text-sm text-slate-400 dark:text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-500">
             Prefer email? Write to us at{' '}
             <a href="mailto:support@trackspendz.com" className="text-brand-600 hover:underline">support@trackspendz.com</a>
           </p>

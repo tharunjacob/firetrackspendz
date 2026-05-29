@@ -175,7 +175,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
                       <p className="font-semibold text-slate-700 text-base">
                         {index === 0 ? 'Select your file' : `Add file ${index + 1}`}
                       </p>
-                      <p className="text-xs text-slate-400 mt-1">Excel, CSV, or PDF</p>
+                      <p className="text-xs text-slate-500 mt-1">Excel, CSV, or PDF</p>
                     </>
                   )}
                 </div>
@@ -216,7 +216,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
                 <div className="flex justify-end px-4 pb-3 border-t border-slate-100 pt-2">
                   <button
                     onClick={() => removeRow(row.id)}
-                    className="text-slate-400 text-xs flex items-center gap-1 min-h-[44px] py-2 active:text-red-500"
+                    className="text-slate-500 text-xs flex items-center gap-1 min-h-[44px] py-2 active:text-red-500"
                   >
                     <Icon name="trash" className="w-4 h-4" /> Remove
                   </button>
@@ -284,7 +284,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
                     {row.file ? (
                       <span className="text-sm text-green-700 font-medium">{row.file.name} ({(row.file.size / 1024).toFixed(0)} KB)</span>
                     ) : (
-                      <span className="text-sm text-slate-400">Drop file or click to browse</span>
+                      <span className="text-sm text-slate-500">Drop file or click to browse</span>
                     )}
                   </div>
 
@@ -301,7 +301,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
                     {row.status === 'ready' && <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><Icon name="check" className="w-3 h-3 text-white" /></div>}
                     {row.status === 'error' && <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shrink-0" title={row.error}><Icon name="close" className="w-3 h-3 text-white" /></div>}
                     {rows.length > 1 && (
-                      <button onClick={() => removeRow(row.id)} className="text-slate-400 hover:text-red-500 transition-colors">
+                      <button onClick={() => removeRow(row.id)} className="text-slate-500 hover:text-red-500 transition-colors">
                         <Icon name="trash" className="w-5 h-5" />
                       </button>
                     )}

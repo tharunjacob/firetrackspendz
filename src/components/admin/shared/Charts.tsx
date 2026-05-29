@@ -34,7 +34,7 @@ export const ErrorTimeline = ({ logs }: { logs: AppLog[] }) => {
               title={`${d.warnings} warnings`}
             />
           </div>
-          <span className="text-xs text-slate-400">{d.day}</span>
+          <span className="text-xs text-slate-500">{d.day}</span>
           <span className="text-xs font-bold text-slate-600">{d.errors}</span>
         </div>
       ))}
@@ -49,7 +49,7 @@ export const TopErrors = ({ logs }: { logs: AppLog[] }) => {
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
   }, [logs]);
 
-  if (topErrors.length === 0) return <p className="text-sm text-slate-400">No errors recorded.</p>;
+  if (topErrors.length === 0) return <p className="text-sm text-slate-500">No errors recorded.</p>;
 
   return (
     <div className="space-y-2">
@@ -85,7 +85,7 @@ export const FeatureUsage = ({ logs }: { logs: AppLog[] }) => {
     return [...counts.entries()].sort((a, b) => b[1] - a[1]);
   }, [logs]);
 
-  if (features.length === 0) return <p className="text-sm text-slate-400">Not enough data yet.</p>;
+  if (features.length === 0) return <p className="text-sm text-slate-500">Not enough data yet.</p>;
 
   const max = features[0]?.[1] || 1;
   return (

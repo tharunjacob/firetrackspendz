@@ -50,12 +50,12 @@ export const OverviewTab = ({ stats, logs }: { stats: AdminStats; logs: AppLog[]
             <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 shrink-0">ERROR</span>
             <div className="min-w-0 flex-1">
               <p className="font-medium text-slate-700 truncate">{log.event}</p>
-              <p className="text-xs text-slate-400">{log.email || 'System'} â€” {new Date(log.created_at).toLocaleString()}</p>
+              <p className="text-xs text-slate-500">{log.email || 'System'} â€” {new Date(log.created_at).toLocaleString()}</p>
             </div>
           </div>
         ))}
         {logs.filter(l => l.level === 'error').length === 0 && (
-          <p className="text-sm text-slate-400 text-center py-4">No errors in recent logs.</p>
+          <p className="text-sm text-slate-500 text-center py-4">No errors in recent logs.</p>
         )}
       </div>
     </div>

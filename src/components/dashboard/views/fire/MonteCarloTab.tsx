@@ -158,7 +158,7 @@ export const MonteCarloTab = ({ fire, currency, multiplier: _multiplier, netWort
               result.successRate >= 70 ? 'border-l-amber-500' :
               'border-l-red-500'
             }`}>
-              <p className="text-xs text-slate-400 uppercase font-bold mb-1">Success Rate</p>
+              <p className="text-xs text-slate-500 uppercase font-bold mb-1">Success Rate</p>
               <p className={`text-4xl font-bold ${
                 result.successRate >= 90 ? 'text-green-600' :
                 result.successRate >= 70 ? 'text-amber-600' : 'text-red-600'
@@ -174,12 +174,12 @@ export const MonteCarloTab = ({ fire, currency, multiplier: _multiplier, netWort
               </p>
             </div>
             <div className="card p-6">
-              <p className="text-xs text-slate-400 uppercase font-bold mb-1">Median Ending Balance</p>
+              <p className="text-xs text-slate-500 uppercase font-bold mb-1">Median Ending Balance</p>
               <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{formatAmount(result.medianEndingBalance, currency)}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">50th percentile after {params.yearsToRetirement + params.yearsInRetirement} years</p>
             </div>
             <div className="card p-6">
-              <p className="text-xs text-slate-400 uppercase font-bold mb-1">
+              <p className="text-xs text-slate-500 uppercase font-bold mb-1">
                 {result.failureYear ? 'Avg Failure Year' : 'No Failures Detected'}
               </p>
               <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
@@ -195,7 +195,7 @@ export const MonteCarloTab = ({ fire, currency, multiplier: _multiplier, netWort
 
           <div className="card p-6">
             <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-4">Portfolio Projection — Percentile Bands</h3>
-            <div className="text-xs text-slate-400 mb-2 flex gap-4">
+            <div className="text-xs text-slate-500 mb-2 flex gap-4">
               <span><span className="inline-block w-3 h-3 bg-brand-100 mr-1 rounded" />10th–90th percentile</span>
               <span><span className="inline-block w-3 h-3 bg-brand-200 mr-1 rounded" />25th–75th percentile</span>
               <span><span className="inline-block w-3 h-3 bg-brand-500 mr-1 rounded" />Median (50th)</span>

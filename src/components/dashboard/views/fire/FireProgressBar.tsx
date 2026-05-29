@@ -20,7 +20,7 @@ export const FireProgressBar = ({ currentSavings, fireNumber, currency, netWorth
     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-slate-100 dark:border-slate-700">
       <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
         <div>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">FIRE Progress</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">FIRE Progress</p>
           <p className={`text-5xl font-bold ${textColor}`}>
             {pct < 1 && pct > 0 ? '<1' : pct.toFixed(1)}% to FIRE
           </p>
@@ -38,7 +38,7 @@ export const FireProgressBar = ({ currentSavings, fireNumber, currency, netWorth
               Using your net worth data &rarr;
             </a>
           ) : netWorthSource === 'manual' ? (
-            <span className="text-xs text-slate-400">Enter savings in Scenarios tab</span>
+            <span className="text-xs text-slate-500">Enter savings in Scenarios tab</span>
           ) : (
             <a href="/net-assets" className="text-xs text-amber-600 hover:underline font-medium">
               No net worth data — add your assets &rarr;
@@ -53,8 +53,8 @@ export const FireProgressBar = ({ currentSavings, fireNumber, currency, netWorth
         />
       </div>
       <div className="flex justify-between mt-1.5">
-        <span className="text-xs text-slate-400">0%</span>
-        <span className="text-xs text-slate-400">100% (FIRE)</span>
+        <span className="text-xs text-slate-500">0%</span>
+        <span className="text-xs text-slate-500">100% (FIRE)</span>
       </div>
     </div>
   );

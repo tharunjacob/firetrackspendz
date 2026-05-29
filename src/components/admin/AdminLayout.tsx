@@ -246,7 +246,7 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Control Room</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Admin access â€” {adminEmail}</p>
+          <p className="text-xs text-slate-500 mt-0.5">Admin access â€” {adminEmail}</p>
         </div>
         <button onClick={loadAll} disabled={loading}
           className="flex items-center gap-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors disabled:opacity-50">

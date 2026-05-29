@@ -51,7 +51,7 @@ export const FeatureFlagsTab = ({ adminId, adminEmail }: Props) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-slate-400 text-sm">Loading feature flags...</div>
+        <div className="text-slate-500 text-sm">Loading feature flags...</div>
       </div>
     );
   }
@@ -84,9 +84,9 @@ export const FeatureFlagsTab = ({ adminId, adminEmail }: Props) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-slate-700">Feature Flags</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Every toggle is recorded in the admin audit log.</p>
+          <p className="text-xs text-slate-500 mt-0.5">Every toggle is recorded in the admin audit log.</p>
         </div>
-        <span className="text-xs text-slate-400">{flags.length} flag{flags.length !== 1 ? 's' : ''}</span>
+        <span className="text-xs text-slate-500">{flags.length} flag{flags.length !== 1 ? 's' : ''}</span>
       </div>
 
       {error && (
@@ -120,14 +120,14 @@ export const FeatureFlagsTab = ({ adminId, adminEmail }: Props) => {
                   {flag.enabled ? 'ON' : 'OFF'}
                 </span>
                 {saving === flag.id && (
-                  <span className="text-xs text-slate-400">Saving...</span>
+                  <span className="text-xs text-slate-500">Saving...</span>
                 )}
               </div>
               <p className="text-xs text-slate-500 mt-1 leading-relaxed">{flag.description}</p>
               <div className="flex items-center gap-3 mt-2 flex-wrap">
                 <span className="text-xs text-slate-300 font-mono">{flag.id}</span>
                 {flag.updated_by && (
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-500">
                     Updated by <span className="font-medium">{flag.updated_by.substring(0, 8)}â€¦</span>
                   </span>
                 )}

@@ -76,7 +76,7 @@ export interface CategoryReturn {
 
 export const DEFAULT_TIERS: AccessibilityTier[] = [
   { id: 'liquid', name: 'Liquid', description: 'Cash and savings you can access immediately', color: '#22c55e', sortOrder: 1 },
-  { id: 'investment', name: 'Investment', description: 'Invested assets accessible with some effort or tax', color: '#6366f1', sortOrder: 2 },
+  { id: 'investment', name: 'Investment', description: 'Invested assets accessible with some effort or tax', color: '#2563eb', sortOrder: 2 },
   { id: 'retirement', name: 'Retirement', description: 'Locked until retirement age', color: '#f59e0b', sortOrder: 3 },
 ];
 

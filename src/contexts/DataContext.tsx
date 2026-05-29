@@ -4,6 +4,7 @@ import { loadFromStorage, saveToStorage, deleteFromStorage, resetAllData } from 
 import { cloudSave, cloudLoad } from '@/services/cloudStorage';
 import { transformData, identifyInterAccountTransfers, deduplicateTransactions } from '@/services/transformer';
 import { clearStoredMappings } from '@/services/learningRules';
+import { generateDemoTransactions } from '@/services/demoData';
 import { logEvent, EVENTS } from '@/services/logger';
 import { LIMITS } from '@/config/storage';
 
@@ -41,6 +42,8 @@ interface DataState {
   isAnonymousPreview: boolean;
   /** Populated when the initial load failed. UI can use this to show a retry banner. */
   loadError: string | null;
+  /** True while the in-memory sample dataset is loaded (never persisted). */
+  isDemoMode: boolean;
   /**
    * Headers from the most recent non-cached Excel/CSV import.
    * Set after a community/AI/rule-based mapping succeeds so the UI can ask the
@@ -54,6 +57,10 @@ interface DataState {
   clearAllData: () => Promise<void>;
   refreshData: () => Promise<void>;
   clearLastImportHeaders: () => void;
+  /** Load the synthetic sample dataset into memory (no storage writes). */
+  loadDemoData: () => void;
+  /** Discard the sample dataset and return to the empty state. */
+  clearDemoData: () => void;
 }
 
 /**
@@ -107,6 +114,10 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
   const [processingProgress, setProcessingProgress] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [lastImportHeaders, setLastImportHeaders] = useState<string[] | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  // Mirror for synchronous reads inside processFiles (see the upload guard below).
+  const isDemoModeRef = useRef(false);
+  useEffect(() => { isDemoModeRef.current = isDemoMode; }, [isDemoMode]);
   // Prevents the upload reminder toast from firing more than once per session
   const uploadReminderShownRef = useRef(false);
 
@@ -191,6 +202,15 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     const startMs = Date.now();
 
     const isAnon = !userId;
+
+    // A real upload supersedes the sample dataset. Discard the in-memory demo
+    // rows (synchronously, so the merge below starts from a clean slate and no
+    // demo row is ever persisted).
+    if (isDemoModeRef.current) {
+      allRawRef.current = [];
+      setAllTransactionsRaw([]);
+      setIsDemoMode(false);
+    }
 
     try {
       // Merge/dedup against the FULL set (allRawRef), never the capped visible
@@ -352,6 +372,23 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     setLastImportHeaders(null);
   }, []);
 
+  // ── Sample data (in-memory only — never touches storage) ──────────────────
+  const loadDemoData = useCallback(() => {
+    const demo = generateDemoTransactions();
+    setAllTransactionsRaw(demo);
+    setTransactions(applyPlanCap(demo, plan));
+    setIsAnonymousPreview(false); // demo is not an anon upload — must not be promoted on sign-in
+    setIsDemoMode(true);
+    logEvent('demo_data_loaded', { count: demo.length });
+  }, [plan]);
+
+  const clearDemoData = useCallback(() => {
+    setIsDemoMode(false);
+    setTransactions([]);
+    setAllTransactionsRaw([]);
+    logEvent('demo_data_cleared', {});
+  }, []);
+
   const refreshData = useCallback(async () => {
     setLoadError(null);
     try {
@@ -439,15 +476,15 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
   const value = useMemo(
     () => ({
       transactions, allTransactionsCount, isLoading, isProcessing, processingProgress,
-      isAnonymousPreview, loadError, lastImportHeaders,
+      isAnonymousPreview, loadError, lastImportHeaders, isDemoMode,
       processFiles, updateTransactions, deleteTransactions, clearAllData, refreshData,
-      clearLastImportHeaders,
+      clearLastImportHeaders, loadDemoData, clearDemoData,
     }),
     [
       transactions, allTransactionsCount, isLoading, isProcessing, processingProgress,
-      isAnonymousPreview, loadError, lastImportHeaders,
+      isAnonymousPreview, loadError, lastImportHeaders, isDemoMode,
       processFiles, updateTransactions, deleteTransactions, clearAllData, refreshData,
-      clearLastImportHeaders,
+      clearLastImportHeaders, loadDemoData, clearDemoData,
     ],
   );
 

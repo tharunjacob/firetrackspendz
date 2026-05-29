@@ -105,7 +105,7 @@ const SettingsPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Default Currency</p>
-            <p className="text-xs text-slate-400">Used across all views and exports</p>
+            <p className="text-xs text-slate-500">Used across all views and exports</p>
           </div>
           <select value={currency} onChange={e => setCurrency(e.target.value as Currency)}
             className="input-field w-36 text-sm">
@@ -160,15 +160,15 @@ const SettingsPage = () => {
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div className="bg-white dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
                   <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{referralStats.completed}</p>
-                  <p className="text-xs text-slate-400">Completed</p>
+                  <p className="text-xs text-slate-500">Completed</p>
                 </div>
                 <div className="bg-white dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
                   <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{referralStats.pending}</p>
-                  <p className="text-xs text-slate-400">Pending</p>
+                  <p className="text-xs text-slate-500">Pending</p>
                 </div>
                 <div className="bg-white dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
                   <p className="text-2xl font-bold text-brand-600">{referralStats.rewardsEarned}</p>
-                  <p className="text-xs text-slate-400">Rewards Earned</p>
+                  <p className="text-xs text-slate-500">Rewards Earned</p>
                 </div>
               </div>
 
@@ -179,7 +179,7 @@ const SettingsPage = () => {
               )}
             </>
           ) : (
-            <p className="text-sm text-slate-400">Loading referral info...</p>
+            <p className="text-sm text-slate-500">Loading referral info...</p>
           )}
         </section>
       )}

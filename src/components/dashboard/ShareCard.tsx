@@ -29,7 +29,7 @@ const CARD_HEIGHT = 1080;
 const TOP_CATEGORIES = 8;
 
 const SHARE_COLORS = [
-  '#818cf8', '#f472b6', '#fbbf24', '#34d399', '#60a5fa',
+  '#2563eb', '#f472b6', '#fbbf24', '#34d399', '#60a5fa',
   '#a78bfa', '#fb7185', '#2dd4bf', '#f59e0b', '#38bdf8',
 ];
 
@@ -61,7 +61,7 @@ export const ShareCard = () => {
     // --- Background: dark gradient ---
     const bgGrad = ctx.createLinearGradient(0, 0, CARD_WIDTH, CARD_HEIGHT);
     bgGrad.addColorStop(0, '#0f172a');
-    bgGrad.addColorStop(0.5, '#1e1b4b');
+    bgGrad.addColorStop(0.5, '#172554');
     bgGrad.addColorStop(1, '#0f172a');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
@@ -82,7 +82,7 @@ export const ShareCard = () => {
     ctx.arc(CARD_WIDTH / 2, -200, 500, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#e0e7ff';
+    ctx.fillStyle = '#dbeafe';
     ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('MY SPENDING DNA', CARD_WIDTH / 2, 80);
@@ -195,7 +195,7 @@ export const ShareCard = () => {
     ctx.stroke();
 
     // Branding
-    ctx.fillStyle = '#818cf8';
+    ctx.fillStyle = '#2563eb';
     ctx.font = 'bold 22px -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('TrackSpendZ', CARD_WIDTH / 2, footerY + 30);
@@ -238,7 +238,7 @@ export const ShareCard = () => {
 
   if (breakdown.length === 0) {
     return (
-      <div className="text-center py-10 text-slate-400">
+      <div className="text-center py-10 text-slate-500">
         <p className="text-sm">Need expense data to generate a share card.</p>
       </div>
     );
@@ -279,7 +279,7 @@ export const ShareCard = () => {
               style={{ maxHeight: '600px' }}
             />
           </div>
-          <p className="text-xs text-slate-400 text-center">
+          <p className="text-xs text-slate-500 text-center">
             Only percentages are shown â€” your actual amounts stay private.
           </p>
         </div>

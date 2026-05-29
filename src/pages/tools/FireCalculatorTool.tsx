@@ -314,21 +314,21 @@ const FireCalculatorTool: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-green-200 dark:border-green-800 p-6 text-center">
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Lean FIRE</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">Essential expenses only (60%)</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mb-2">Essential expenses only (60%)</p>
                   <p className="text-2xl font-bold text-green-600">
                     {formatAmount(results.leanFire, currency)}
                   </p>
                 </div>
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-brand-200 dark:border-brand-800 p-6 text-center">
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Regular FIRE</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">Full current expenses (25x)</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mb-2">Full current expenses (25x)</p>
                   <p className="text-2xl font-bold text-brand-600">
                     {formatAmount(results.regularFire, currency)}
                   </p>
                 </div>
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-brand-200 dark:border-brand-800 p-6 text-center">
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Fat FIRE</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">Comfortable cushion (33x)</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mb-2">Comfortable cushion (33x)</p>
                   <p className="text-2xl font-bold text-brand-600">
                     {formatAmount(results.fatFire, currency)}
                   </p>

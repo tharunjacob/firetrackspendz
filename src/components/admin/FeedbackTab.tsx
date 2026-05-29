@@ -45,14 +45,14 @@ export const FeedbackTab = ({ feedbackItems, resolveFeedback }: Props) => {
                 <span className={`text-xs font-medium ${fb.status === 'open' ? 'text-amber-600' : 'text-green-600'}`}>
                   {fb.status}
                 </span>
-                <span className="text-xs text-slate-400">{new Date(fb.created_at).toLocaleString()}</span>
+                <span className="text-xs text-slate-500">{new Date(fb.created_at).toLocaleString()}</span>
               </div>
               <h4 className="font-semibold text-slate-800 text-sm">{fb.subject}</h4>
               <p className="text-sm text-slate-600 mt-1 whitespace-pre-wrap">{fb.message}</p>
               <div className="flex items-center gap-3 mt-2">
-                <span className="text-xs text-slate-400">From: {fb.email}</span>
-                {fb.user_id && <span className="text-xs text-slate-400">User ID: {fb.user_id.slice(0, 8)}...</span>}
-                {fb.context?.plan && <span className="text-xs text-slate-400">Plan: {fb.context.plan}</span>}
+                <span className="text-xs text-slate-500">From: {fb.email}</span>
+                {fb.user_id && <span className="text-xs text-slate-500">User ID: {fb.user_id.slice(0, 8)}...</span>}
+                {fb.context?.plan && <span className="text-xs text-slate-500">Plan: {fb.context.plan}</span>}
               </div>
             </div>
             <div className="flex gap-2 shrink-0">
@@ -72,7 +72,7 @@ export const FeedbackTab = ({ feedbackItems, resolveFeedback }: Props) => {
       ))}
 
       {filtered.length === 0 && (
-        <div className="text-center py-12 text-slate-400 text-sm">No feedback in this category.</div>
+        <div className="text-center py-12 text-slate-500 text-sm">No feedback in this category.</div>
       )}
     </div>
   );

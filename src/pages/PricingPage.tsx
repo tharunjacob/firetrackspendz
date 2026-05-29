@@ -218,7 +218,7 @@ const PricingPage = () => {
         </div>
 
         {!pricing.isIndia && (
-          <p className="text-xs text-slate-400 mt-6 max-w-xl mx-auto">
+          <p className="text-xs text-slate-500 mt-6 max-w-xl mx-auto">
             Billing is processed in INR by Razorpay. International cards are accepted —
             your statement will show the INR-equivalent charge.
           </p>
@@ -240,7 +240,7 @@ const PricingPage = () => {
             <details key={faq.q} className="card p-5 group">
               <summary className="font-semibold text-slate-700 dark:text-slate-200 cursor-pointer list-none flex items-center justify-between">
                 {faq.q}
-                <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5 text-slate-500 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>

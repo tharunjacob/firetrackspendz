@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Icon } from '@/components/common/Icons';
-import { formatAmount } from '@/utils/constants';
+import { formatAmount, COLORS } from '@/utils/constants';
 import { getUserSetting, setUserSetting } from '@/services/userSettings';
 import { STORAGE_KEYS } from '@/config/storage';
 import { SummaryView } from '@/components/dashboard/views/SummaryView';
@@ -15,9 +15,7 @@ import {
 // Consolidated household view with per-member drill-down
 // ============================================================
 
-const FAMILY_COLORS = [
-  '#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6',
-];
+const FAMILY_COLORS = COLORS.categories;
 
 const StatusBadge = ({ status }: { status: FamilyMember['status'] }) => {
   const config = {
@@ -247,15 +245,15 @@ const FamilyDashboard = () => {
               </p>
             </div>
             <div className="stat-card">
-              <p className="text-xs text-slate-400 uppercase tracking-wide">Monthly Income</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wide">Monthly Income</p>
               <p className="text-xl font-bold text-green-600 mt-1">{formatAmount(householdStats.income, currency)}</p>
             </div>
             <div className="stat-card">
-              <p className="text-xs text-slate-400 uppercase tracking-wide">Monthly Expense</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wide">Monthly Expense</p>
               <p className="text-xl font-bold text-red-500 mt-1">{formatAmount(householdStats.expense, currency)}</p>
             </div>
             <div className="stat-card">
-              <p className="text-xs text-slate-400 uppercase tracking-wide">Savings Rate</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wide">Savings Rate</p>
               <p className={`text-xl font-bold mt-1 ${householdStats.savingsRate >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {(householdStats.savingsRate * 100).toFixed(1)}%
               </p>
@@ -267,7 +265,7 @@ const FamilyDashboard = () => {
             <div className="card p-10 text-center">
               <Icon name="upload" className="w-10 h-10 text-slate-300 mx-auto mb-3" />
               <p className="font-semibold text-slate-600 dark:text-slate-300">No transactions yet</p>
-              <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
+              <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
                 Upload statements from the main dashboard. Use the "Uploading for" selector to tag each member's transactions.
               </p>
               <a href="/dashboard" className="inline-block mt-4 btn-primary text-sm px-5 py-2">Go to Dashboard</a>
@@ -280,7 +278,7 @@ const FamilyDashboard = () => {
               <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-0.5">
                 Monthly Spending by Member
               </h3>
-              <p className="text-xs text-slate-400 mb-4">Last 6 months · Expenses only</p>
+              <p className="text-xs text-slate-500 mb-4">Last 6 months · Expenses only</p>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={stackedChartData} barGap={2}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -306,7 +304,7 @@ const FamilyDashboard = () => {
 
           {activeMembers.length >= 2 && !hasAnyStackedData && transactions.length > 0 && (
             <div className="card p-6 border border-dashed border-slate-200 dark:border-slate-700 text-center">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-500">
                 No per-member spending data yet. Upload statements tagged with a member's name to see the breakdown chart.
               </p>
             </div>
@@ -317,7 +315,7 @@ const FamilyDashboard = () => {
             <div className="card overflow-hidden">
               <div className="p-5 pb-3">
                 <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">Category Breakdown</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Top 10 categories · All time · Expenses</p>
+                <p className="text-xs text-slate-500 mt-0.5">Top 10 categories · All time · Expenses</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -397,7 +395,7 @@ const FamilyDashboard = () => {
                     No transactions found for{' '}
                     <strong>{activeMembers.find(m => m.id === activeMemberTab)?.name ?? 'this member'}</strong>.
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     Upload statements using the "Uploading for" selector on the main dashboard.
                   </p>
                 </div>
@@ -409,7 +407,7 @@ const FamilyDashboard = () => {
           {activeMembers.length < 2 && transactions.length > 0 && (
             <div className="card p-8 text-center border border-dashed border-slate-200 dark:border-slate-700">
               <p className="font-semibold text-slate-600 dark:text-slate-300">Add your first family member</p>
-              <p className="text-sm text-slate-400 mt-1 mb-4">
+              <p className="text-sm text-slate-500 mt-1 mb-4">
                 Go to the Members tab to add a family member and start tracking household finances together.
               </p>
               <button
@@ -436,7 +434,7 @@ const FamilyDashboard = () => {
             </div>
 
             {activeMembers.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-slate-400">No members yet.</p>
+              <p className="px-5 py-8 text-center text-sm text-slate-500">No members yet.</p>
             ) : (
               <ul className="divide-y divide-slate-100 dark:divide-slate-700">
                 {activeMembers.map(m => (
@@ -451,11 +449,11 @@ const FamilyDashboard = () => {
                       <p className="font-medium text-slate-800 dark:text-slate-100 truncate">
                         {m.name}
                         {m.status === 'owner' && (
-                          <span className="text-xs text-slate-400 ml-1.5">(you)</span>
+                          <span className="text-xs text-slate-500 ml-1.5">(you)</span>
                         )}
                       </p>
                       {m.email && (
-                        <p className="text-xs text-slate-400 truncate">{m.email}</p>
+                        <p className="text-xs text-slate-500 truncate">{m.email}</p>
                       )}
                     </div>
                     <StatusBadge status={m.status} />
@@ -512,7 +510,7 @@ const FamilyDashboard = () => {
                 </div>
               </div>
             ) : (
-              <p className="px-5 py-4 border-t border-slate-100 dark:border-slate-700 text-center text-sm text-slate-400">
+              <p className="px-5 py-4 border-t border-slate-100 dark:border-slate-700 text-center text-sm text-slate-500">
                 Maximum of 5 members reached.
               </p>
             )}
@@ -548,7 +546,7 @@ const FamilyDashboard = () => {
           <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-2">
             Shared Family Budgets
           </h3>
-          <p className="text-sm text-slate-400 max-w-md mx-auto">
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
             Set household-level budgets for categories like Groceries, Utilities, and Entertainment.
             All family members contribute to the same budget pool.
           </p>

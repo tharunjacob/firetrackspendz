@@ -28,7 +28,10 @@ export const MetricCards = ({ totalIncome, totalExpenses, netSavings, currency, 
   return (
     <div className="mb-5 sm:mb-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">Financial Dashboard</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">
+          Your {displayYear} overview
+          {isCurrentYear && <span className="ml-2 text-sm font-medium text-slate-500 dark:text-slate-400">· year to date</span>}
+        </h2>
         {!isCurrentYear && (
           <span className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full font-medium">
             Showing {displayYear} — no {new Date().getFullYear()} data yet

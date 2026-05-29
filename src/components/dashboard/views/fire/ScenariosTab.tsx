@@ -100,7 +100,7 @@ export const ScenariosTab = ({ fire, currency, multiplier, transactions, netWort
     return [
       { variant: 'lean' as const, label: 'Lean FIRE', desc: 'Essentials only (60% of current spending)', fireNumber: leanFire, monthlyExpense: Math.round(leanExpense / 12), yearsToFire: yearsTo(leanFire), color: '#22c55e', realValue: realOf(leanFire, yearsTo(leanFire)) },
       { variant: 'regular' as const, label: 'Regular FIRE', desc: `Current lifestyle (${multiplier}x annual expenses)`, fireNumber: regularFire, monthlyExpense: Math.round(regularExpense / 12), yearsToFire: yearsTo(regularFire), color: '#3b82f6', realValue: realOf(regularFire, yearsTo(regularFire)) },
-      { variant: 'fat' as const, label: 'Fat FIRE', desc: 'Comfortable lifestyle (33x, 30% buffer)', fireNumber: fatFire, monthlyExpense: Math.round(fatExpense / 12), yearsToFire: yearsTo(fatFire), color: '#8b5cf6', realValue: realOf(fatFire, yearsTo(fatFire)) },
+      { variant: 'fat' as const, label: 'Fat FIRE', desc: 'Comfortable lifestyle (33x, 30% buffer)', fireNumber: fatFire, monthlyExpense: Math.round(fatExpense / 12), yearsToFire: yearsTo(fatFire), color: '#0d9488', realValue: realOf(fatFire, yearsTo(fatFire)) },
       { variant: 'coast' as const, label: 'Coast FIRE', desc: 'Invest this much NOW, stop contributing, retire on time', fireNumber: coastFire, monthlyExpense: 0, yearsToFire: currentSavings >= coastFire ? 0 : yearsTo(coastFire), color: '#f59e0b', realValue: realOf(coastFire, yearsTo(coastFire)) },
       { variant: 'barista' as const, label: 'Barista FIRE', desc: `Part-time income covers gap (${formatAmount(partTimeIncome, currency)}/mo)`, fireNumber: baristaFire, monthlyExpense: Math.round(gap / 12), yearsToFire: yearsTo(baristaFire), color: '#ec4899', realValue: realOf(baristaFire, yearsTo(baristaFire)) },
     ];
@@ -163,7 +163,7 @@ export const ScenariosTab = ({ fire, currency, multiplier, transactions, netWort
                 )}
               </div>
             ))}
-            <div className="sm:col-span-3 text-xs text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 rounded-lg px-4 py-2">
+            <div className="sm:col-span-3 text-xs text-slate-500 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 rounded-lg px-4 py-2">
               Using {defaults.returnRate}% return · {inputs.inflationRate.toFixed(1)}% inflation · monthly savings: {formatAmount(inputs.monthlySavings, currency)}/mo from your data.
               <button onClick={() => switchMode('advanced')} className="ml-2 text-brand-600 hover:underline">Customise &rarr;</button>
             </div>
@@ -209,10 +209,10 @@ export const ScenariosTab = ({ fire, currency, multiplier, transactions, netWort
         {displayScenarios.map(s => (
           <div key={s.variant} className="card p-5 border-l-4" style={{ borderLeftColor: s.color }}>
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{s.label}</h4>
-            <p className="text-xs text-slate-400 mb-3">{s.desc}</p>
+            <p className="text-xs text-slate-500 mb-3">{s.desc}</p>
             <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{formatAmount(Math.round(s.fireNumber), currency)}</p>
             {s.yearsToFire > 0 && s.yearsToFire < 99 && (
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 nominal · {formatAmount(Math.round(s.realValue), currency)} in today's money
                 <InfoTooltip text="Nominal = future amount needed. 'Today's money' discounts inflation so you can compare to current prices." />
               </p>
@@ -231,7 +231,7 @@ export const ScenariosTab = ({ fire, currency, multiplier, transactions, netWort
                 {s.yearsToFire >= 99 ? 'Not reachable' : s.yearsToFire === 0 ? 'Already there!' : `${s.yearsToFire} years`}
               </span>
               {s.yearsToFire > 0 && s.yearsToFire < 99 && (
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-500">
                   (age {inputs.currentAge + s.yearsToFire})
                 </span>
               )}

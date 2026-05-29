@@ -75,7 +75,7 @@ export const AuthModal = ({ isOpen = true, onClose }: AuthModalProps) => {
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full p-8 animate-slide-up" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-6">
           <Logo size="sm" />
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
             <Icon name="close" className="w-6 h-6" />
           </button>
         </div>
@@ -109,7 +109,7 @@ export const AuthModal = ({ isOpen = true, onClose }: AuthModalProps) => {
 
             <div className="flex items-center gap-3 my-4">
               <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700"></div>
-              <span className="text-xs text-slate-400 uppercase">or</span>
+              <span className="text-xs text-slate-500 uppercase">or</span>
               <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700"></div>
             </div>
 

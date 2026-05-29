@@ -52,7 +52,7 @@ const DateRangePicker = ({
         <input type="date" value={range.from}
           onChange={e => { setPreset('custom'); setRange({ ...range, from: e.target.value }); }}
           className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600" />
-        <span className="text-slate-400 text-xs">→</span>
+        <span className="text-slate-500 text-xs">→</span>
         <input type="date" value={range.to}
           onChange={e => { setPreset('custom'); setRange({ ...range, to: e.target.value }); }}
           className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600" />
@@ -64,7 +64,7 @@ const DateRangePicker = ({
 // ── Empty State ───────────────────────────────────────────────
 
 const EmptyState = ({ label }: { label: string }) => (
-  <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+  <div className="flex flex-col items-center justify-center py-10 text-slate-500">
     <div className="text-3xl mb-2">📭</div>
     <p className="text-sm">{label}</p>
     <p className="text-xs mt-1 text-slate-300">Connect Supabase to populate with real data</p>
@@ -79,7 +79,7 @@ const Section = ({ title, subtitle, children }: {
   <div className="card p-5">
     <div className="mb-4">
       <h3 className="text-sm font-bold text-slate-800">{title}</h3>
-      {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+      {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
     </div>
     {children}
   </div>
@@ -91,9 +91,9 @@ const KPI = ({ label, value, sub, color = 'text-slate-800' }: {
   label: string; value: string | number; sub?: string; color?: string;
 }) => (
   <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
-    <p className="text-xs text-slate-400 dark:text-slate-400 uppercase tracking-wide">{label}</p>
+    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">{label}</p>
     <p className={`text-2xl font-bold mt-1 ${color}`}>{value}</p>
-    {sub && <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">{sub}</p>}
+    {sub && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{sub}</p>}
   </div>
 );
 
@@ -103,7 +103,7 @@ const FunnelSection = ({ steps }: { steps: FunnelStep[] }) => {
   if (!steps.length) return <EmptyState label="No funnel data for this period" />;
 
   const maxUsers = steps[0]?.users || 1;
-  const COLORS = ['#3b82f6','#6366f1','#8b5cf6','#a855f7','#c084fc','#e879f9'];
+  const COLORS = ['#2563eb','#3b82f6','#60a5fa','#0ea5e9','#0891b2','#0d9488'];
 
   return (
     <div className="space-y-2">
@@ -120,7 +120,7 @@ const FunnelSection = ({ steps }: { steps: FunnelStep[] }) => {
               <span className="text-white text-xs font-bold whitespace-nowrap">{s.users.toLocaleString()}</span>
             </div>
           </div>
-          <div className="w-24 text-xs text-slate-400 shrink-0 text-right">
+          <div className="w-24 text-xs text-slate-500 shrink-0 text-right">
             {i === 0 ? '—' : (
               <span className={s.pct_of_prev < 50 ? 'text-red-500' : s.pct_of_prev < 75 ? 'text-amber-500' : 'text-green-500'}>
                 {s.pct_of_prev}% prev
@@ -173,7 +173,7 @@ const CohortSection = ({ rows }: { rows: CohortRow[] }) => {
             <th className="text-left pr-3 py-2 text-slate-500 font-medium whitespace-nowrap">Cohort</th>
             <th className="text-right px-2 py-2 text-slate-500 font-medium">Size</th>
             {weeks.map(w => (
-              <th key={w} className="text-center px-1 py-2 text-slate-400 font-medium min-w-[44px]">
+              <th key={w} className="text-center px-1 py-2 text-slate-500 font-medium min-w-[44px]">
                 {w === 0 ? 'Wk0' : `+${w}`}
               </th>
             ))}
@@ -227,7 +227,7 @@ const AdoptionSection = ({ rows }: { rows: FeatureAdoptionRow[] }) => {
           <Tooltip
             formatter={(value, name) => [value, name === 'users' ? 'Unique Users' : 'Total Uses']}
             contentStyle={{ fontSize: 12 }} />
-          <Bar dataKey="users" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={18}>
+          <Bar dataKey="users" fill="#2563eb" radius={[0, 4, 4, 0]} barSize={18}>
             <LabelList dataKey="pct" position="right" formatter={(v: number) => `${v}%`}
               style={{ fontSize: 11, fill: '#64748b' }} />
           </Bar>
@@ -265,7 +265,7 @@ const SessionSection = ({
 
     {dau.length > 0 ? (
       <div>
-        <p className="text-xs text-slate-400 mb-2 font-medium">Daily Active Users</p>
+        <p className="text-xs text-slate-500 mb-2 font-medium">Daily Active Users</p>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={dau} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -301,7 +301,7 @@ const RevenueSection = ({ metrics }: { metrics: RevenueMetrics }) => (
     <div className="grid grid-cols-3 gap-3">
       <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 text-center">
         <p className="text-3xl font-bold text-slate-800">{metrics.total_users}</p>
-        <p className="text-xs text-slate-400 mt-1">Total Users</p>
+        <p className="text-xs text-slate-500 mt-1">Total Users</p>
       </div>
       <div className="bg-brand-50 rounded-lg p-4 text-center">
         <p className="text-3xl font-bold text-brand-700">{metrics.pro_users}</p>
@@ -316,7 +316,7 @@ const RevenueSection = ({ metrics }: { metrics: RevenueMetrics }) => (
     {/* Revenue bar visual */}
     {metrics.total_users > 0 && (
       <div>
-        <p className="text-xs text-slate-400 mb-2">User Breakdown</p>
+        <p className="text-xs text-slate-500 mb-2">User Breakdown</p>
         <div className="w-full h-5 rounded-full overflow-hidden flex">
           <div className="bg-slate-300 transition-all" title="Free"
             style={{ width: `${((metrics.total_users - metrics.paying_users) / metrics.total_users) * 100}%` }} />
@@ -329,7 +329,7 @@ const RevenueSection = ({ metrics }: { metrics: RevenueMetrics }) => (
           {[['bg-slate-300','Free'], ['bg-brand-400','Pro'], ['bg-amber-400','Enterprise']].map(([c, l]) => (
             <div key={l} className="flex items-center gap-1">
               <div className={`w-2.5 h-2.5 rounded-full ${c}`} />
-              <span className="text-xs text-slate-400">{l}</span>
+              <span className="text-xs text-slate-500">{l}</span>
             </div>
           ))}
         </div>
@@ -382,7 +382,7 @@ export const AnalyticsTab = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-base font-bold text-slate-800">Analytics Dashboard</h2>
-          <p className="text-xs text-slate-400">User behaviour, feature adoption, cohort retention &amp; revenue</p>
+          <p className="text-xs text-slate-500">User behaviour, feature adoption, cohort retention &amp; revenue</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <DateRangePicker range={range} setRange={setRange} />

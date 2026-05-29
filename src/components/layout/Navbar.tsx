@@ -68,7 +68,7 @@ export const Navbar = () => {
                   className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex justify-between ${c === currency ? 'text-brand-600 font-semibold' : 'text-slate-700 dark:text-slate-200'}`}
                 >
                   <span>{CURRENCIES[c].symbol} {c}</span>
-                  <span className="text-slate-400">{CURRENCIES[c].name}</span>
+                  <span className="text-slate-500">{CURRENCIES[c].name}</span>
                 </button>
               ))}
             </div>
@@ -88,7 +88,7 @@ export const Navbar = () => {
             {menuOpen && (
               <div className="absolute right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-md py-2 z-50 min-w-[180px]">
                 <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
-                  <p className="text-xs text-slate-400">Signed in as</p>
+                  <p className="text-xs text-slate-500">Signed in as</p>
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">{userEmail}</p>
                 </div>
                 <Link to="/settings" onClick={() => setMenuOpen(false)} className="w-full px-4 py-2 text-left text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">

@@ -52,7 +52,7 @@ const DonutChartCard = ({ title, data, colors, formatCurrency }: {
     return (
       <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm h-full flex flex-col items-center justify-center min-h-[400px]">
         <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2 text-center">{title}</h3>
-        <p className="text-slate-400 text-sm text-center">Upload a statement to see your {title.toLowerCase()} breakdown here.</p>
+        <p className="text-slate-500 text-sm text-center">Upload a statement to see your {title.toLowerCase()} breakdown here.</p>
       </div>
     );
   }
@@ -65,7 +65,7 @@ const DonutChartCard = ({ title, data, colors, formatCurrency }: {
         <div className="col-span-1 md:col-span-2 h-[220px] md:h-full relative">
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <span className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">{formatCurrency(total)}</span>
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Total</span>
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Total</span>
           </div>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -158,17 +158,17 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="stat-card">
-          <p className="text-xs text-slate-400 uppercase">Monthly Avg Expense</p>
+          <p className="text-xs text-slate-500 uppercase">Monthly Avg Expense</p>
           <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{fmtCurrency(fire.avgMonthlyExpense)}</p>
         </div>
         <div className="stat-card">
-          <p className="text-xs text-slate-400 uppercase">Savings Rate</p>
+          <p className="text-xs text-slate-500 uppercase">Savings Rate</p>
           <p className={`text-xl font-bold ${(fire.savingsRate || 0) >= 20 ? 'text-green-600' : 'text-amber-600'}`}>
             {(fire.savingsRate || 0).toFixed(1)}%
           </p>
         </div>
         <div className="stat-card">
-          <p className="text-xs text-slate-400 uppercase">Personal Inflation</p>
+          <p className="text-xs text-slate-500 uppercase">Personal Inflation</p>
           <p className="text-xl font-bold text-red-500">{(fire.personalInflation * 100).toFixed(1)}%</p>
         </div>
         <button

@@ -55,7 +55,7 @@ export const TransactionCard = ({
     </div>
     <div className="flex flex-col gap-1.5 flex-shrink-0 items-center">
       {editing ? (
-        <button onClick={onCancelEdit} className="text-slate-400 hover:text-red-500" title="Cancel edit">
+        <button onClick={onCancelEdit} className="text-slate-500 hover:text-red-500" title="Cancel edit">
           <Icon name="close" className="w-4 h-4" />
         </button>
       ) : (

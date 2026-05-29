@@ -47,7 +47,7 @@ export const NotificationCenter = () => {
         className="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
         title={`${notifications.length} notification${notifications.length !== 1 ? 's' : ''}`}
       >
-        <Icon name="bell" className={`w-5 h-5 ${notifications.length > 0 ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400'}`} />
+        <Icon name="bell" className={`w-5 h-5 ${notifications.length > 0 ? 'text-slate-700 dark:text-slate-200' : 'text-slate-500'}`} />
         {notifications.length > 0 && (
           <span className={`absolute -top-0.5 -right-0.5 w-4.5 h-4.5 flex items-center justify-center text-[10px] font-bold text-white rounded-full ${
             highPriority.length > 0 ? 'bg-red-500 animate-pulse' : 'bg-brand-600'
@@ -66,7 +66,7 @@ export const NotificationCenter = () => {
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Notifications</h3>
               {notifications.length > 0 && (
-                <button onClick={dismissAll} className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+                <button onClick={dismissAll} className="text-xs text-slate-500 hover:text-slate-600 transition-colors">
                   Dismiss all
                 </button>
               )}
@@ -78,7 +78,7 @@ export const NotificationCenter = () => {
                 <div className="py-12 text-center">
                   <Icon name="check" className="w-8 h-8 text-green-400 mx-auto mb-2" />
                   <p className="text-sm text-slate-500 dark:text-slate-400">All caught up!</p>
-                  <p className="text-xs text-slate-400 mt-1">No new notifications</p>
+                  <p className="text-xs text-slate-500 mt-1">No new notifications</p>
                 </div>
               ) : (
                 notifications.map(n => {

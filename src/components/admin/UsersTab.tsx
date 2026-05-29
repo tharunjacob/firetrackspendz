@@ -96,14 +96,14 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
             </button>
           ))}
         </div>
-        <span className="text-sm text-slate-400 self-center whitespace-nowrap">
+        <span className="text-sm text-slate-500 self-center whitespace-nowrap">
           {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}
         </span>
       </div>
 
       {/* Activity + Risk Segment Filters */}
       <div className="flex gap-3 flex-wrap items-center">
-        <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">Activity</span>
+        <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Activity</span>
         <div className="flex gap-1">
           {([
             { key: 'all', label: 'All' },
@@ -122,7 +122,7 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
           ))}
         </div>
 
-        <span className="text-xs text-slate-400 font-medium uppercase tracking-wide ml-2">Churn Risk</span>
+        <span className="text-xs text-slate-500 font-medium uppercase tracking-wide ml-2">Churn Risk</span>
         <div className="flex gap-1">
           {([
             { key: 'all', label: 'All', cls: '' },
@@ -165,7 +165,7 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
                   <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer" onClick={() => loadUserDetail(u)}>
                     <td className="px-4 py-3">
                       <p className="font-medium text-slate-800">{u.email}</p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-500">
                         {u.full_name || 'â€”'} Â· {u.id.substring(0, 8)}...
                         {isNewUser(u) && (
                           <span className="ml-1.5 px-1.5 py-0.5 rounded text-xs font-bold bg-brand-100 text-brand-700">NEW</span>
@@ -189,7 +189,7 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
                         </span>
                       ) : 'â€”'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-400">
+                    <td className="px-4 py-3 text-xs text-slate-500">
                       {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'â€”'}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -202,14 +202,14 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
             </tbody>
           </table>
           {filteredUsers.length === 0 && (
-            <p className="text-center text-sm text-slate-400 py-8">No users found.</p>
+            <p className="text-center text-sm text-slate-500 py-8">No users found.</p>
           )}
         </div>
         {filteredUsers.length > PAGE_SIZE && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
             <button disabled={userPage === 0} onClick={() => setUserPage(p => p - 1)}
               className="text-sm text-brand-600 disabled:text-slate-300">â† Previous</button>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500">
               Page {userPage + 1} of {Math.ceil(filteredUsers.length / PAGE_SIZE)}
             </span>
             <button disabled={(userPage + 1) * PAGE_SIZE >= filteredUsers.length} onClick={() => setUserPage(p => p + 1)}

@@ -97,7 +97,7 @@ const NetAssetPage = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Net Asset Tracker</h1>
-          <p className="text-sm text-slate-400">Track your household wealth, month by month</p>
+          <p className="text-sm text-slate-500">Track your household wealth, month by month</p>
         </div>
         {!isMultiOwnerAllowed && config.owners.length >= 1 && (
           <span className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 px-3 py-1.5 rounded-lg">

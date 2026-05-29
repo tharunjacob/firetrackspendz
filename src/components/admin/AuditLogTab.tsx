@@ -60,7 +60,7 @@ export const AuditLogTab = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-slate-400 text-sm">Loading audit log...</div>
+        <div className="text-slate-500 text-sm">Loading audit log...</div>
       </div>
     );
   }
@@ -80,9 +80,9 @@ export const AuditLogTab = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold text-slate-700">Admin Audit Log</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Every admin mutation â€” plan changes, flag toggles, rule actions, mimic sessions.</p>
+          <p className="text-xs text-slate-500 mt-0.5">Every admin mutation â€” plan changes, flag toggles, rule actions, mimic sessions.</p>
         </div>
-        <span className="text-xs text-slate-400">{filtered.length} entries</span>
+        <span className="text-xs text-slate-500">{filtered.length} entries</span>
       </div>
 
       {/* Search */}
@@ -97,7 +97,7 @@ export const AuditLogTab = () => {
         <div className="card p-10 text-center">
           <p className="text-4xl mb-3">ðŸ“­</p>
           <p className="text-sm font-bold text-slate-600">No audit entries yet</p>
-          <p className="text-xs text-slate-400 mt-1">Admin actions (plan changes, flag toggles, etc.) will appear here.</p>
+          <p className="text-xs text-slate-500 mt-1">Admin actions (plan changes, flag toggles, etc.) will appear here.</p>
         </div>
       ) : (
         <>
@@ -118,7 +118,7 @@ export const AuditLogTab = () => {
                     const style = getActionStyle(entry.action);
                     return (
                       <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                        <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+                        <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
                           {new Date(entry.created_at).toLocaleString()}
                         </td>
                         <td className="px-4 py-3">
@@ -134,7 +134,7 @@ export const AuditLogTab = () => {
                           <span className="font-medium">{entry.target_type}</span>
                           <span className="text-slate-300 font-mono ml-1">{entry.target_id.substring(0, 10)}â€¦</span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-slate-400 truncate max-w-[200px]">
+                        <td className="px-4 py-3 text-xs text-slate-500 truncate max-w-[200px]">
                           {Object.entries(entry.details || {})
                             .slice(0, 3)
                             .map(([k, v]) => `${k}: ${String(v)}`)
@@ -150,7 +150,7 @@ export const AuditLogTab = () => {
               <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
                 <button disabled={page === 0} onClick={() => setPage(p => p - 1)}
                   className="text-sm text-brand-600 disabled:text-slate-300">â† Previous</button>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-500">
                   Page {page + 1} of {Math.ceil(filtered.length / PAGE_SIZE)}
                 </span>
                 <button disabled={(page + 1) * PAGE_SIZE >= filtered.length} onClick={() => setPage(p => p + 1)}

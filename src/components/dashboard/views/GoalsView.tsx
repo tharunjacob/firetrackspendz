@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { logEvent, EVENTS } from '@/services/logger';
 import { useApp } from '@/contexts/AppContext';
 import { useTheme } from '@/contexts/UIContext';
-import { formatAmount } from '@/utils/constants';
+import { formatAmount, COLORS } from '@/utils/constants';
 import { Icon } from '@/components/common/Icons';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { getUserSetting, setUserSetting } from '@/services/userSettings';
@@ -16,7 +16,7 @@ import type { SavingsGoal } from '@/types';
 // ============================================================
 
 const GOAL_ICONS = ['target', 'fire', 'wallet', 'shield', 'chart', 'flash', 'flag'];
-const GOAL_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
+const GOAL_COLORS = COLORS.categories;
 
 export const GoalsView = () => {
   useEffect(() => { logEvent(EVENTS.FEATURE_GOALS_OPENED); }, []);
@@ -146,19 +146,19 @@ export const GoalsView = () => {
       {goals.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="stat-card">
-            <p className="text-xs text-slate-400 uppercase">Goals</p>
+            <p className="text-xs text-slate-500 uppercase">Goals</p>
             <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{goals.length}</p>
           </div>
           <div className="stat-card">
-            <p className="text-xs text-slate-400 uppercase">Total Target</p>
+            <p className="text-xs text-slate-500 uppercase">Total Target</p>
             <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{formatAmount(totalTarget, currency)}</p>
           </div>
           <div className="stat-card">
-            <p className="text-xs text-slate-400 uppercase">Total Saved</p>
+            <p className="text-xs text-slate-500 uppercase">Total Saved</p>
             <p className="text-xl font-bold text-green-600">{formatAmount(totalSaved, currency)}</p>
           </div>
           <div className="stat-card">
-            <p className="text-xs text-slate-400 uppercase">Overall Progress</p>
+            <p className="text-xs text-slate-500 uppercase">Overall Progress</p>
             <p className="text-xl font-bold text-brand-600">{totalTarget > 0 ? ((totalSaved / totalTarget) * 100).toFixed(1) : 0}%</p>
           </div>
         </div>
@@ -199,16 +199,16 @@ export const GoalsView = () => {
                   <div>
                     <h4 className="font-bold text-slate-800 dark:text-slate-100">{g.name}</h4>
                     {g.deadline && (
-                      <p className="text-xs text-slate-400">Target: {new Date(g.deadline).toLocaleDateString()}</p>
+                      <p className="text-xs text-slate-500">Target: {new Date(g.deadline).toLocaleDateString()}</p>
                     )}
                   </div>
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => startEdit(g)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors">
-                    <Icon name="cog" className="w-3.5 h-3.5 text-slate-400" />
+                    <Icon name="cog" className="w-3.5 h-3.5 text-slate-500" />
                   </button>
                   <button onClick={() => deleteGoal(g.id)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
-                    <Icon name="trash" className="w-3.5 h-3.5 text-slate-400" />
+                    <Icon name="trash" className="w-3.5 h-3.5 text-slate-500" />
                   </button>
                 </div>
               </div>
@@ -217,14 +217,14 @@ export const GoalsView = () => {
               <div className="mt-4">
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="font-bold" style={{ color: g.color }}>{formatAmount(g.currentAmount, currency)}</span>
-                  <span className="text-slate-400">{formatAmount(g.targetAmount, currency)}</span>
+                  <span className="text-slate-500">{formatAmount(g.targetAmount, currency)}</span>
                 </div>
                 <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: g.color }} />
                 </div>
                 <div className="flex justify-between mt-1.5">
                   <span className="text-xs font-bold" style={{ color: g.color }}>{pct.toFixed(1)}%</span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-500">
                     {remaining > 0 ? `${formatAmount(remaining, currency)} to go` : 'Goal reached!'}
                   </span>
                 </div>
@@ -245,7 +245,7 @@ export const GoalsView = () => {
                   + Custom
                 </button>
                 {monthsToGoal && remaining > 0 && (
-                  <span className="text-xs text-slate-400 ml-auto">
+                  <span className="text-xs text-slate-500 ml-auto">
                     ~{monthsToGoal} month{monthsToGoal > 1 ? 's' : ''} left
                   </span>
                 )}
@@ -297,7 +297,7 @@ export const GoalsView = () => {
         <div className="card p-10 text-center">
           <Icon name="target" className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-1">Set Your First Goal</h3>
-          <p className="text-sm text-slate-400 mb-4 max-w-md mx-auto">
+          <p className="text-sm text-slate-500 mb-4 max-w-md mx-auto">
             Track savings for an emergency fund, vacation, house down payment, or any financial goal. Watch your progress visually.
           </p>
           <button onClick={() => setIsAdding(true)} className="btn-primary text-sm px-6 py-2">
@@ -353,7 +353,7 @@ export const GoalsView = () => {
               </div>
 
               {avgMonthlySavings > 0 && (
-                <p className="text-xs text-slate-400 bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                <p className="text-xs text-slate-500 bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
                   Based on your data, your average monthly savings is {formatAmount(avgMonthlySavings, currency)}.
                 </p>
               )}

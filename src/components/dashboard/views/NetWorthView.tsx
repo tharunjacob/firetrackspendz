@@ -330,7 +330,7 @@ export const NetWorthView = () => {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Net Worth Over Time</h3>
-            <div className="flex items-center gap-4 text-xs text-slate-400">
+            <div className="flex items-center gap-4 text-xs text-slate-500">
               <span className="flex items-center gap-1.5">
                 <span className="w-4 h-0.5 bg-brand-500 inline-block rounded" />
                 Actual
@@ -345,8 +345,8 @@ export const NetWorthView = () => {
             <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#6366f1" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <stop offset="5%"  stopColor="#2563eb" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.6} />
@@ -363,8 +363,8 @@ export const NetWorthView = () => {
               />
               <Area
                 type="monotone" dataKey="netWorth"
-                stroke="#6366f1" fill="url(#nwGrad)" strokeWidth={2.5}
-                dot={{ fill: '#6366f1', r: 3 }} activeDot={{ r: 5 }}
+                stroke="#2563eb" fill="url(#nwGrad)" strokeWidth={2.5}
+                dot={{ fill: '#2563eb', r: 3 }} activeDot={{ r: 5 }}
               />
               <Area
                 type="monotone" dataKey="inflationBaseline"
@@ -427,7 +427,7 @@ export const NetWorthView = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Assets</h3>
-              <p className="text-xs text-slate-400 mt-0.5">{formatAmount(totalAssets, currency)} total</p>
+              <p className="text-xs text-slate-500 mt-0.5">{formatAmount(totalAssets, currency)} total</p>
             </div>
             <button onClick={() => openAdd('asset')} className="btn-primary text-xs px-3 py-1.5">
               <Icon name="plus" className="w-3 h-3 inline mr-1" />Add
@@ -437,7 +437,7 @@ export const NetWorthView = () => {
           {assetEntries.length === 0 ? (
             <div className="py-6 text-center">
               <Icon name="wallet" className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-400 dark:text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-500">
                 Add savings, FDs, stocks, property, gold…
               </p>
             </div>
@@ -473,7 +473,7 @@ export const NetWorthView = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Liabilities</h3>
-              <p className="text-xs text-slate-400 mt-0.5">{formatAmount(totalLiabilities, currency)} total</p>
+              <p className="text-xs text-slate-500 mt-0.5">{formatAmount(totalLiabilities, currency)} total</p>
             </div>
             <button
               onClick={() => openAdd('liability')}
@@ -486,7 +486,7 @@ export const NetWorthView = () => {
           {liabilityEntries.length === 0 ? (
             <div className="py-6 text-center">
               <Icon name="flag" className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-400 dark:text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-500">
                 Add home loans, car loans, credit card balances…
               </p>
             </div>
@@ -524,7 +524,7 @@ export const NetWorthView = () => {
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             {thisMonthSaved ? '✓ Snapshot saved for this month' : "Record this month's net worth"}
           </p>
-          <p className="text-xs text-slate-400 mt-0.5 truncate">
+          <p className="text-xs text-slate-500 mt-0.5 truncate">
             {thisMonthSaved
               ? `${formatAmount(snapshots.find(s => s.date === thisMonthKey())?.netWorth ?? 0, currency)} recorded · ${snapshots.length} snapshot${snapshots.length !== 1 ? 's' : ''} total`
               : 'Save monthly snapshots to track growth and see the inflation trend chart.'}
