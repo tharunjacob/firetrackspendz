@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Icon } from '@/components/common/Icons';
 
 interface Props {
   hasTransactions: boolean;
@@ -10,28 +11,28 @@ interface Props {
 const steps = [
   {
     id: 1,
-    icon: '📄',
+    icon: 'document',
     title: 'Upload Your First Statement',
     desc: 'Grab any bank or credit card statement (Excel, CSV, or PDF) and drop it here. We auto-detect columns and categorize everything.',
     action: 'upload',
   },
   {
     id: 2,
-    icon: '📊',
+    icon: 'pieChart',
     title: 'Explore Your Dashboard',
     desc: 'See where your money goes. Monthly trends, category breakdowns, savings rate — all calculated automatically from your data.',
     action: 'none',
   },
   {
     id: 3,
-    icon: '💰',
+    icon: 'coins',
     title: 'Track Your Net Worth',
     desc: 'Go to Net Assets to record what you own — savings, investments, property, retirement. Watch your wealth grow month by month.',
     action: 'assets',
   },
   {
     id: 4,
-    icon: '🔥',
+    icon: 'fire',
     title: 'Calculate Your FIRE Number',
     desc: 'Once you have expenses and assets, the FIRE calculator shows exactly when you can achieve financial independence.',
     action: 'none',
@@ -61,8 +62,11 @@ export const OnboardingGuide: React.FC<Props> = ({ hasTransactions, hasAssets, o
             const done = (step.id <= 2 && hasTransactions) || (step.id === 3 && hasAssets) || (step.id === 4 && hasTransactions && hasAssets);
             return (
               <div key={step.id} className={`flex gap-3 p-3 rounded-lg transition-colors ${done ? 'bg-green-50/80 dark:bg-green-950/30' : 'bg-white/80 dark:bg-slate-700/50'}`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-lg ${done ? 'bg-green-100 dark:bg-green-900/40' : 'bg-slate-100 dark:bg-slate-600'}`}>
-                  {done ? '✓' : step.icon}
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${done ? 'bg-green-100 dark:bg-green-900/40' : 'bg-slate-100 dark:bg-slate-600'}`}>
+                  <Icon
+                    name={done ? 'check' : step.icon}
+                    className={`w-4 h-4 ${done ? 'text-green-600 dark:text-green-400' : 'text-brand-600 dark:text-brand-400'}`}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-semibold ${done ? 'text-green-700 dark:text-green-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>

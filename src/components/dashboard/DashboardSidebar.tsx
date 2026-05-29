@@ -142,9 +142,7 @@ export const DashboardSidebar = ({
               className="focus-ring w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-lg transition-colors"
             >
               <span className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-                </svg>
+                <Icon name="filter" className="w-4 h-4 text-slate-400 shrink-0" />
                 Filters
                 {activeFilterCount > 0 && (
                   <span className="min-w-[18px] h-[18px] bg-brand-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center px-1">
@@ -152,12 +150,10 @@ export const DashboardSidebar = ({
                   </span>
                 )}
               </span>
-              <svg
+              <Icon
+                name="chevronDown"
                 className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`}
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
+              />
             </button>
 
             {filtersOpen && (
@@ -212,9 +208,10 @@ export const DashboardSidebar = ({
 
         {/* Monthly report card notice — Pro/Enterprise only */}
         {showReportCardNotice && (
-          <div className="mx-3 mb-2 p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg border border-brand-100 dark:border-brand-800">
+          <div className="mx-3 mb-2 p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg border border-brand-100 dark:border-brand-800 flex items-start gap-2">
+            <Icon name="chart" className="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0 mt-0.5" />
             <p className="text-xs text-brand-700 dark:text-brand-300 leading-snug">
-              📊 Monthly report cards are sent on the 1st of each month.
+              Monthly report cards are sent on the 1st of each month.
             </p>
           </div>
         )}

@@ -307,9 +307,7 @@ const LandingPage = () => {
                   'Starts from zero each session',
                 ].map(item => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-slate-500 dark:text-slate-400">
-                    <svg className="w-4 h-4 text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <Icon name="close" className="w-4 h-4 text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0" />
                     {item}
                   </li>
                 ))}
