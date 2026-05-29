@@ -28,15 +28,15 @@ export const OverviewTab = ({ stats, logs }: { stats: AdminStats; logs: AppLog[]
       <h3 className="text-sm font-bold text-slate-700 mb-3">Revenue Breakdown</h3>
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-brand-50 rounded-lg p-4 text-center">
-          <p className="text-2xl font-black text-brand-700">${stats.proUsers * 49}</p>
+          <p className="text-2xl font-bold text-brand-700">${stats.proUsers * 49}</p>
           <p className="text-xs text-brand-500 mt-1">{stats.proUsers} Pro Ã— $49/yr</p>
         </div>
         <div className="bg-amber-50 rounded-lg p-4 text-center">
-          <p className="text-2xl font-black text-amber-700">${stats.enterpriseUsers * 149}</p>
+          <p className="text-2xl font-bold text-amber-700">${stats.enterpriseUsers * 149}</p>
           <p className="text-xs text-amber-500 mt-1">{stats.enterpriseUsers} Enterprise Ã— $149/yr</p>
         </div>
         <div className="bg-green-50 rounded-lg p-4 text-center">
-          <p className="text-2xl font-black text-green-700">${stats.totalRevenue}</p>
+          <p className="text-2xl font-bold text-green-700">${stats.totalRevenue}</p>
           <p className="text-xs text-green-500 mt-1">Total ARR</p>
         </div>
       </div>

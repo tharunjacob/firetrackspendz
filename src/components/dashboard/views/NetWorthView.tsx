@@ -242,11 +242,11 @@ export const NetWorthView = () => {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs text-white/70 uppercase tracking-widest font-semibold">Net Worth</p>
-            <p className="text-4xl font-black mt-1 tabular-nums">{formatAmount(netWorth, currency)}</p>
+            <p className="text-4xl font-bold mt-1 tabular-nums">{formatAmount(netWorth, currency)}</p>
             <p className="text-sm text-white/50 mt-0.5">Assets − Liabilities</p>
           </div>
           {momDelta !== null && (
-            <div className="text-right bg-white/15 rounded-xl px-3 py-2 flex-shrink-0">
+            <div className="text-right bg-white/15 rounded-lg px-3 py-2 flex-shrink-0">
               <p className="text-white/60 text-xs mb-0.5">vs last month</p>
               <p className="font-bold text-sm">
                 {momDelta >= 0 ? '+' : ''}{formatCompact(momDelta, currency)}
@@ -532,7 +532,7 @@ export const NetWorthView = () => {
         </div>
         <button
           onClick={saveSnapshot}
-          className={`text-sm px-4 py-2 rounded-xl font-semibold flex-shrink-0 transition-colors ${
+          className={`text-sm px-4 py-2 rounded-lg font-semibold flex-shrink-0 transition-colors ${
             thisMonthSaved
               ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
               : 'btn-primary'

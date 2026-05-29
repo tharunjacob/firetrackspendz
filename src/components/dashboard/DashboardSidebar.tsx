@@ -19,7 +19,7 @@ const MultiSelect = ({ label, options, selected, onChange }: {
       <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
         {options.map(o => (
           <button key={o} onClick={() => toggle(o)}
-            className={`px-3 py-1 text-xs font-medium rounded-full transition-all border ${
+            className={`focus-ring px-3 py-1 text-xs font-medium rounded-full transition-all border ${
               selected.includes(o)
                 ? 'bg-brand-500 border-brand-600 text-white'
                 : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'
@@ -92,7 +92,7 @@ export const DashboardSidebar = ({
         {/* Mobile header */}
         <div className="lg:hidden flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
           <span className="font-bold text-slate-800 dark:text-slate-100">Navigation</span>
-          <button onClick={() => setIsOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100">
+          <button onClick={() => setIsOpen(false)} className="focus-ring rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100">
             <Icon name="close" className="w-6 h-6" />
           </button>
         </div>
@@ -118,7 +118,7 @@ export const DashboardSidebar = ({
                     <button
                       key={t}
                       onClick={() => { setActiveTab(t); setIsOpen(false); }}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors mb-0.5 ${
+                      className={`focus-ring w-full text-left px-3 py-2 text-sm rounded-lg transition-colors mb-0.5 ${
                         isActive
                           ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 font-semibold border-l-2 border-brand-500'
                           : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
@@ -139,7 +139,7 @@ export const DashboardSidebar = ({
           <div className="px-2 py-2">
             <button
               onClick={() => setFiltersOpen(o => !o)}
-              className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-lg transition-colors"
+              className="focus-ring w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-lg transition-colors"
             >
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -167,7 +167,7 @@ export const DashboardSidebar = ({
                   <label htmlFor="currency-select" className="block text-xs font-bold text-brand-800 dark:text-brand-300 mb-1.5">Currency</label>
                   <select id="currency-select" value={currency}
                     onChange={e => setCurrency(e.target.value as Currency)}
-                    className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-700 border border-brand-200 dark:border-brand-700 rounded-lg text-sm focus:ring-brand-500 focus:border-brand-500 text-slate-800 dark:text-slate-100 font-medium outline-none"
+                    className="focus-ring w-full px-2.5 py-1.5 bg-white dark:bg-slate-700 border border-brand-200 dark:border-brand-700 rounded-lg text-sm focus:border-brand-500 text-slate-800 dark:text-slate-100 font-medium outline-none"
                   >
                     {(Object.keys(CURRENCIES) as Currency[]).map(c => (
                       <option key={c} value={c}>{c} ({CURRENCIES[c].symbol})</option>
@@ -202,7 +202,7 @@ export const DashboardSidebar = ({
                 </div>
 
                 <button onClick={resetFilters}
-                  className="w-full text-center text-sm py-2 px-4 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 transition shadow-sm font-medium">
+                  className="focus-ring w-full text-center text-sm py-2 px-4 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 transition shadow-sm font-medium">
                   Reset Filters
                 </button>
               </div>
@@ -223,14 +223,14 @@ export const DashboardSidebar = ({
         <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 space-y-1 shrink-0">
           <Link
             to="/settings"
-            className="flex items-center gap-2 px-3 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
+            className="focus-ring flex items-center gap-2 px-3 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
           >
             <Icon name="cog" className="w-4 h-4" />
             Settings
           </Link>
           {onClear && transactions.length > 0 && (
             <button onClick={onClear}
-              className="w-full text-left flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition font-medium">
+              className="focus-ring w-full text-left flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition font-medium">
               <Icon name="trash" className="w-4 h-4" />
               Clear All Data
             </button>

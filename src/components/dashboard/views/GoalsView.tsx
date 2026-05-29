@@ -193,7 +193,7 @@ export const GoalsView = () => {
             <div key={g.id} className="card p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl" style={{ backgroundColor: g.color + '15' }}>
+                  <div className="p-2 rounded-lg" style={{ backgroundColor: g.color + '15' }}>
                     <Icon name={g.icon} className="w-5 h-5" />
                   </div>
                   <div>

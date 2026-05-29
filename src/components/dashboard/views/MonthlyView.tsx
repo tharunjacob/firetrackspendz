@@ -16,7 +16,7 @@ const MonthlyTooltip = ({ active, payload, label, formatCurrency }: any) => {
   const expenseTop = data.expenseBreakdown || [];
 
   return (
-    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 text-sm z-50 min-w-[280px]">
+    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 text-sm z-50 min-w-[280px]">
       <p className="font-bold text-slate-800 dark:text-slate-100 mb-2 border-b border-slate-100 dark:border-slate-700 pb-1 text-base">{label}</p>
       <div className="grid grid-cols-2 gap-4">
         <div>

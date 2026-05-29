@@ -74,7 +74,7 @@ export const HealthTab = ({ stats, logs, onRefresh }: Props) => {
 
       {/* Error Spike Alert */}
       {spikeAlert && (
-        <div className="bg-red-50 border border-red-300 rounded-xl px-5 py-4 flex items-start gap-3">
+        <div className="bg-red-50 border border-red-300 rounded-lg px-5 py-4 flex items-start gap-3">
           <span className="text-2xl">ðŸš¨</span>
           <div>
             <p className="font-bold text-red-700 text-sm">Error Spike Detected</p>

@@ -159,15 +159,15 @@ const SettingsPage = () => {
 
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div className="bg-white dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
-                  <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{referralStats.completed}</p>
+                  <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{referralStats.completed}</p>
                   <p className="text-xs text-slate-400">Completed</p>
                 </div>
                 <div className="bg-white dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
-                  <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{referralStats.pending}</p>
+                  <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{referralStats.pending}</p>
                   <p className="text-xs text-slate-400">Pending</p>
                 </div>
                 <div className="bg-white dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
-                  <p className="text-2xl font-black text-brand-600">{referralStats.rewardsEarned}</p>
+                  <p className="text-2xl font-bold text-brand-600">{referralStats.rewardsEarned}</p>
                   <p className="text-xs text-slate-400">Rewards Earned</p>
                 </div>
               </div>

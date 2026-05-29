@@ -53,13 +53,13 @@ export const Logo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
   const sizeMap = { sm: 'h-8 text-lg', md: 'h-10 text-xl', lg: 'h-14 text-3xl' };
   return (
     <div className={`flex items-center gap-2 ${sizeMap[size]}`}>
-      <div className="bg-brand-600 rounded-xl p-1.5 flex items-center justify-center">
+      <div className="bg-brand-600 rounded-lg p-1.5 flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" stroke="white" strokeWidth="2" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
           <path strokeLinecap="round" strokeLinejoin="round" stroke="white" strokeWidth="2" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
         </svg>
       </div>
-      <span className="font-black tracking-tight text-slate-900 dark:text-slate-100">Track<span className="text-brand-600">SpendZ</span></span>
+      <span className="font-bold tracking-tight text-slate-900 dark:text-slate-100">Track<span className="text-brand-600">SpendZ</span></span>
     </div>
   );
 };

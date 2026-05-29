@@ -178,7 +178,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
         </p>
 
         {/* Template download */}
-        <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 mb-4">
+        <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-600">CSV template format:</span>
             <button onClick={downloadTemplate} className="text-sm text-brand-600 hover:underline flex items-center gap-1">
@@ -203,7 +203,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
           onClick={() => fileRef.current?.click()}
-          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
             dragOver ? 'border-brand-400 bg-brand-50' : 'border-slate-200 hover:border-brand-300'
           }`}
         >
@@ -226,7 +226,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
               <button
                 key={i}
                 onClick={() => handleSheetSelect(sheet)}
-                className="text-left p-4 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50 transition-colors"
+                className="text-left p-4 rounded-lg border border-slate-200 hover:border-brand-400 hover:bg-brand-50 transition-colors"
               >
                 <p className="font-medium text-slate-700">{sheet.name}</p>
                 <p className="text-xs text-slate-400 mt-1">{sheet.rows.length} rows</p>

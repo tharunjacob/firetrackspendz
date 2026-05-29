@@ -114,7 +114,7 @@ export const FormatPresetsTab = () => {
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 text-slate-400">No {statusFilter !== 'all' ? statusFilter : ''} presets found.</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
               <tr>

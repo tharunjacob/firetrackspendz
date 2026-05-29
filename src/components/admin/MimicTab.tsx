@@ -40,7 +40,7 @@ export const MimicTab = ({ users, mimicEmail, setMimicEmail, startMimic }: Props
 
         {/* Context card when a matching user is found */}
         {targetUser && (
-          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
             <p className="text-xs font-bold text-amber-700 uppercase mb-2">Target User Preview</p>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-200 text-amber-700 rounded-full flex items-center justify-center font-bold">

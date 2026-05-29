@@ -157,7 +157,7 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
       <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm text-center">
         <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Shareable Year Review Card</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Generate a beautiful image of your year in review to share on social media.</p>
-        <div className="inline-block bg-brand-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl opacity-80">
+        <div className="inline-block bg-brand-500 text-white text-sm font-semibold px-5 py-2.5 rounded-lg opacity-80">
           Upgrade to Pro to Unlock
         </div>
       </div>
@@ -194,7 +194,7 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
               </button>
             </div>
           </div>
-          <div className="bg-white p-4 flex justify-center bg-slate-900 rounded-xl overflow-hidden">
+          <div className="bg-white p-4 flex justify-center bg-slate-900 rounded-lg overflow-hidden">
             <canvas
               ref={canvasRef}
               className="max-w-full h-auto rounded-lg"

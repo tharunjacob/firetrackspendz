@@ -178,7 +178,7 @@ export const CompareView = ({ data }: { data?: Transaction[] }) => {
         </div>
 
         {/* Period Selectors */}
-        <div className="flex items-center justify-center gap-4 bg-brand-50 dark:bg-brand-900/20 p-4 rounded-xl border border-brand-100 dark:border-brand-800">
+        <div className="flex items-center justify-center gap-4 bg-brand-50 dark:bg-brand-900/20 p-4 rounded-lg border border-brand-100 dark:border-brand-800">
           <select value={period1} onChange={e => setPeriod1(e.target.value)} className="px-4 py-2 bg-white dark:bg-slate-700 border border-brand-200 dark:border-brand-700 rounded-lg font-medium text-slate-700 dark:text-slate-200 shadow-sm">
             {options.map(o => <option key={`p1-${o}`} value={o}>{formatLabel(o)}</option>)}
           </select>
@@ -190,7 +190,7 @@ export const CompareView = ({ data }: { data?: Transaction[] }) => {
 
         {/* Comparison Table */}
         {comparisonData && (
-          <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+          <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
             <table className="w-full text-sm text-left">
               <thead className="bg-slate-800 dark:bg-slate-900 text-white">
                 <tr>

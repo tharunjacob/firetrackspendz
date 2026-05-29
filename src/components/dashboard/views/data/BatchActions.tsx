@@ -43,7 +43,7 @@ export const BatchActions = ({
           Categorize as...
         </button>
         {batchOpen && (
-          <div className="absolute right-0 top-full mt-1 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg min-w-[180px] max-h-64 overflow-y-auto">
+          <div className="absolute right-0 top-full mt-1 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-md min-w-[180px] max-h-64 overflow-y-auto">
             {allCategories.map(c => (
               <button
                 key={c}

@@ -179,7 +179,7 @@ const FeedbackPage = () => {
                   key={cat.key}
                   type="button"
                   onClick={() => setForm(f => ({ ...f, category: cat.key }))}
-                  className={`p-3 rounded-xl border-2 text-center transition-all ${
+                  className={`p-3 rounded-lg border-2 text-center transition-all ${
                     form.category === cat.key
                       ? cat.color + ' border-current shadow-sm'
                       : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-600'
@@ -252,7 +252,7 @@ const FeedbackPage = () => {
           </div>
 
           {/* Auto-collected context info */}
-          <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-3">
+          <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg p-3">
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Diagnostic info (sent automatically to help us debug):</p>
             <div className="flex flex-wrap gap-2">
               {[
@@ -267,7 +267,7 @@ const FeedbackPage = () => {
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm px-4 py-3 rounded-xl">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm px-4 py-3 rounded-lg">
               {error}
             </div>
           )}

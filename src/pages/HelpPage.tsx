@@ -28,7 +28,7 @@ const sections: HelpSection[] = [
         <p><strong className="text-slate-800 dark:text-slate-200">2. Name the account</strong> — Enter a label like &ldquo;HDFC Savings&rdquo; or &ldquo;Amex Credit Card&rdquo; so you can filter by account later.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">3. Add more files</strong> — Click &ldquo;Add Another File&rdquo; to upload statements from multiple banks or accounts in one go.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">4. Hit Analyze</strong> — TrackSpendZ will parse every row, categorise transactions, detect inter-account transfers, and take you straight to your Summary dashboard.</p>
-        <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-xl p-4 mt-2">
+        <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-lg p-4 mt-2">
           <p className="text-brand-800 dark:text-brand-300 text-xs font-medium">Tip: You can try the dashboard without signing up. Upload a file and explore — sign up only when you want to save your data.</p>
         </div>
       </div>
@@ -260,7 +260,7 @@ const HelpPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <section className="max-w-3xl mx-auto px-4 sm:px-6 pt-16 pb-6 text-center">
-        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-3">Help Center</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">Help Center</h1>
         <p className="text-slate-500 dark:text-slate-400 mb-8">Everything you need to know about using TrackSpendZ.</p>
 
         {/* Search */}
@@ -288,7 +288,7 @@ const HelpPage = () => {
                 onClick={() => setExpanded(expanded === section.id ? null : section.id)}
                 className="w-full px-5 py-4 flex items-center gap-4 text-left"
               >
-                <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-600 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-600 flex items-center justify-center shrink-0">
                   <Icon name={section.icon} className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">

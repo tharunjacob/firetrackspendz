@@ -134,7 +134,7 @@ const PricingPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
-        <h1 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 mb-4">Simple, Transparent Pricing</h1>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">Simple, Transparent Pricing</h1>
         <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-8">
           Start free. Upgrade when you need AI insights, cloud sync, and advanced features.
         </p>
@@ -176,7 +176,7 @@ const PricingPage = () => {
               )}
               <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">{plan.name}</h3>
               <div className="mb-1">
-                <span className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">{plan.price}</span>
+                <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{plan.price}</span>
                 <span className="text-slate-500 dark:text-slate-400 text-sm">{plan.period}</span>
               </div>
               {plan.sub && (
@@ -205,7 +205,7 @@ const PricingPage = () => {
                     handleUpgrade(plan.key);
                   }
                 }}
-                className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                className={`w-full py-3 rounded-lg font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                   plan.popular
                     ? 'bg-brand-600 text-white hover:bg-brand-700'
                     : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600'

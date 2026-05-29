@@ -256,14 +256,14 @@ export const DebtPayoffView = () => {
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-xl transition-colors"
+            className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg transition-colors"
           >
             Add your first debt
           </button>
         </div>
 
         {spendingInsight && (
-          <div className="max-w-md mx-auto bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4">
+          <div className="max-w-md mx-auto bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4">
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">Your spending data is ready to help</p>
             <p className="text-sm text-amber-700 dark:text-amber-400">
               You spent {formatAmount(spendingInsight.topAmount, currency)} on <strong>{spendingInsight.topCategory}</strong> last month. Redirecting just {formatAmount(spendingInsight.suggested, currency)}/month here could meaningfully accelerate your debt payoff.
@@ -295,12 +295,12 @@ export const DebtPayoffView = () => {
         {debts.map((debt, i) => (
           <div key={debt.id}>
             {editingId === debt.id ? (
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
+              <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wide">Editing — {debt.name}</p>
                 <DebtForm initial={debt} onSave={handleEdit} onCancel={() => setEditingId(null)} />
               </div>
             ) : (
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 group">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/40 group">
                 <div
                   className="w-3 h-10 rounded-full shrink-0"
                   style={{ background: DEBT_COLORS[i % DEBT_COLORS.length] }}
@@ -332,7 +332,7 @@ export const DebtPayoffView = () => {
         ))}
 
         {isAdding && (
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
+          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wide">New debt</p>
             <DebtForm onSave={handleAdd} onCancel={() => setIsAdding(false)} />
           </div>
@@ -406,9 +406,9 @@ export const DebtPayoffView = () => {
 
             {/* Hero stat */}
             {activeResult.neverPaysOff ? (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl p-4">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 bg-red-100 dark:bg-red-800/40 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 bg-red-100 dark:bg-red-800/40 rounded-lg flex items-center justify-center shrink-0">
                     <Icon name="warning" className="w-5 h-5 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
@@ -421,14 +421,14 @@ export const DebtPayoffView = () => {
               </div>
             ) : (
               <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 bg-brand-50 dark:bg-brand-900/20 rounded-xl p-4 text-center">
+                <div className="flex-1 bg-brand-50 dark:bg-brand-900/20 rounded-lg p-4 text-center">
                   <p className="text-xs font-medium text-brand-600 dark:text-brand-400 uppercase tracking-wide">Debt-free by</p>
-                  <p className="text-2xl font-extrabold text-brand-700 dark:text-brand-300 mt-1">{formatDate(activeResult.debtFreeDate)}</p>
+                  <p className="text-2xl font-bold text-brand-700 dark:text-brand-300 mt-1">{formatDate(activeResult.debtFreeDate)}</p>
                   <p className="text-sm text-brand-500 dark:text-brand-400 mt-0.5">{formatMonths(activeResult.totalMonths)} from now</p>
                 </div>
-                <div className="flex-1 bg-red-50 dark:bg-red-900/20 rounded-xl p-4 text-center">
+                <div className="flex-1 bg-red-50 dark:bg-red-900/20 rounded-lg p-4 text-center">
                   <p className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide">Total interest you'll pay</p>
-                  <p className="text-2xl font-extrabold text-red-700 dark:text-red-300 mt-1">{formatAmount(activeResult.totalInterestPaid, currency)}</p>
+                  <p className="text-2xl font-bold text-red-700 dark:text-red-300 mt-1">{formatAmount(activeResult.totalInterestPaid, currency)}</p>
                   <p className="text-sm text-red-500 dark:text-red-400 mt-0.5">over {formatMonths(activeResult.totalMonths)}</p>
                 </div>
               </div>
@@ -510,7 +510,7 @@ export const DebtPayoffView = () => {
           {spendingInsight && insightSavings && insightSavings.monthsSaved > 0 && (
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-5">
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 bg-amber-100 dark:bg-amber-800/40 rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 bg-amber-100 dark:bg-amber-800/40 rounded-lg flex items-center justify-center shrink-0">
                   <Icon name="flash" className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>

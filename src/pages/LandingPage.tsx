@@ -35,7 +35,7 @@ const LandingPage = () => {
                 No signup required · Free to start
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 dark:text-slate-100 leading-[1.1] mb-5">
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-slate-900 dark:text-slate-100 leading-[1.1] mb-5">
                 See exactly where<br />
                 <span className="text-gradient">your money goes</span>
               </h1>
@@ -48,7 +48,7 @@ const LandingPage = () => {
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-8">
                 <button
                   onClick={() => navigate('/dashboard')}
-                  className="btn-primary text-base px-8 py-3.5 shadow-lg shadow-brand-200/60 w-full sm:w-auto"
+                  className="btn-primary text-base px-8 py-3.5 shadow-md shadow-brand-200/60 w-full sm:w-auto"
                 >
                   Upload Your Statement — Free
                 </button>
@@ -73,8 +73,8 @@ const LandingPage = () => {
 
             {/* Right — dashboard mockup */}
             <div id="demo" className="relative mx-auto w-full max-w-lg">
-              <div className="absolute -inset-4 bg-brand-100 rounded-3xl blur-2xl opacity-60" />
-              <div className="relative rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden bg-white dark:bg-slate-800">
+              <div className="absolute -inset-4 bg-brand-100 rounded-2xl blur-2xl opacity-60" />
+              <div className="relative rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden bg-white dark:bg-slate-800">
                 {/* Browser chrome */}
                 <div className="bg-slate-800 px-4 py-2.5 flex items-center gap-2">
                   <div className="flex gap-1.5">
@@ -96,7 +96,7 @@ const LandingPage = () => {
                       { label: 'Savings Rate', value: '34%', sub: '↑ On track!', subColor: 'text-green-600' },
                       { label: 'FIRE Progress', value: '18%', sub: '₹4.2L / ₹23L', subColor: 'text-slate-400' },
                     ].map(m => (
-                      <div key={m.label} className="bg-white dark:bg-slate-800 rounded-xl p-2.5 shadow-sm border border-slate-100 dark:border-slate-700">
+                      <div key={m.label} className="bg-white dark:bg-slate-800 rounded-lg p-2.5 shadow-sm border border-slate-100 dark:border-slate-700">
                         <p className="text-[10px] text-slate-400 mb-0.5">{m.label}</p>
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{m.value}</p>
                         <p className={`text-[10px] ${m.subColor}`}>{m.sub}</p>
@@ -105,7 +105,7 @@ const LandingPage = () => {
                   </div>
 
                   {/* Spending chart */}
-                  <div className="bg-white dark:bg-slate-800 rounded-xl p-3 shadow-sm border border-slate-100 dark:border-slate-700">
+                  <div className="bg-white dark:bg-slate-800 rounded-lg p-3 shadow-sm border border-slate-100 dark:border-slate-700">
                     <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-2.5">Spending by Category</p>
                     <div className="flex items-center gap-3">
                       <svg viewBox="0 0 36 36" className="w-20 h-20 flex-shrink-0 -rotate-90">
@@ -137,7 +137,7 @@ const LandingPage = () => {
                   </div>
 
                   {/* Recent transactions */}
-                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                  <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
                     <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 px-3 py-2 border-b border-slate-50 dark:border-slate-700">
                       Recent Transactions
                     </p>
@@ -193,7 +193,7 @@ const LandingPage = () => {
               },
             ].map(s => (
               <div key={s.step} className="relative flex flex-col items-center">
-                <div className="relative z-10 w-16 h-16 bg-brand-600 text-white rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-brand-200/50">
+                <div className="relative z-10 w-16 h-16 bg-brand-600 text-white rounded-2xl flex items-center justify-center mb-5 shadow-md shadow-brand-200/50">
                   <Icon name={s.icon} className="w-7 h-7" />
                 </div>
                 <div className="text-xs font-bold text-brand-400 mb-1 tracking-widest">{s.step}</div>
@@ -256,7 +256,7 @@ const LandingPage = () => {
               },
             ].map(f => (
               <div key={f.title} className="card p-6 hover:shadow-md transition-shadow">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${f.color}`}>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${f.color}`}>
                   <Icon name={f.icon} className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-2">{f.title}</h3>
@@ -360,7 +360,7 @@ const LandingPage = () => {
             {/* Free */}
             <div className="card p-6">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Free</p>
-              <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-1">₹0</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">₹0</div>
               <p className="text-xs text-slate-400 mb-5">Forever free</p>
               <ul className="space-y-2 mb-6">
                 {['Up to 500 transactions', 'Unlimited file uploads', 'Core dashboards (5 views)', 'Local storage only'].map(f => (
@@ -381,7 +381,7 @@ const LandingPage = () => {
                 Most popular
               </div>
               <p className="text-xs font-bold text-brand-500 uppercase tracking-widest mb-3">Pro</p>
-              <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-1">{pricing.pro.price}<span className="text-base font-normal text-slate-400">{pricing.pro.period}</span></div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.pro.price}<span className="text-base font-normal text-slate-400">{pricing.pro.period}</span></div>
               <p className="text-xs text-slate-400 mb-5">{pricing.isIndia ? 'Billed monthly' : 'Billed annually'}</p>
               <ul className="space-y-2 mb-6">
                 {[
@@ -406,7 +406,7 @@ const LandingPage = () => {
             {/* Enterprise */}
             <div className="card p-6">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Enterprise</p>
-              <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-1">{pricing.enterprise.price}<span className="text-base font-normal text-slate-400">{pricing.enterprise.period}</span></div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.enterprise.price}<span className="text-base font-normal text-slate-400">{pricing.enterprise.period}</span></div>
               <p className="text-xs text-slate-400 mb-5">Up to 5 family members</p>
               <ul className="space-y-2 mb-6">
                 {[
@@ -446,7 +446,7 @@ const LandingPage = () => {
             </p>
             <button
               onClick={() => navigate('/dashboard')}
-              className="bg-white text-brand-700 font-bold px-8 py-3.5 rounded-xl hover:bg-brand-50 transition-colors text-base"
+              className="bg-white text-brand-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-50 transition-colors text-base"
             >
               Upload Your Statement — Free
             </button>

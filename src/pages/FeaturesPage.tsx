@@ -83,7 +83,7 @@ const FeaturesPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-20 pb-12 text-center">
-        <h1 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 mb-4">Built for People Who Care About Money</h1>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">Built for People Who Care About Money</h1>
         <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           Every feature designed to give you clarity, control, and confidence with your finances.
         </p>

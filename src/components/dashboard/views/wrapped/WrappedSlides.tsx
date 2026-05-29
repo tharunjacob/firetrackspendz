@@ -20,7 +20,7 @@ const StatCard = ({ label, value, sub, accent }: {
 const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white dark:bg-slate-800 p-3 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 text-sm">
+    <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 text-sm">
       <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">{label}</p>
       <p className="text-brand-600 font-mono">{payload[0].value.toFixed(1)}%</p>
     </div>
@@ -64,7 +64,7 @@ export const WrappedSlides = ({ stats, isPro, fmt }: Props) => {
         </p>
         <button
           onClick={() => logEvent(EVENTS.PAYWALL_CTA_CLICKED, { source: 'wrapped_view' })}
-          className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm"
+          className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3 rounded-lg transition-all shadow-md hover:shadow-md text-sm"
         >
           Upgrade to Pro
         </button>

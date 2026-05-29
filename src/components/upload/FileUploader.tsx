@@ -115,7 +115,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
 
   // ── Encrypted PDF password block (shared between layouts) ──
   const PasswordPrompt = ({ row }: { row: FileRow }) => row.needsPassword ? (
-    <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl px-3 py-2 w-full">
+    <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg px-3 py-2 w-full">
       <svg className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
       </svg>
@@ -230,7 +230,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
           {/* Add another file */}
           <button
             onClick={addRow}
-            className="w-full flex items-center justify-center gap-2 py-3 text-sm text-brand-600 font-medium border border-dashed border-brand-300 rounded-xl min-h-[44px] active:bg-brand-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 text-sm text-brand-600 font-medium border border-dashed border-brand-300 rounded-lg min-h-[44px] active:bg-brand-50 transition-colors"
           >
             <Icon name="plus" className="w-4 h-4" /> Add Another File
           </button>
@@ -265,7 +265,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
           <div className="space-y-4">
             {rows.map((row) => (
               <div key={row.id} className="flex flex-col gap-1">
-                <div className="flex flex-col sm:flex-row gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                <div className="flex flex-col sm:flex-row gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
                   {/* Owner Name */}
                   <input
                     type="text"
@@ -280,7 +280,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
                     onDragOver={e => e.preventDefault()}
                     onDrop={e => handleDrop(row.id, e)}
                     onClick={() => triggerFilePick(row.id)}
-                    className={`flex-1 border-2 border-dashed rounded-xl px-4 py-3 text-center cursor-pointer transition-colors
+                    className={`flex-1 border-2 border-dashed rounded-lg px-4 py-3 text-center cursor-pointer transition-colors
                       ${row.file ? 'border-green-300 bg-green-50' : 'border-slate-200 hover:border-brand-300 hover:bg-brand-50'}`}
                   >
                     {row.file ? (

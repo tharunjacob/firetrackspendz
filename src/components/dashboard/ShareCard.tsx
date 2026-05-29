@@ -272,7 +272,7 @@ export const ShareCard = () => {
               </button>
             </div>
           </div>
-          <div className="card p-4 flex justify-center bg-slate-900 rounded-xl overflow-hidden">
+          <div className="card p-4 flex justify-center bg-slate-900 rounded-lg overflow-hidden">
             <canvas
               ref={canvasRef}
               className="max-w-full h-auto rounded-lg"

@@ -13,7 +13,7 @@ export const WrappedIntro = ({ selectedYear, availableYears, onSelectYear }: Pro
     <select
       value={selectedYear}
       onChange={e => onSelectYear(Number(e.target.value))}
-      className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+      className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
     >
       {availableYears.map(y => (
         <option key={y} value={y}>{y}</option>

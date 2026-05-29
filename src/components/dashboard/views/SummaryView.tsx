@@ -26,7 +26,7 @@ const DonutTooltip = ({ active, payload, formatCurrency, total }: any) => {
   const d = payload[0];
   const pct = total > 0 ? d.value / total : 0;
   return (
-    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 text-sm z-50 min-w-[180px]">
+    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 text-sm z-50 min-w-[180px]">
       <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-100 dark:border-slate-700">
         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.payload.fill }} />
         <p className="font-bold text-slate-800 dark:text-slate-100 text-base">{d.name}</p>
@@ -97,7 +97,7 @@ const DonutChartCard = ({ title, data, colors, formatCurrency }: {
 const CustomBarTooltip = ({ active, payload, label, currency }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg px-4 py-3 text-xs">
+    <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-lg shadow-md px-4 py-3 text-xs">
       <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1.5">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center gap-2 py-0.5">

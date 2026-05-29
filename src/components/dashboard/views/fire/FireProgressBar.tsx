@@ -21,7 +21,7 @@ export const FireProgressBar = ({ currentSavings, fireNumber, currency, netWorth
       <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
         <div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">FIRE Progress</p>
-          <p className={`text-5xl font-black ${textColor}`}>
+          <p className={`text-5xl font-bold ${textColor}`}>
             {pct < 1 && pct > 0 ? '<1' : pct.toFixed(1)}% to FIRE
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">

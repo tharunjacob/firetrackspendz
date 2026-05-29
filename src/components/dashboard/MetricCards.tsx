@@ -10,7 +10,7 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ title, value, accentColor, label, labelColor }: MetricCardProps) => (
-  <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-lg border border-slate-200 dark:border-slate-700 border-l-4 transition-shadow"
+  <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-md border border-slate-200 dark:border-slate-700 border-l-4 transition-shadow"
     style={{ borderLeftColor: accentColor }}>
     <p className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider mb-1">{title}</p>
     <div className="flex justify-between items-baseline mt-2">

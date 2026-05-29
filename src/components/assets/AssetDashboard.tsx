@@ -84,7 +84,7 @@ export const AssetDashboard: React.FC<Props> = ({ snapshots, config, currency })
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="card p-4 col-span-2 lg:col-span-1 bg-brand-600 text-white">
           <p className="text-xs text-brand-200 uppercase tracking-wider">Net Worth</p>
-          <p className="text-2xl font-extrabold mt-1">{fmt(latest.totalCurrentValue)}</p>
+          <p className="text-2xl font-bold mt-1">{fmt(latest.totalCurrentValue)}</p>
           <p className="text-xs text-brand-200 mt-1">{fmtDate(latest.date)}</p>
         </div>
         <div className="stat-card">

@@ -29,7 +29,7 @@ export const FeedbackButton = () => {
       onClick={() => navigate(ROUTES.FEEDBACK)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="fixed right-0 bottom-24 z-40 bg-slate-700 hover:bg-slate-800 text-white rounded-l-xl shadow-lg transition-all duration-200 flex items-center gap-2 overflow-hidden group"
+      className="fixed right-0 bottom-24 z-40 bg-slate-700 hover:bg-slate-800 text-white rounded-l-xl shadow-md transition-all duration-200 flex items-center gap-2 overflow-hidden group"
       style={{ padding: hovered ? '10px 16px 10px 12px' : '10px 10px' }}
       aria-label="Send feedback"
     >

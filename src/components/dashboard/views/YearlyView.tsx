@@ -9,7 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 const YearlyTooltip = ({ active, payload, label, formatCurrency }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 text-sm z-50 min-w-[200px]">
+    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 text-sm z-50 min-w-[200px]">
       <p className="font-bold text-slate-800 dark:text-slate-100 mb-3 border-b border-slate-100 dark:border-slate-700 pb-1 text-base">{label}</p>
       {payload.map((pld: any, index: number) => {
         const breakdown = pld.payload[pld.dataKey === 'income' ? 'incomeBreakdown' : 'expenseBreakdown'] || [];

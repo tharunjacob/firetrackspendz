@@ -328,7 +328,7 @@ export const DashboardShell = () => {
                 />
               )}
               {loadError && transactions.length === 0 && (
-                <div className="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-start justify-between gap-4">
+                <div className="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-start justify-between gap-4">
                   <div>
                     <p className="font-semibold text-red-800 dark:text-red-300">Failed to load your data</p>
                     <p className="text-sm text-red-700 dark:text-red-400 mt-0.5">{loadError}. Try refreshing — if this keeps happening, check your connection or sign out and back in.</p>
@@ -339,7 +339,7 @@ export const DashboardShell = () => {
                 </div>
               )}
               {showImportConfirmBanner && (
-                <div className="mb-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="mb-4 p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
                     Import looks good? Help other users with the same bank format by confirming.
                   </p>

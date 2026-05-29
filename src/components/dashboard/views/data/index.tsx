@@ -196,7 +196,7 @@ export const DataView = () => {
   return (
     <div className="space-y-4 animate-fade-in">
       {showEditHint && (
-        <div className="flex items-start gap-3 bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-xl px-4 py-3">
+        <div className="flex items-start gap-3 bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-lg px-4 py-3">
           <Icon name="pencil" className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" />
           <p className="flex-1 text-xs text-brand-800 dark:text-brand-300 leading-relaxed">
             Tap any category to edit it. Your corrections automatically apply to future uploads.

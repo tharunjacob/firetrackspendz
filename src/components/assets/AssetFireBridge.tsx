@@ -86,21 +86,21 @@ export const AssetFireBridge: React.FC<Props> = ({ snapshots, config: _config, c
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <p className="text-xs text-orange-200 uppercase tracking-wider">FIRE Progress</p>
-            <p className="text-4xl font-extrabold mt-1">{fireProgress.toFixed(1)}%</p>
+            <p className="text-4xl font-bold mt-1">{fireProgress.toFixed(1)}%</p>
             <p className="text-sm text-orange-100 mt-1">
               {fmt(accessibleAssets)} of {fmt(freedomNumber)}
             </p>
           </div>
           <div>
             <p className="text-xs text-orange-200 uppercase tracking-wider">Years to FIRE</p>
-            <p className="text-4xl font-extrabold mt-1">
+            <p className="text-4xl font-bold mt-1">
               {yearsToFire >= 0 ? `~${yearsToFire + 1}` : freedomNumber > 0 ? '25+' : '—'}
             </p>
             <p className="text-sm text-orange-100 mt-1">at current growth + contributions</p>
           </div>
           <div>
             <p className="text-xs text-orange-200 uppercase tracking-wider">Runway</p>
-            <p className="text-4xl font-extrabold mt-1">{yearsRunway} yrs</p>
+            <p className="text-4xl font-bold mt-1">{yearsRunway} yrs</p>
             <p className="text-sm text-orange-100 mt-1">{monthsRunway} months at current expenses</p>
           </div>
         </div>

@@ -47,7 +47,7 @@ export const OnboardingGuide: React.FC<Props> = ({ hasTransactions, hasAssets, o
     <div className="mb-8">
       <div className="card p-6 bg-brand-50 dark:bg-slate-800 border border-brand-100 dark:border-slate-700">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 bg-brand-600 text-white rounded-xl flex items-center justify-center text-lg font-bold">
+          <div className="w-10 h-10 bg-brand-600 text-white rounded-lg flex items-center justify-center text-lg font-bold">
             {completedSteps}/{steps.length}
           </div>
           <div>
@@ -60,7 +60,7 @@ export const OnboardingGuide: React.FC<Props> = ({ hasTransactions, hasAssets, o
           {steps.map((step) => {
             const done = (step.id <= 2 && hasTransactions) || (step.id === 3 && hasAssets) || (step.id === 4 && hasTransactions && hasAssets);
             return (
-              <div key={step.id} className={`flex gap-3 p-3 rounded-xl transition-colors ${done ? 'bg-green-50/80 dark:bg-green-950/30' : 'bg-white/80 dark:bg-slate-700/50'}`}>
+              <div key={step.id} className={`flex gap-3 p-3 rounded-lg transition-colors ${done ? 'bg-green-50/80 dark:bg-green-950/30' : 'bg-white/80 dark:bg-slate-700/50'}`}>
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-lg ${done ? 'bg-green-100 dark:bg-green-900/40' : 'bg-slate-100 dark:bg-slate-600'}`}>
                   {done ? '✓' : step.icon}
                 </div>

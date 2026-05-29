@@ -159,7 +159,7 @@ export const MonteCarloTab = ({ fire, currency, multiplier: _multiplier, netWort
               'border-l-red-500'
             }`}>
               <p className="text-xs text-slate-400 uppercase font-bold mb-1">Success Rate</p>
-              <p className={`text-4xl font-black ${
+              <p className={`text-4xl font-bold ${
                 result.successRate >= 90 ? 'text-green-600' :
                 result.successRate >= 70 ? 'text-amber-600' : 'text-red-600'
               }`}>{result.successRate}%</p>
@@ -175,14 +175,14 @@ export const MonteCarloTab = ({ fire, currency, multiplier: _multiplier, netWort
             </div>
             <div className="card p-6">
               <p className="text-xs text-slate-400 uppercase font-bold mb-1">Median Ending Balance</p>
-              <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{formatAmount(result.medianEndingBalance, currency)}</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{formatAmount(result.medianEndingBalance, currency)}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">50th percentile after {params.yearsToRetirement + params.yearsInRetirement} years</p>
             </div>
             <div className="card p-6">
               <p className="text-xs text-slate-400 uppercase font-bold mb-1">
                 {result.failureYear ? 'Avg Failure Year' : 'No Failures Detected'}
               </p>
-              <p className="text-2xl font-black text-slate-800 dark:text-slate-100">
+              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                 {result.failureYear ? `Year ${result.failureYear}` : 'N/A'}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">

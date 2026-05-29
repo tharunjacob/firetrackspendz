@@ -53,7 +53,7 @@ export const FilterPanel = ({
         </div>
 
         <div className="p-4 space-y-5 pb-10">
-          <div className="p-4 bg-brand-50 rounded-xl border border-brand-100">
+          <div className="p-4 bg-brand-50 rounded-lg border border-brand-100">
             <label className="block text-sm font-bold text-brand-800 mb-2">Currency</label>
             <select
               value={currency}
@@ -163,14 +163,14 @@ export const FilterPanel = ({
           <div className="space-y-2 pt-1">
             <button
               onClick={onReset}
-              className="w-full py-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-sm font-medium min-h-[44px]"
+              className="w-full py-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-sm font-medium min-h-[44px]"
             >
               Reset Filters
             </button>
             {onClearAll && (
               <button
                 onClick={() => { onClearAll(); onClose(); }}
-                className="w-full py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium min-h-[44px] flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm font-medium min-h-[44px] flex items-center justify-center gap-2"
               >
                 <Icon name="trash" className="w-4 h-4" />
                 Clear All Data

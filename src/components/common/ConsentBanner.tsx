@@ -24,7 +24,7 @@ export const ConsentBanner = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg px-4 py-3 sm:py-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-md px-4 py-3 sm:py-4">
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <p className="text-sm text-slate-600 dark:text-slate-400 flex-1">
           We use anonymous analytics to improve TrackSpendZ. No personal financial data is tracked.{' '}

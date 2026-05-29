@@ -60,7 +60,7 @@ export const Navbar = () => {
             {CURRENCIES[currency].symbol} {currency}
           </button>
           {currencyOpen && (
-            <div className="absolute right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg py-2 z-50 min-w-[160px]">
+            <div className="absolute right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-md py-2 z-50 min-w-[160px]">
               {(Object.keys(CURRENCIES) as Currency[]).map(c => (
                 <button
                   key={c}
@@ -86,7 +86,7 @@ export const Navbar = () => {
               <span className="hidden md:inline text-sm font-medium text-slate-700 dark:text-slate-200">{userEmail?.split('@')[0]}</span>
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg py-2 z-50 min-w-[180px]">
+              <div className="absolute right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-md py-2 z-50 min-w-[180px]">
                 <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
                   <p className="text-xs text-slate-400">Signed in as</p>
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">{userEmail}</p>

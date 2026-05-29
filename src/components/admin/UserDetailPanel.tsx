@@ -95,7 +95,7 @@ export const UserDetailPanel = ({
         </div>
 
         {/* Health Score */}
-        <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
+        <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
           <p className="text-xs text-slate-400 uppercase font-bold mb-3">Health Score</p>
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-baseline gap-2">

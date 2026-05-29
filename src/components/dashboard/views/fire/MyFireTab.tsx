@@ -88,17 +88,17 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
               <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Financial Freedom</span>
               <span className="text-slate-400 text-sm">Target Corpus ({multiplier}x Living + Liabilities)</span>
             </div>
-            <p className="text-5xl font-black mb-2">{formatAmount(effectiveFireNumber + bigTicketCorpus, currency)}</p>
+            <p className="text-5xl font-bold mb-2">{formatAmount(effectiveFireNumber + bigTicketCorpus, currency)}</p>
             <p className="text-slate-400">Your "Freedom Number" to retire today.</p>
           </div>
           <div className="flex gap-4">
-            <div className="bg-slate-700/50 rounded-xl p-4 min-w-[160px]">
+            <div className="bg-slate-700/50 rounded-lg p-4 min-w-[160px]">
               <p className="text-xs text-slate-400 uppercase font-bold mb-1">Avg Monthly Spend</p>
               <input type="number" value={Math.round(effectiveMonthly)} onChange={e => setEditableMonthly(Number(e.target.value))}
                 className="bg-transparent text-2xl font-bold text-white w-full outline-none border-b border-slate-600 focus:border-brand-400 transition" />
               <p className="text-xs text-slate-500 mt-1">Estimated Living Cost</p>
             </div>
-            <div className="bg-slate-700/50 rounded-xl p-4 min-w-[160px]">
+            <div className="bg-slate-700/50 rounded-lg p-4 min-w-[160px]">
               <p className="text-xs text-slate-400 uppercase font-bold mb-1">Personal Inflation</p>
               <div className="flex items-baseline">
                 <input type="number" step="0.1" value={effectiveInflation.toFixed(1)} onChange={e => setEditableInflation(Number(e.target.value))}
@@ -108,7 +108,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
               <p className="text-xs text-slate-500 mt-1">Affects future projections</p>
             </div>
             {netWorthTotal === null && (
-              <div className="bg-slate-700/50 rounded-xl p-4 min-w-[160px]">
+              <div className="bg-slate-700/50 rounded-lg p-4 min-w-[160px]">
                 <p className="text-xs text-slate-400 uppercase font-bold mb-1">Starting Net Worth</p>
                 <div className="flex items-baseline">
                   <span className="text-xl text-slate-400 mr-1">{currency === 'INR' ? '₹' : '$'}</span>
@@ -127,7 +127,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
           </p>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {effectiveProjections.map(p => (
-              <div key={p.year} className="bg-slate-700/40 rounded-xl p-4 border border-slate-600/50">
+              <div key={p.year} className="bg-slate-700/40 rounded-lg p-4 border border-slate-600/50">
                 <p className="text-sm font-bold text-brand-300">{p.year} Year{p.year > 1 ? 's' : ''}</p>
                 <p className="text-xl font-bold mt-1">{formatAmount(Math.round(p.value + bigTicketCorpus), currency)}</p>
                 <p className="text-xs text-slate-500 mt-1">nominal</p>
@@ -191,7 +191,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Recurring Commitments</h3>
             <span className="text-xs bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 px-2 py-1 rounded-full font-bold">{recurring.length} Found</span>
           </div>
-          <p className="text-3xl font-black text-slate-800 dark:text-slate-100">{formatAmount(recurringTotal, currency)}</p>
+          <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">{formatAmount(recurringTotal, currency)}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">/ month estimated fixed cost</p>
           <div className="space-y-2 max-h-64 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
             {recurring.map((r, i) => {
@@ -233,7 +233,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
             </span>
           )}
           <p className="text-xs uppercase text-slate-400 font-bold tracking-wider">Real Income Growth</p>
-          <p className={`text-4xl font-black ${realIncomeGrowth !== null && realIncomeGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`text-4xl font-bold ${realIncomeGrowth !== null && realIncomeGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {realIncomeGrowth !== null ? `${realIncomeGrowth.toFixed(1)}%` : 'N/A'}
           </p>
           {fire.annualIncomeGrowth !== undefined && (
@@ -249,7 +249,7 @@ export const MyFireTab = ({ fire, recurring, transactions, currency, multiplier,
             {balancedSpender === 'Stable' ? 'Positive' : balancedSpender === 'Moderate' ? 'Moderate' : 'Warning'}
           </span>
           <p className="text-xs uppercase text-slate-400 font-bold tracking-wider">Balanced Spender</p>
-          <p className={`text-4xl font-black ${balancedSpender === 'Stable' ? 'text-green-600' : balancedSpender === 'Moderate' ? 'text-amber-600' : 'text-red-600'}`}>
+          <p className={`text-4xl font-bold ${balancedSpender === 'Stable' ? 'text-green-600' : balancedSpender === 'Moderate' ? 'text-amber-600' : 'text-red-600'}`}>
             {balancedSpender}
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 text-center">

@@ -78,7 +78,7 @@ export const BottomTabBar = ({ activeTab, setActiveTab, moreSheetOpen, setMoreSh
                       <button
                         key={t}
                         onClick={() => { setActiveTab(t); setMoreSheetOpen(false); }}
-                        className={`flex items-center px-3 py-3 rounded-xl text-sm font-medium transition-colors min-h-[44px] text-left ${
+                        className={`flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors min-h-[44px] text-left ${
                           activeTab === t
                             ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800'
                             : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 active:bg-slate-100 dark:active:bg-slate-600'

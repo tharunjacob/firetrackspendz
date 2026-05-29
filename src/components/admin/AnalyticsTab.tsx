@@ -90,9 +90,9 @@ const Section = ({ title, subtitle, children }: {
 const KPI = ({ label, value, sub, color = 'text-slate-800' }: {
   label: string; value: string | number; sub?: string; color?: string;
 }) => (
-  <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4">
+  <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
     <p className="text-xs text-slate-400 dark:text-slate-400 uppercase tracking-wide">{label}</p>
-    <p className={`text-2xl font-black mt-1 ${color}`}>{value}</p>
+    <p className={`text-2xl font-bold mt-1 ${color}`}>{value}</p>
     {sub && <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">{sub}</p>}
   </div>
 );
@@ -299,16 +299,16 @@ const RevenueSection = ({ metrics }: { metrics: RevenueMetrics }) => (
     </div>
 
     <div className="grid grid-cols-3 gap-3">
-      <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 text-center">
-        <p className="text-3xl font-black text-slate-800">{metrics.total_users}</p>
+      <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 text-center">
+        <p className="text-3xl font-bold text-slate-800">{metrics.total_users}</p>
         <p className="text-xs text-slate-400 mt-1">Total Users</p>
       </div>
-      <div className="bg-brand-50 rounded-xl p-4 text-center">
-        <p className="text-3xl font-black text-brand-700">{metrics.pro_users}</p>
+      <div className="bg-brand-50 rounded-lg p-4 text-center">
+        <p className="text-3xl font-bold text-brand-700">{metrics.pro_users}</p>
         <p className="text-xs text-brand-400 mt-1">Pro × $49/yr</p>
       </div>
-      <div className="bg-amber-50 rounded-xl p-4 text-center">
-        <p className="text-3xl font-black text-amber-700">{metrics.enterprise_users}</p>
+      <div className="bg-amber-50 rounded-lg p-4 text-center">
+        <p className="text-3xl font-bold text-amber-700">{metrics.enterprise_users}</p>
         <p className="text-xs text-amber-400 mt-1">Enterprise × $149/yr</p>
       </div>
     </div>

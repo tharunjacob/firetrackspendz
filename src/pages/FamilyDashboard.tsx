@@ -192,7 +192,7 @@ const FamilyDashboard = () => {
           See your entire household's finances in one place. Add up to 5 family members,
           track combined spending, and compare category breakdowns side-by-side.
         </p>
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
           <p className="text-sm text-amber-700 dark:text-amber-400">
             Family Dashboard is an Enterprise feature. Upgrade to Enterprise ($149/year) to unlock
             family accounts, shared views, and priority support.
@@ -241,7 +241,7 @@ const FamilyDashboard = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="card p-4 bg-brand-600 text-white">
               <p className="text-xs text-brand-200 uppercase tracking-wide">Members</p>
-              <p className="text-3xl font-black mt-1">
+              <p className="text-3xl font-bold mt-1">
                 {activeMembers.length}
                 <span className="text-lg font-normal opacity-60"> / 5</span>
               </p>

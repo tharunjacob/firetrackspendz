@@ -210,7 +210,7 @@ export const ScenariosTab = ({ fire, currency, multiplier, transactions, netWort
           <div key={s.variant} className="card p-5 border-l-4" style={{ borderLeftColor: s.color }}>
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">{s.label}</h4>
             <p className="text-xs text-slate-400 mb-3">{s.desc}</p>
-            <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{formatAmount(Math.round(s.fireNumber), currency)}</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{formatAmount(Math.round(s.fireNumber), currency)}</p>
             {s.yearsToFire > 0 && s.yearsToFire < 99 && (
               <p className="text-xs text-slate-400 mt-0.5">
                 nominal · {formatAmount(Math.round(s.realValue), currency)} in today's money
