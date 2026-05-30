@@ -1,5 +1,13 @@
-﻿
+﻿import { useEffect } from 'react';
+
 export const Toast = ({ message, type = 'success', onClose }: { message: string; type?: 'success' | 'error' | 'info'; onClose: () => void }) => {
+  // Auto-dismiss after 3.5 s. Errors stay a bit longer (5 s) since the user needs to read them.
+  useEffect(() => {
+    const duration = type === 'error' ? 5000 : 3500;
+    const timer = setTimeout(onClose, duration);
+    return () => clearTimeout(timer);
+  }, [onClose, type]);
+
   const bg = type === 'error' ? 'bg-red-900 border-red-700' : type === 'info' ? 'bg-brand-900 border-brand-700' : 'bg-slate-900 border-slate-700';
   const dot = type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-brand-400' : 'bg-green-500';
   return (
