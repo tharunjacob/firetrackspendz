@@ -29,7 +29,7 @@ BEGIN
   -- Admin allow-list — these emails get the admin panel + read-all access.
   -- This function is the SINGLE source of truth for admin checks across all RLS
   -- policies below. To add/remove an admin, edit this array and re-run the file.
-  RETURN user_email = ANY(ARRAY['tharun@krexo.in', 'tharunjacob@gmail.com']);
+  RETURN user_email = ANY(ARRAY['tharun@krexo.in', 'tharunjacob@gmail.com', 'utharuninni777@gmail.com']);
 END;
 $$;
 

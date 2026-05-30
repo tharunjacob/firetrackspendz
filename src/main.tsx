@@ -20,6 +20,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 // Register Service Worker for offline support
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  // Self-heal: purge /sw.js and old trackspendz-v2 cache from Cache Storage
+  if (window.caches) {
+    caches.delete('trackspendz-v2').catch(() => {});
+    caches.keys().then(keys => {
+      keys.forEach(key => {
+        caches.open(key).then(cache => {
+          cache.delete('/sw.js').catch(() => {});
+        });
+      });
+    });
+  }
+
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW registration failed:', err));
   });

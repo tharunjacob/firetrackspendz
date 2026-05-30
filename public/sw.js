@@ -1,5 +1,5 @@
 // TrackSpendZ Service Worker — Offline-first caching
-const CACHE_NAME = 'trackspendz-v2';
+const CACHE_NAME = 'trackspendz-v3';
 const STATIC_ASSETS = ['/', '/index.html', '/manifest.json', '/icons/favicon.svg'];
 
 // Install: pre-cache critical assets
@@ -25,8 +25,9 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET and external requests
+  // Skip non-GET, self service worker script, and external requests
   if (request.method !== 'GET') return;
+  if (url.pathname === '/sw.js') return;
   if (!url.origin.includes(self.location.origin) && !url.hostname.includes('cdn')) return;
 
   // API calls: network-first (never cache Rest API/Supabase)

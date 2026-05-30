@@ -576,7 +576,9 @@ export const transformData = async (
           throw new Error(e.message || 'Failed to decrypt PDF');
         }
       } else {
-        try { await extractTextFromEncryptedPDF(arrayBuffer); } catch (e: any) {
+        try {
+          extractionPayload.text = await extractTextFromEncryptedPDF(arrayBuffer);
+        } catch (e: any) {
           if (e.message === 'PASSWORD_REQUIRED') throw e;
         }
       }

@@ -103,7 +103,7 @@ DECLARE
 BEGIN
   SELECT email, raw_user_meta_data INTO user_email, user_metadata FROM auth.users WHERE id = auth.uid();
   RETURN (
-    user_email = ANY(ARRAY['tharun@krexo.in', 'tharunjacob@gmail.com'])
+    user_email = ANY(ARRAY['tharun@krexo.in', 'tharunjacob@gmail.com', 'utharuninni777@gmail.com'])
     OR user_metadata->>'is_admin' = 'true'
     OR user_metadata->>'role' = 'admin'
   );
