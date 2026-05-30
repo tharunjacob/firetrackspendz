@@ -266,7 +266,10 @@ No markdown fences. No column headers in output. Only the pipe-delimited transac
   try {
     let contents: GeminiContents;
     if (isRawText) {
-      contents = [{ role: 'user', parts: [{ text: prompt + '\n\nBANK STATEMENT TEXT:\n' + dataInput }] }];
+      // Trim to 80K chars max — keeps token count manageable while preserving
+      // all relevant transaction rows (typical multi-page statement is 5–40K chars).
+      const trimmedText = dataInput.length > 80000 ? dataInput.slice(0, 80000) : dataInput;
+      contents = [{ role: 'user', parts: [{ text: prompt + '\n\nBANK STATEMENT TEXT:\n' + trimmedText }] }];
     } else {
       contents = [{ role: 'user', parts: [{ text: prompt }, { inlineData: { mimeType: 'application/pdf', data: dataInput } }] }];
     }

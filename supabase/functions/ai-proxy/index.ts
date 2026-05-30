@@ -29,32 +29,48 @@ serve(async (req: Request) => {
 
     // Parse the request from the client
     const { action, payload } = await req.json() as { action: string; payload: any };
+    console.log(`[ai-proxy] action=${action} user=${user.email} jsonMode=${!!payload.jsonMode}`);
 
     // Route to the correct Gemini endpoint
+    // gemini-2.5-flash has thinking enabled by default which causes 75-94s response
+    // times and exceeds the client-side 120s abort timeout.
+    // thinkingBudget:0 disables thinking entirely, dropping latency to ~5-10s.
     const model = 'gemini-2.5-flash';
     const endpoint = `${GEMINI_BASE}/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
-    // Build the Gemini request body from the payload
+    // Always merge thinkingConfig with any other generationConfig options
+    const generationConfig: Record<string, unknown> = {
+      thinkingConfig: { thinkingBudget: 0 }, // disable thinking → fast responses
+    };
+    if (payload.jsonMode) {
+      generationConfig.responseMimeType = 'application/json';
+    }
+
     const geminiBody = {
       contents: payload.contents,
-      ...(payload.jsonMode ? { generationConfig: { responseMimeType: 'application/json' } } : {}),
+      generationConfig,
     };
 
+    const startMs = Date.now();
     const geminiRes = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(geminiBody),
     });
+    const elapsed = Date.now() - startMs;
 
     const data = await geminiRes.json();
 
     if (!geminiRes.ok) {
-      console.error('[ai-proxy] Gemini error:', data);
+      console.error(`[ai-proxy] Gemini error (${elapsed}ms):`, JSON.stringify(data).slice(0, 500));
       return new Response(JSON.stringify({ error: data.error?.message ?? 'Gemini API error' }), {
         status: geminiRes.status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const outputLen = data.candidates?.[0]?.content?.parts?.[0]?.text?.length ?? 0;
+    console.log(`[ai-proxy] OK (${elapsed}ms) outputChars=${outputLen}`);
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

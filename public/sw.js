@@ -1,5 +1,5 @@
 // TrackSpendZ Service Worker — Offline-first caching
-const CACHE_NAME = 'trackspendz-v3';
+const CACHE_NAME = 'trackspendz-v4';
 const STATIC_ASSETS = ['/', '/index.html', '/manifest.json', '/icons/favicon.svg'];
 
 // Install: pre-cache critical assets
@@ -7,7 +7,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
-  self.skipWaiting();
+  // NOTE: No self.skipWaiting() — we let the normal SW lifecycle play out.
+  // skipWaiting() steals clients immediately and aborts any in-flight fetch
+  // requests (e.g. an ongoing PDF analysis call), which manifests as
+  // "Lock broken by another request with the 'steal' option" in the console.
 });
 
 // Activate: clean up old caches
@@ -17,7 +20,9 @@ self.addEventListener('activate', (event) => {
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
-  self.clients.claim();
+  // NOTE: No self.clients.claim() — pairing with no skipWaiting() means the
+  // new SW only takes control after the user closes and reopens the tab.
+  // This is safer than hijacking an active session mid-upload.
 });
 
 // Fetch: network-first for API and navigation, cache-first for static assets

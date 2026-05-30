@@ -20,9 +20,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 // Register Service Worker for offline support
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  // Self-heal: purge /sw.js and old trackspendz-v2 cache from Cache Storage
+  // Self-heal: purge old caches (v2, v3) that may have been left by previous SW versions
   if (window.caches) {
     caches.delete('trackspendz-v2').catch(() => {});
+    caches.delete('trackspendz-v3').catch(() => {});
     caches.keys().then(keys => {
       keys.forEach(key => {
         caches.open(key).then(cache => {

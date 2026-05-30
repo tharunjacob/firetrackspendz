@@ -41,7 +41,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
       if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 s max (needed for heavy PDF parse tasks)
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 s max — matches Supabase Edge Function wall-time limit
 
       let res: Response;
       try {
@@ -62,7 +62,11 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
 
       const data = await res.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    } catch (e) {
+    } catch (e: any) {
+      // Convert AbortError (timeout) into a user-friendly message
+      if (e?.name === 'AbortError') {
+        throw new Error('PDF parsing timed out — please try again. If it keeps failing, convert your PDF to CSV first.');
+      }
       console.warn('[aiProxy] Edge function call failed, no dev fallback in production:', e);
       throw e;
     }
@@ -79,7 +83,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
   if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
 
   const devController = new AbortController();
-  const devTimeoutId = setTimeout(() => devController.abort(), 90000); // 90 s max
+  const devTimeoutId = setTimeout(() => devController.abort(), 120000); // 120 s max
   let res: Response;
   try {
     res = await fetch(url, {
