@@ -89,7 +89,7 @@ function App() {
       </Suspense>
       </div>
 
-      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
+      {toast.visible && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
       {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} />}
       <FeedbackButton />
       <ConsentBanner />

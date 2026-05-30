@@ -17,10 +17,26 @@ export class ErrorBoundary extends Component<Props, State> {
       error: error.message,
       componentStack: info.componentStack?.slice(0, 500),
     }, 'error');
+
+    // Automatically reload the window when a chunk loading error occurs due to a new deployment
+    if (error.message && error.message.includes('dynamically imported module')) {
+      window.location.reload();
+    }
   }
 
   render() {
     if (this.state.hasError) {
+      if ((this.state.error?.message || '').includes('dynamically imported module')) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+            <div className="text-center">
+              <div className="w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-sm text-slate-500">Updating application to the latest version...</p>
+            </div>
+          </div>
+        );
+      }
+
       return this.props.fallback || (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-8">
           <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700 p-8 text-center">
