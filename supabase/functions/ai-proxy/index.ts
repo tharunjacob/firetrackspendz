@@ -31,7 +31,7 @@ serve(async (req: Request) => {
     const { action, payload } = await req.json() as { action: string; payload: any };
 
     // Route to the correct Gemini endpoint
-    const model = 'gemini-2.0-flash';
+    const model = 'gemini-2.5-flash';
     const endpoint = `${GEMINI_BASE}/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
     // Build the Gemini request body from the payload

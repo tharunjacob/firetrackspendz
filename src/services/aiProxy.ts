@@ -73,7 +73,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
     throw new Error('AI unavailable: no VITE_GEMINI_API_KEY set and no Supabase Edge Function configured.');
   }
 
-  const model = 'gemini-2.0-flash';
+  const model = 'gemini-2.5-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${DEV_GEMINI_API_KEY}`;
   const body: Record<string, unknown> = { contents: payload.contents };
   if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
