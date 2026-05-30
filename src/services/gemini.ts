@@ -234,7 +234,7 @@ Type — exactly one of: Income | Expense | Transfer
   Expense: purchase, bill, EMI, loan payment, insurance premium, ATM withdrawal,
            debit entry (Dr), outward payment to merchant
   Transfer: UPI/NEFT/IMPS/RTGS to own account, internal fund move, FD creation,
-            savings account top-up, wallet load, "self transfer"
+            savings account top-up, wallet load, "self transfer", credit card bill payment
   When unsure between Expense and Transfer: use the description — merchant name = Expense,
   account number or "self" = Transfer.
 
@@ -256,11 +256,12 @@ EXAMPLES (one per bank style):
 2025-03-17|ATM Cash Withdrawal|5000.00|Expense|Cash
 2025-03-18|Netflix|649.00|Expense|Entertainment
 2025-03-19|Transfer to Savings|10000.00|Transfer|Transfer
-2025-03-20|HDFC Credit Card Payment|15000.00|Expense|EMI
+2025-03-20|HDFC Credit Card Payment|15000.00|Transfer|Transfer
 2025-03-21|Income Tax Refund|12500.00|Income|Income
 2025-03-22|Zerodha MF Purchase|5000.00|Expense|Investment
 
 No markdown fences. No column headers in output. Only the pipe-delimited transaction lines.`;
+
 
   try {
     let contents: GeminiContents;
@@ -276,7 +277,7 @@ No markdown fences. No column headers in output. Only the pipe-delimited transac
 
     const VALID_TYPES = new Set(['Income', 'Expense', 'Transfer']);
     const INCOME_SIGNALS = /\b(salary|wage|interest|refund|cashback|dividend|bonus|credit|deposit|inward|received|cr\b)/i;
-    const TRANSFER_SIGNALS = /\b(transfer|internal|own account|self|fd |wallet|top.?up)\b/i;
+    const TRANSFER_SIGNALS = /\b(transfer|internal|own account|self|fd |wallet|top.?up|cc payment|credit card payment|cc pay|bppy cc|cc bill|payment to credit card)\b/i;
 
     return rawText.split('\n').filter((line: string) => line.trim() && !line.startsWith('#')).map((line: string) => {
       const parts = line.split('|').map((p: string) => p.trim());
@@ -287,14 +288,20 @@ No markdown fences. No column headers in output. Only the pipe-delimited transac
       if (isNaN(amount) || amount === 0) return null;
 
       let type: string = VALID_TYPES.has(parts[3]) ? parts[3] : 'Expense';
+      let category: string = parts[4] || 'Unclassified';
 
-      // Sign-based override when Gemini didn't set a type or set a bad one
-      if (!VALID_TYPES.has(parts[3])) {
-        const desc = (parts[1] || '').toLowerCase();
+      const desc = (parts[1] || '').toLowerCase();
+
+      // Clear Transfer signals override (LLM corrective logic)
+      if (TRANSFER_SIGNALS.test(desc)) {
+        type = 'Transfer';
+        category = 'Transfer';
+      } else if (!VALID_TYPES.has(parts[3])) {
+        // Sign-based override when Gemini didn't set a type
         if (rawAmt.includes('+') || /\bcr\b/i.test(rawAmt) || INCOME_SIGNALS.test(desc)) type = 'Income';
-        else if (TRANSFER_SIGNALS.test(desc)) type = 'Transfer';
         else if (['refund', 'cashback', 'reversal', 'credit'].some(k => desc.includes(k))) type = 'Income';
       }
+
 
       const rawDate = (parts[0] ?? '').trim();
       // Normalise common non-ISO date formats → YYYY-MM-DD
@@ -323,7 +330,7 @@ No markdown fences. No column headers in output. Only the pipe-delimited transac
         description: parts[1] || 'Unknown',
         amount,
         type,
-        category: parts[4] || 'Unclassified',
+        category,
       };
     }).filter(Boolean);
   } catch (e: any) {
