@@ -51,7 +51,9 @@ self.addEventListener('fetch', (event) => {
       });
     }).catch(() => {
       // Fallback for navigation requests
-      if (request.mode === 'navigate') return caches.match('/index.html');
+      if (request.mode === 'navigate') {
+        return caches.match('/index.html').then((res) => res || fetch(request));
+      }
     })
   );
 });
