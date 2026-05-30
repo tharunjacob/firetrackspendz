@@ -41,7 +41,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
       if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 s max
+      const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 s max (needed for heavy PDF parse tasks)
 
       let res: Response;
       try {
@@ -79,7 +79,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
   if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
 
   const devController = new AbortController();
-  const devTimeoutId = setTimeout(() => devController.abort(), 20000);
+  const devTimeoutId = setTimeout(() => devController.abort(), 90000); // 90 s max
   let res: Response;
   try {
     res = await fetch(url, {

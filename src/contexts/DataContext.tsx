@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, type ReactNode, type MutableRefObject } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, type ReactNode, type MutableRefObject } from 'react';
 import type { Transaction, FileJob, SubscriptionPlan } from '@/types';
 import { loadFromStorage, saveToStorage, deleteFromStorage, resetAllData } from '@/services/storage';
 import { cloudSave, cloudLoad } from '@/services/cloudStorage';
@@ -220,6 +220,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       // for both anonymous and signed-in users, so this compares against everything.
       let fullDataset = [...allRawRef.current];
       let completed = 0;
+      let successCount = 0;
       let totalDuplicates = 0;
       let totalNewTransactions = 0;
       let hadError = false;
@@ -230,6 +231,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
         try {
           const res = await transformData(job.file, job.owner, job.password);
           if (res.transactions.length) {
+            successCount++;
             // Capture headers from the first file that used a non-cached mapping
             if (res.lastHeaders && !importHeaders) {
               importHeaders = res.lastHeaders;
@@ -284,7 +286,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       }
 
       // Single persist after all files processed (signed-in users only).
-      if (!isAnon && !isMimicMode && totalNewTransactions > 0) {
+      if (!isAnon && !isMimicMode && totalNewTransactions > 0 && successCount > 0) {
         try {
           await saveToStorage(fullDataset);
         } catch (e) {
@@ -302,10 +304,16 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
 
       if (jobs.length > 0) {
         const dupMsg = totalDuplicates > 0 ? ` (${totalDuplicates} duplicates skipped)` : '';
-        showToast(`Processed ${jobs.length} file(s) successfully${dupMsg}`);
-        if (!hadError) {
+        if (successCount === jobs.length) {
+          showToast(`Processed ${jobs.length} file(s) successfully${dupMsg}`);
+        } else if (successCount > 0) {
+          showToast(`Processed ${successCount} of ${jobs.length} file(s) successfully${dupMsg}`);
+        }
+
+        if (successCount > 0) {
           logEvent(EVENTS.UPLOAD_ANALYSIS_COMPLETED, {
             fileCount: jobs.length,
+            successCount,
             newTransactions: totalNewTransactions,
             duplicatesSkipped: totalDuplicates,
             durationMs: Date.now() - startMs,
@@ -315,6 +323,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       }
     } finally {
       clearInterval(interval);
+
       setProcessingProgress(100);
       setTimeout(() => setIsProcessing(false), 800);
     }

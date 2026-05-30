@@ -498,6 +498,19 @@ export const isPdfEncrypted = async (file: File): Promise<boolean> => {
   }
 };
 
+export const validatePdfPassword = async (file: File, password?: string): Promise<boolean> => {
+  if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') return true;
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfjs = await getPdfJs();
+    await pdfjs.getDocument({ data: arrayBuffer, password, disableFontFace: true }).promise;
+    return true;
+  } catch (err: any) {
+    return false;
+  }
+};
+
+
 const extractTextFromEncryptedPDF = async (arrayBuffer: ArrayBuffer, password?: string): Promise<string> => {
   const pdfjs = await getPdfJs();
   try {

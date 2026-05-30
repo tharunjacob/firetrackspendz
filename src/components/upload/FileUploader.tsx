@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Icon } from '@/components/common/Icons';
-import { isPdfEncrypted } from '@/services/transformer';
+import { isPdfEncrypted, validatePdfPassword } from '@/services/transformer';
 import type { FileJob } from '@/types';
 import { logEvent, EVENTS } from '@/services/logger';
 import { LIMITS } from '@/config/storage';
@@ -35,6 +35,9 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
 
+  const filesRef = useRef<{ [rowId: string]: File }>({});
+  const validationTimeouts = useRef<{ [rowId: string]: number }>({});
+
   const updateRow = (id: string, updates: Partial<FileRow>) => {
     setRows(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
   };
@@ -46,6 +49,11 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
   const removeRow = (id: string) => {
     if (rows.length <= 1) return;
     setRows(prev => prev.filter(r => r.id !== id));
+    delete filesRef.current[id];
+    if (validationTimeouts.current[id]) {
+      clearTimeout(validationTimeouts.current[id]);
+      delete validationTimeouts.current[id];
+    }
   };
 
   const triggerFilePick = (rowId: string) => {
@@ -54,6 +62,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
   };
 
   const handleFileSelect = async (rowId: string, file: File) => {
+    filesRef.current[rowId] = file;
     updateRow(rowId, { file, status: 'checking', error: undefined });
     logEvent(EVENTS.UPLOAD_FILE_SELECTED, {
       fileName: file.name,
@@ -99,9 +108,37 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
     }
   };
 
+  const handlePasswordChange = (rowId: string, password: string) => {
+    updateRow(rowId, { password, status: password ? 'checking' : 'idle', error: undefined });
+
+    if (validationTimeouts.current[rowId]) {
+      clearTimeout(validationTimeouts.current[rowId]);
+    }
+
+    if (!password) {
+      return;
+    }
+
+    validationTimeouts.current[rowId] = window.setTimeout(async () => {
+      const file = filesRef.current[rowId];
+      if (!file) return;
+
+      try {
+        const isValid = await validatePdfPassword(file, password);
+        if (isValid) {
+          updateRow(rowId, { status: 'ready', error: undefined });
+        } else {
+          updateRow(rowId, { status: 'error', error: 'Incorrect PDF password' });
+        }
+      } catch (err) {
+        updateRow(rowId, { status: 'error', error: 'Failed to validate password' });
+      }
+    }, 400);
+  };
+
   const handleAnalyze = () => {
     const jobs: FileJob[] = rows
-      .filter(r => r.file && r.owner.trim() && (r.status === 'ready' || (r.needsPassword && r.password)))
+      .filter(r => r.file && r.owner.trim() && r.status === 'ready')
       .map(r => ({ file: r.file!, owner: r.owner.trim(), password: r.needsPassword ? r.password : undefined }));
 
     if (jobs.length === 0) return;
@@ -121,7 +158,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
     onStartAnalysis(jobs);
   };
 
-  const readyCount = rows.filter(r => r.file && r.owner.trim() && (r.status === 'ready' || (r.needsPassword && r.password))).length;
+  const readyCount = rows.filter(r => r.file && r.owner.trim() && r.status === 'ready').length;
 
   // ── Encrypted PDF password block (shared between layouts) ──
   const PasswordPrompt = ({ row }: { row: FileRow }) => row.needsPassword ? (
@@ -133,18 +170,27 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
           type="password"
           placeholder="Enter PDF password"
           value={row.password}
-          onChange={e => updateRow(row.id, { password: e.target.value })}
+          onChange={e => handlePasswordChange(row.id, e.target.value)}
           className="text-sm bg-white dark:bg-slate-700 border border-amber-300 dark:border-amber-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent w-full dark:text-slate-100"
           autoFocus
         />
       </div>
-      {row.password && (
+      {row.password && row.status === 'ready' && (
         <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shrink-0">
           <Icon name="check" className="w-3 h-3 text-white" />
         </div>
       )}
+      {row.password && row.status === 'checking' && (
+        <div className="w-5 h-5 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin shrink-0" />
+      )}
+      {row.status === 'error' && row.error && (
+        <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shrink-0" title={row.error}>
+          <Icon name="close" className="w-3 h-3 text-white" />
+        </div>
+      )}
     </div>
   ) : null;
+
 
   return (
     <div id="upload-section" className="w-full max-w-4xl mx-auto px-4">
