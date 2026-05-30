@@ -1,8 +1,5 @@
-﻿import { useEffect, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { getSupabase } from '@/services/supabase';
-import { RPC } from '@/config/database';
 
 // ============================================================
 // Admin Panel — Secret URL: /ctrl-room-7x9k
@@ -18,12 +15,6 @@ import { RPC } from '@/config/database';
 // even if both gates were skipped, admin-only reads/writes would fail.
 // ============================================================
 
-const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || '')
-  .split(',')
-  .map((e: string) => e.trim().toLowerCase());
-
-type AdminCheck = 'pending' | 'allowed' | 'denied';
-
 const NotFound = () => (
   <div className="max-w-2xl mx-auto px-4 py-20 text-center">
     <div className="text-6xl mb-4">404</div>
@@ -33,40 +24,21 @@ const NotFound = () => (
 );
 
 const AdminPage = () => {
-  const { user } = useApp();
-  const [serverCheck, setServerCheck] = useState<AdminCheck>('pending');
-
-  const clientAllowed = !!user && ADMIN_EMAILS.includes(user.email?.toLowerCase() || '');
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!clientAllowed || !user) {
-      setServerCheck('denied');
-      return;
-    }
-    (async () => {
-      try {
-        const { data, error } = await getSupabase().rpc(RPC.IS_ADMIN);
-        if (cancelled) return;
-        setServerCheck(!error && data === true ? 'allowed' : 'denied');
-      } catch {
-        if (!cancelled) setServerCheck('denied');
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [clientAllowed, user]);
+  const { user, isAdmin, isAuthReady } = useApp();
 
   const devAdmin = import.meta.env.DEV &&
     new URLSearchParams(window.location.search).get('dev_admin') === 'true';
   if (devAdmin) return <AdminLayout adminEmail="dev@trackspendz.local" adminId="dev-user-001" />;
-  if (!clientAllowed || serverCheck === 'denied') return <NotFound />;
-  if (serverCheck === 'pending' || !user) {
+
+  if (!isAuthReady) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center text-slate-500">
         Loading…
       </div>
     );
   }
+
+  if (!user || !isAdmin) return <NotFound />;
 
   return <AdminLayout adminEmail={user.email || ''} adminId={user.id} />;
 };

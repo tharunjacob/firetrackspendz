@@ -543,7 +543,17 @@ export const transformData = async (
     let extractionPayload: { base64?: string; text?: string } = {};
 
     try {
-      const base64 = btoa(new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      const len = bytes.byteLength;
+      const chunk = 8192;
+      for (let i = 0; i < len; i += chunk) {
+        binary += String.fromCharCode.apply(
+          null,
+          bytes.subarray(i, Math.min(i + chunk, len)) as unknown as number[]
+        );
+      }
+      const base64 = btoa(binary);
       extractionPayload.base64 = base64;
 
       if (password) {

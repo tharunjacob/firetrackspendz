@@ -1,7 +1,11 @@
 import { getSupabase, isCloudEnabled } from './supabase';
 
-const SUPABASE_FUNCTIONS_URL = import.meta.env.VITE_SUPABASE_URL
-  ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-proxy`
+const cleanSupabaseUrl = import.meta.env.VITE_SUPABASE_URL
+  ? import.meta.env.VITE_SUPABASE_URL.replace(/\/+$/, '')
+  : null;
+
+const SUPABASE_FUNCTIONS_URL = cleanSupabaseUrl
+  ? `${cleanSupabaseUrl}/functions/v1/ai-proxy`
   : null;
 
 // Dev fallback — only used when there is no Supabase URL configured (local dev without Supabase)
@@ -28,7 +32,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
       const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error('PDF upload requires a free account. Sign in or create an account to upload PDFs.');
+        throw new Error('AI features require a free account. Sign in or create an account to continue.');
       }
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',

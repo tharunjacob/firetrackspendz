@@ -1,10 +1,12 @@
-﻿import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import type { UserProfile, SubscriptionPlan } from '@/types';
 import { getCurrentUser, getProfile, onAuthStateChange, signOut as authSignOut } from '@/services/auth';
 import { syncLocalToCloud } from '@/services/storage';
 import { initializeRules } from '@/services/learningRules';
 import { logEvent, EVENTS } from '@/services/logger';
 import { claimReferral } from '@/services/referral';
+import { getSupabase, isCloudEnabled } from '@/services/supabase';
+import { RPC } from '@/config/database';
 
 // ============================================================
 // Auth Context â€” Handles user authentication state ONLY
@@ -39,6 +41,7 @@ interface AuthState {
   logout: () => Promise<void>;
   isMimicMode: boolean;
   isAuthReady: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -61,6 +64,7 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isMimicMode] = useState(() => !!new URLSearchParams(window.location.search).get('mimic_user_id'));
 
   const devPlan = import.meta.env.DEV
@@ -85,6 +89,14 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
           const prof = await getProfile(currentUser.id);
           if (prof) setProfile(prof);
 
+          // Check if admin
+          if (isCloudEnabled()) {
+            try {
+              const { data } = await getSupabase().rpc(RPC.IS_ADMIN);
+              setIsAdmin(data === true);
+            } catch { setIsAdmin(false); }
+          }
+
           if (!isMimicMode) {
             try { await syncLocalToCloud(); } catch (e) { console.warn('Sync failed:', e); }
           }
@@ -108,12 +120,20 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
         const prof = await getProfile(session.user.id);
         if (prof) setProfile(prof);
 
+        // Check if admin
+        if (isCloudEnabled()) {
+          try {
+            const { data } = await getSupabase().rpc(RPC.IS_ADMIN);
+            setIsAdmin(data === true);
+          } catch { setIsAdmin(false); }
+        }
+
         // Claim referral if the user arrived via a referral link
         const pendingReferralCode = localStorage.getItem('tsz_referral_code');
         if (pendingReferralCode) {
           claimReferral(pendingReferralCode, session.user.id)
             .then(claimed => { if (claimed) localStorage.removeItem('tsz_referral_code'); })
-            .catch(() => {/* fail silently â€” referral claim must not block sign-in */});
+            .catch(() => {/* fail silently — referral claim must not block sign-in */});
         }
 
         // Notify DataContext to handle data promotion / loading
@@ -122,6 +142,7 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
         setUserId(null);
         setUserEmail(null);
         setProfile(null);
+        setIsAdmin(false);
         onSignOut?.();
       }
     });
@@ -137,9 +158,9 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
   const value = useMemo(
     () => ({
       userId: effectiveUserId, userEmail: effectiveEmail, profile, plan, isAuthOpen, setIsAuthOpen,
-      user, logout, isMimicMode, isAuthReady,
+      user, logout, isMimicMode, isAuthReady, isAdmin,
     }),
-    [effectiveUserId, effectiveEmail, profile, plan, isAuthOpen, user, logout, isMimicMode, isAuthReady],
+    [effectiveUserId, effectiveEmail, profile, plan, isAuthOpen, user, logout, isMimicMode, isAuthReady, isAdmin],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

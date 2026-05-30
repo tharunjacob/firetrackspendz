@@ -8,7 +8,7 @@ import { CURRENCIES } from '@/utils/constants';
 import type { Currency } from '@/types';
 
 export const Navbar = () => {
-  const { userId, userEmail, plan, setIsAuthOpen, logout, currency, setCurrency, transactions } = useApp();
+  const { userId, userEmail, plan, setIsAuthOpen, logout, currency, setCurrency, transactions, isAdmin } = useApp();
   const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
@@ -94,6 +94,11 @@ export const Navbar = () => {
                 <Link to="/settings" onClick={() => setMenuOpen(false)} className="w-full px-4 py-2 text-left text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
                   <Icon name="cog" className="w-4 h-4" /> Settings
                 </Link>
+                {isAdmin && (
+                  <Link to="/ctrl-room-7x9k" onClick={() => setMenuOpen(false)} className="w-full px-4 py-2 text-left text-sm text-brand-600 dark:text-brand-400 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 font-medium">
+                    <Icon name="lock" className="w-4 h-4" /> Admin Panel
+                  </Link>
+                )}
                 <button
                   onClick={() => { logout(); setMenuOpen(false); }}
                   className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"

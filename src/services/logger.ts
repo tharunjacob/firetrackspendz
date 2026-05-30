@@ -204,7 +204,7 @@ window.addEventListener('beforeunload', () => {
 
   // Best-effort drain via fetch+keepalive on tab close
   if (eventQueue.length > 0 && isCloudEnabled()) {
-    const url = import.meta.env.VITE_SUPABASE_URL;
+    const url = (import.meta.env.VITE_SUPABASE_URL || '').replace(/\/+$/, '');
     const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
     if (url && key) {
       const rows = eventQueue.map(e => ({

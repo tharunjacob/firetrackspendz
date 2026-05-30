@@ -41,6 +41,7 @@ interface AppState {
   logout: () => Promise<void>;
   isMimicMode: boolean;
   isAuthReady: boolean;
+  isAdmin: boolean;
 
   // Data (from DataContext)
   transactions: Transaction[];
@@ -92,6 +93,7 @@ export const useApp = (): AppState => {
     logout: auth.logout,
     isMimicMode: auth.isMimicMode,
     isAuthReady: auth.isAuthReady,
+    isAdmin: auth.isAdmin,
 
     // Data
     transactions: data.transactions,

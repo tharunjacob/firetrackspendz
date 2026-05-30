@@ -1,4 +1,4 @@
-﻿import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Navbar } from '@/components/layout/Navbar';
@@ -46,7 +46,11 @@ const Loading = () => (
 );
 
 function App() {
-  const { user, toast, hideToast, isAuthOpen, setIsAuthOpen } = useApp();
+  const { user, toast, hideToast, isAuthOpen, setIsAuthOpen, isAuthReady } = useApp();
+
+  if (!isAuthReady) {
+    return <Loading />;
+  }
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
