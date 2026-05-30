@@ -223,7 +223,6 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       let successCount = 0;
       let totalDuplicates = 0;
       let totalNewTransactions = 0;
-      let hadError = false;
       // Track headers from the first file that returns non-cached headers (for confirmation prompt)
       let importHeaders: string[] | null = null;
 
@@ -273,7 +272,6 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
             });
           }
         } catch (e: unknown) {
-          hadError = true;
           const message = e instanceof Error ? e.message : 'Failed to process file';
           logEvent(EVENTS.UPLOAD_ANALYSIS_FAILED, {
             fileName: job.file.name,
@@ -290,7 +288,6 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
         try {
           await saveToStorage(fullDataset);
         } catch (e) {
-          hadError = true;
           const message = e instanceof Error ? e.message : 'Failed to save uploaded data';
           console.error('[processFiles] saveToStorage failed', e);
           showToast(message, 'error');
