@@ -35,7 +35,7 @@ export const DashboardShell = () => {
     processFiles, isProcessing, processingProgress, clearAllData,
     lastImportHeaders, clearLastImportHeaders, showToast,
     plan, userId,
-    isDemoMode, loadDemoData, clearDemoData,
+    isDemoMode, loadDemoData, clearDemoData, isLoading,
   } = useApp();
 
   const devPlan = import.meta.env.DEV
@@ -386,7 +386,12 @@ export const DashboardShell = () => {
                 </div>
               )}
 
-              {transactions.length === 0 ? (
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <div className="w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full animate-spin mb-3" />
+                  <p className="text-sm text-slate-500">Loading your transactions...</p>
+                </div>
+              ) : transactions.length === 0 ? (
                 <div className="py-8 sm:py-12" ref={uploaderRef}>
                   {plan === 'enterprise' && familyMembers.filter(m => m.status !== 'removed').length > 1 && (
                     <div className="flex items-center gap-3 max-w-4xl mx-auto px-4 mb-4">

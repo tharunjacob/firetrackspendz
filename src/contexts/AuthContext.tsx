@@ -98,7 +98,7 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
           }
 
           if (!isMimicMode) {
-            try { await syncLocalToCloud(); } catch (e) { console.warn('Sync failed:', e); }
+            syncLocalToCloud().catch(e => console.warn('Sync failed:', e));
           }
         }
       } catch (e) {
