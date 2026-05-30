@@ -20,7 +20,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for API, cache-first for static assets
+// Fetch: network-first for API and navigation, cache-first for static assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -29,7 +29,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   if (!url.origin.includes(self.location.origin) && !url.hostname.includes('cdn')) return;
 
-  // API calls: network-first
+  // API calls: network-first (never cache Rest API/Supabase)
   if (url.pathname.startsWith('/rest/') || url.hostname.includes('supabase')) {
     event.respondWith(
       fetch(request).catch(() => caches.match(request))
@@ -37,7 +37,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets: cache-first, fallback to network
+  // Navigation requests and index.html: Network-First to prevent stale chunks bug on redeployments
+  if (request.mode === 'navigate' || url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Static assets (JS chunks, CSS, images): Cache-First, fallback to network
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
@@ -49,11 +65,7 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       });
-    }).catch(() => {
-      // Fallback for navigation requests
-      if (request.mode === 'navigate') {
-        return caches.match('/index.html').then((res) => res || fetch(request));
-      }
     })
   );
 });
+
