@@ -60,6 +60,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProps) => {
+  const { currency, setCurrency } = useUI();
   const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -88,7 +89,12 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
           setUserId(currentUser.id);
           setUserEmail(currentUser.email || null);
           const prof = await getProfile(currentUser.id);
-          if (prof) setProfile(prof);
+          if (prof) {
+            setProfile(prof);
+            if (prof.preferred_currency) {
+              setCurrency(prof.preferred_currency);
+            }
+          }
 
           // Check if admin
           if (isCloudEnabled()) {
@@ -119,7 +125,12 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
         await initializeRules();
 
         const prof = await getProfile(session.user.id);
-        if (prof) setProfile(prof);
+        if (prof) {
+          setProfile(prof);
+          if (prof.preferred_currency) {
+            setCurrency(prof.preferred_currency);
+          }
+        }
 
         // Check if admin
         if (isCloudEnabled()) {
@@ -149,7 +160,7 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
     });
 
     return () => subscription.unsubscribe();
-  }, [isMimicMode, onSignIn, onSignOut]);
+  }, [isMimicMode, onSignIn, onSignOut, setCurrency]);
 
   const logout = useCallback(async () => {
     try {
@@ -161,15 +172,6 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
       window.location.href = '/';
     }
   }, [userEmail]);
-
-  const { currency, setCurrency } = useUI();
-
-  // Sync DB currency to UI on sign-in
-  useEffect(() => {
-    if (profile?.preferred_currency && profile.preferred_currency !== currency) {
-      setCurrency(profile.preferred_currency);
-    }
-  }, [profile?.preferred_currency, currency, setCurrency]);
 
   // Sync UI currency changes back to DB
   useEffect(() => {
@@ -193,7 +195,7 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
     };
 
     updateDbCurrency();
-  }, [currency, userId, profile, setProfile]);
+  }, [currency, userId, profile?.preferred_currency, setProfile]);
 
   const value = useMemo(
     () => ({
