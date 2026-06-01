@@ -184,7 +184,7 @@ const sections: HelpSection[] = [
     content: (
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <p>Go to <strong className="text-slate-800 dark:text-slate-200">Settings → Export Data</strong> to download all your transactions as a CSV or JSON file.</p>
-        <p>Enterprise users get additional tax-ready CSV/PDF export reports for sharing with an accountant or for record-keeping.</p>
+        <p>Enterprise users get advanced multi-member exports for consolidated accounting.</p>
       </div>
     ),
   },
@@ -197,7 +197,7 @@ const sections: HelpSection[] = [
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <p><strong className="text-slate-800 dark:text-slate-200">Free:</strong> Up to 500 transactions, basic categorization, monthly breakdowns, local storage.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">Pro ($49/year):</strong> Unlimited transactions, AI advisor, FIRE calculator, net worth, budgets, cloud sync, trend analysis, anomaly detection.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">Enterprise ($149/year):</strong> Everything in Pro plus family accounts (5 members), shared budgets &amp; goals, custom categories, advanced tax categorization, CSV/PDF export reports.</p>
+        <p><strong className="text-slate-800 dark:text-slate-200">Enterprise ($149/year):</strong> Everything in Pro plus household tracking (up to 5 profiles), consolidated budgets &amp; goals, custom categories &amp; rules, and CSV/JSON data exports.</p>
         <p>You can try the app free without signing up — upload a statement and explore all views instantly. <Link to="/pricing" className="text-brand-600 hover:underline">View full pricing →</Link></p>
       </div>
     ),
@@ -206,12 +206,12 @@ const sections: HelpSection[] = [
     id: 'family',
     icon: 'user',
     title: 'Family Dashboard (Enterprise)',
-    summary: 'Manage household finances with up to 5 family members.',
+    summary: 'Manage household finances with up to 5 profiles.',
     content: (
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <p>Enterprise users can invite up to 5 family members to share a household view.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">What you get:</strong> Combined income/expense overview, per-member contribution breakdown, comparison charts, and shared budget management.</p>
-        <p>Navigate to <strong className="text-slate-800 dark:text-slate-200">/family</strong> from the sidebar or settings to manage your family group.</p>
+        <p>Enterprise users can create up to 5 household member profiles under their account.</p>
+        <p><strong className="text-slate-800 dark:text-slate-200">What you get:</strong> Combined household stats, per-member contribution charts, multi-profile comparison tables, and consolidated budget tracking.</p>
+        <p>Navigate to the <strong className="text-slate-800 dark:text-slate-200">Family Dashboard</strong> tab from the sidebar to manage your profiles.</p>
       </div>
     ),
   },
@@ -222,8 +222,8 @@ const sections: HelpSection[] = [
     summary: 'Your financial data stays yours — always.',
     content: (
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <p><strong className="text-slate-800 dark:text-slate-200">Local-first:</strong> Free users&rsquo; data never leaves their device. Everything is stored in browser localStorage.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">Encrypted cloud sync (Pro+):</strong> Data is encrypted at rest and in transit via Supabase with row-level security — only you can access your data.</p>
+        <p><strong className="text-slate-800 dark:text-slate-200">Local-first:</strong> Free users&rsquo; data is stored locally in the browser&rsquo;s IndexedDB and never leaves their device unless they sign up.</p>
+        <p><strong className="text-slate-800 dark:text-slate-200">Secure Cloud Sync (Pro+):</strong> Data is transferred securely via HTTPS and stored in a private database managed by Supabase with strict Row-Level Security.</p>
         <p><strong className="text-slate-800 dark:text-slate-200">No ads, no data selling:</strong> We never sell, share, or monetise your financial data. <Link to="/privacy" className="text-brand-600 hover:underline">Read our privacy policy →</Link></p>
         <p><strong className="text-slate-800 dark:text-slate-200">Passwords:</strong> PDF passwords are used in-browser only and are never transmitted or stored.</p>
       </div>

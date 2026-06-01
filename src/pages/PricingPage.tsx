@@ -119,10 +119,10 @@ const PricingPage = () => {
       desc: 'For families and power users.',
       features: [
         'Everything in Pro',
-        'Family accounts (up to 5 members)',
-        'Shared budgets & goals',
-        'Advanced tax categorization',
-        'CSV/PDF export reports',
+        'Household profiles (up to 5 profiles)',
+        'Consolidated budgets & goals',
+        'Custom category rules engine',
+        'CSV & JSON data exports',
         'Dedicated support',
         'Custom categories & rules',
       ],
@@ -232,7 +232,7 @@ const PricingPage = () => {
           {[
             { q: 'Can I try the app before signing up?', a: 'Yes! You can upload a statement and explore your full dashboard without an account. Sign up free to unlock cloud sync and save your data across devices. No credit card required.' },
             { q: 'Which banks do you support?', a: 'Any bank that lets you download statements as CSV, Excel, or PDF. We support 150+ column formats and AI-powered mapping for new formats.' },
-            { q: 'Is my financial data safe?', a: 'Your data is encrypted at rest and in transit. Free users store data locally on their device. Pro users get encrypted cloud sync powered by Supabase with row-level security.' },
+            { q: 'Is my financial data safe?', a: 'Your data is secure. In transit, data is encrypted using HTTPS/SSL. Cloud data is stored securely on Supabase with row-level security so only you can access it. Free users store data locally on their device\'s IndexedDB.' },
             { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel your subscription anytime from Settings → Subscription. You keep Pro features until the end of your current billing period.' },
             { q: 'What payment methods do you accept?', a: 'Razorpay supports UPI, credit/debit cards (Visa, Mastercard, RuPay, AMEX), net banking, and wallets in India. International cards are accepted and billed in INR.' },
             { q: 'Do you sell my data?', a: 'Never. Your financial data is yours. We don\'t sell, share, or use your data for advertising. Period.' },

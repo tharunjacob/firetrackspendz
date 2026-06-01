@@ -58,7 +58,7 @@ const LandingPage = () => {
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <Icon name="shield" className="w-4 h-4 text-green-500" />
-                  Bank-level encryption
+                  Secure cloud storage (SSL & RLS)
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Icon name="shield" className="w-4 h-4 text-green-500" />
@@ -404,12 +404,12 @@ const LandingPage = () => {
             <div className="card p-6">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Enterprise</p>
               <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.enterprise.price}<span className="text-base font-normal text-slate-500">{pricing.enterprise.period}</span></div>
-              <p className="text-xs text-slate-500 mb-5">Up to 5 family members</p>
+              <p className="text-xs text-slate-500 mb-5">Up to 5 profiles</p>
               <ul className="space-y-2 mb-6">
                 {[
                   'Everything in Pro',
-                  'Family accounts (5 members)',
-                  'Shared dashboards',
+                  'Household tracking (5 profiles)',
+                  'Consolidated dashboard',
                   'Custom category rules',
                   'Priority support',
                 ].map(f => (
