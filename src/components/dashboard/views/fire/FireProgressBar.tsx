@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/config/routes';
 import type { Currency } from '@/types';
 import { formatAmount } from '@/utils/constants';
 
@@ -31,18 +33,18 @@ export const FireProgressBar = ({ currentSavings, fireNumber, currency, netWorth
         </div>
         <div className="text-right shrink-0">
           {netWorthSource === 'asset' ? (
-            <a
-              href="/net-assets"
+            <Link
+              to={ROUTES.ASSETS}
               className="text-xs text-brand-600 hover:underline font-medium"
             >
               Using your net worth data &rarr;
-            </a>
+            </Link>
           ) : netWorthSource === 'manual' ? (
             <span className="text-xs text-slate-500">Enter savings in Scenarios tab</span>
           ) : (
-            <a href="/net-assets" className="text-xs text-amber-600 hover:underline font-medium">
+            <Link to={ROUTES.ASSETS} className="text-xs text-amber-600 hover:underline font-medium">
               No net worth data — add your assets &rarr;
-            </a>
+            </Link>
           )}
         </div>
       </div>

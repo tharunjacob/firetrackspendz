@@ -38,7 +38,7 @@ export const ROUTES = {
   FEEDBACK: '/feedback',
 
   // Protected pages (require sign-in)
-  ASSETS: '/assets',
+  ASSETS: '/net-assets',
   SETTINGS: '/settings',
   FAMILY: '/family',
 

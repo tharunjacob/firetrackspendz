@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '@/config/routes';
 import { logEvent, EVENTS } from '@/services/logger';
 import { useApp } from '@/contexts/AppContext';
 import { formatAmount, formatCompact } from '@/utils/constants';
@@ -232,7 +233,7 @@ export const NetWorthView = () => {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Net Worth</h2>
-        <Link to="/net-assets" className="text-xs text-brand-600 dark:text-brand-400 hover:underline font-medium">
+        <Link to={ROUTES.ASSETS} className="text-xs text-brand-600 dark:text-brand-400 hover:underline font-medium">
           Full Asset Tracker →
         </Link>
       </div>
@@ -550,7 +551,7 @@ export const NetWorthView = () => {
             Upload Excel files, track per category and date, analyze returns, compare across family members.
           </p>
         </div>
-        <Link to="/net-assets" className="btn-primary text-sm px-4 py-2 whitespace-nowrap flex-shrink-0">
+        <Link to={ROUTES.ASSETS} className="btn-primary text-sm px-4 py-2 whitespace-nowrap flex-shrink-0">
           Full Tracker →
         </Link>
       </div>

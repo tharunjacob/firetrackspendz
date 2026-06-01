@@ -5,6 +5,7 @@ import { NotificationCenter } from '@/components/dashboard/NotificationCenter';
 import { useApp } from '@/contexts/AppContext';
 import { useTheme } from '@/contexts/UIContext';
 import { CURRENCIES } from '@/utils/constants';
+import { ROUTES } from '@/config/routes';
 import type { Currency } from '@/types';
 
 export const Navbar = () => {
@@ -23,7 +24,7 @@ export const Navbar = () => {
         {userId ? (
           <div className="hidden md:flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-400">
             <Link to="/dashboard" className="hover:text-brand-600 transition-colors">Expenses</Link>
-            <Link to="/assets" className="hover:text-brand-600 transition-colors">Net Assets</Link>
+            <Link to={ROUTES.ASSETS} className="hover:text-brand-600 transition-colors">Net Assets</Link>
             {plan === 'enterprise' && <Link to="/family" className="hover:text-brand-600 transition-colors">Family</Link>}
             <Link to="/help" className="hover:text-brand-600 transition-colors">Help</Link>
           </div>
