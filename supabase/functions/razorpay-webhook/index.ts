@@ -232,10 +232,13 @@ serve(async (req: Request) => {
   }
 
   const target = supabase.from('user_profiles').update(finalPatch);
-  if (profile?.id) {
-    await target.eq('id', profile.id);
-  } else {
-    await target.eq('razorpay_subscription_id', subscriptionId);
+  const { error: updateErr } = profile?.id
+    ? await target.eq('id', profile.id)
+    : await target.eq('razorpay_subscription_id', subscriptionId);
+
+  if (updateErr) {
+    console.error('[razorpay-webhook] DB update error:', updateErr);
+    return jsonResponse({ error: `Database update failed: ${updateErr.message}` }, 500);
   }
 
   return jsonResponse({ received: true, event: event.event });

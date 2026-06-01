@@ -162,7 +162,7 @@ serve(async (req: Request) => {
 
     // Persist the pending subscription on the user profile so the webhook
     // can correlate later events even if the client never returns.
-    await serviceClient
+    const { error: updateErr } = await serviceClient
       .from('user_profiles')
       .update({
         razorpay_subscription_id: rzpJson.id,
@@ -171,6 +171,11 @@ serve(async (req: Request) => {
         subscription_status: 'pending',
       })
       .eq('id', user.id);
+
+    if (updateErr) {
+      console.error('[razorpay-create-subscription] DB update error:', updateErr);
+      return jsonResponse({ error: `Database update failed: ${updateErr.message}` }, 500);
+    }
 
     return jsonResponse({
       subscriptionId: rzpJson.id,

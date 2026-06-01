@@ -112,11 +112,12 @@ export async function verifyRazorpaySignature(
   const expected = Array.from(new Uint8Array(sigBuf))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
+  const signatureLower = signature.toLowerCase();
   // Length-aware comparison to avoid trivial timing leaks.
-  if (expected.length !== signature.length) return false;
+  if (expected.length !== signatureLower.length) return false;
   let diff = 0;
   for (let i = 0; i < expected.length; i++) {
-    diff |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
+    diff |= expected.charCodeAt(i) ^ signatureLower.charCodeAt(i);
   }
   return diff === 0;
 }

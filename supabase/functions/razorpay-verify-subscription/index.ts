@@ -103,10 +103,15 @@ serve(async (req: Request) => {
       );
     }
 
-    await serviceClient
+    const { error: updateErr } = await serviceClient
       .from('user_profiles')
       .update(update)
       .eq('id', user.id);
+
+    if (updateErr) {
+      console.error('[razorpay-verify-subscription] DB update error:', updateErr);
+      return jsonResponse({ error: `Database update failed: ${updateErr.message}` }, 500);
+    }
 
     return jsonResponse({ ok: true });
   } catch (err) {
