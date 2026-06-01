@@ -10,7 +10,7 @@ export const APP_VERSION = '2.0.0';
 // Pricing
 export const PRICING = {
   free: { name: 'Free', price: 0, fileUploads: 3, features: ['Basic Dashboard', '3 File Uploads', 'Local Storage Only'] },
-  pro: { name: 'Pro', priceMonthly: 5, priceYearly: 49, features: ['Unlimited Uploads', 'Cloud Sync', 'AI Advisor', 'FIRE Calculator', 'Net Worth Tracker', 'Budgets & Alerts', 'CSV & JSON Exports', 'Priority Support'] },
+  pro: { name: 'Pro', priceMonthly: 4.99, priceYearly: 49.99, features: ['Unlimited Uploads', 'Cloud Sync', 'AI Advisor', 'FIRE Calculator', 'Net Worth Tracker', 'Budgets & Alerts', 'CSV & JSON Exports', 'Priority Support'] },
   enterprise: { name: 'Enterprise', priceMonthly: 15, priceYearly: 149, features: ['Everything in Pro', 'Household Tracking', 'Advanced Custom Rules', 'Dedicated Support'] },
 } as const;
 

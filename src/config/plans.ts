@@ -62,12 +62,12 @@ export const PLAN_PRICING: Record<Exclude<SubscriptionPlan, 'free'>, PlanPricing
   },
   pro: {
     inr: {
-      monthly: { amount: 199,  label: '₹199',   period: '/mo' },
+      monthly: { amount: 149,  label: '₹149',   period: '/mo' },
       yearly:  { amount: 1499, label: '₹1,499', period: '/yr' },
     },
     usd: {
       monthly: { amount: 4.99, label: '$4.99', period: '/mo' },
-      yearly:  { amount: 49,   label: '$49',   period: '/yr' },
+      yearly:  { amount: 49.99, label: '$49.99', period: '/yr' },
     },
   },
   enterprise: {

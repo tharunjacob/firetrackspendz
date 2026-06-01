@@ -90,6 +90,12 @@ serve(async (req: Request) => {
       const tier = (sub?.notes?.tier ?? 'pro') as 'pro' | 'enterprise';
       update.subscription_plan = tier;
       update.next_billing_date = sub?.charge_at ? new Date(sub.charge_at * 1000).toISOString() : null;
+      if (sub?.notes?.period) {
+        update.subscription_period = sub.notes.period;
+      }
+      if (sub?.notes?.currency) {
+        update.preferred_currency = sub.notes.currency;
+      }
     } else {
       console.warn(
         '[razorpay-verify-subscription] Subscription fetch failed; deferring tier to webhook',

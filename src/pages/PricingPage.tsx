@@ -68,7 +68,6 @@ const PricingPage = () => {
   });
 
   const proTier = pricing.pro[billingPeriod];
-  const enterpriseTier = pricing.enterprise[billingPeriod];
   const maxYearlySavings = getMaxYearlySavingsPercent(pricing.currency);
 
   const plans = [
@@ -113,9 +112,9 @@ const PricingPage = () => {
     {
       key: 'enterprise' as const,
       name: 'Enterprise',
-      price: enterpriseTier.price,
-      period: enterpriseTier.period,
-      sub: enterpriseTier.sub,
+      price: 'Coming Soon',
+      period: '',
+      sub: null,
       desc: 'For families and power users.',
       features: [
         'Everything in Pro',
@@ -126,7 +125,7 @@ const PricingPage = () => {
         'Dedicated support',
         'Custom categories & rules',
       ],
-      cta: 'Get Enterprise',
+      cta: 'Coming Soon',
       popular: false,
     },
   ];
@@ -168,16 +167,25 @@ const PricingPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map(plan => (
-            <div key={plan.key} className={`card p-6 relative flex flex-col ${plan.popular ? 'border-2 border-brand-500 shadow-xl shadow-brand-100/50 dark:shadow-brand-900/30' : ''}`}>
+            <div key={plan.key} className={`card p-6 relative flex flex-col ${
+              plan.popular ? 'border-2 border-brand-500 shadow-xl shadow-brand-100/50 dark:shadow-brand-900/30' : ''
+            } ${
+              plan.key === 'enterprise' ? 'border border-dashed border-slate-300 dark:border-slate-700 opacity-90' : ''
+            }`}>
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-bold px-4 py-1 rounded-full">
                   Most Popular
                 </div>
               )}
+              {plan.key === 'enterprise' && (
+                <div className="absolute top-3 right-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded">
+                  Coming Soon
+                </div>
+              )}
               <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">{plan.name}</h3>
               <div className="mb-1">
                 <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{plan.price}</span>
-                <span className="text-slate-500 dark:text-slate-400 text-sm">{plan.period}</span>
+                {plan.period && <span className="text-slate-500 dark:text-slate-400 text-sm">{plan.period}</span>}
               </div>
               {plan.sub && (
                 <p className="text-xs text-brand-600 font-medium mb-3">{plan.sub}</p>
@@ -194,8 +202,9 @@ const PricingPage = () => {
               </ul>
 
               <button
-                disabled={!!upgrading}
+                disabled={plan.key === 'enterprise' || !!upgrading}
                 onClick={() => {
+                  if (plan.key === 'enterprise') return;
                   logEvent(EVENTS.UPGRADE_CLICKED, { plan: plan.key, period: billingPeriod, cta: plan.cta });
                   if (plan.key === 'free') {
                     navigate(ROUTES.DASHBOARD);
@@ -206,7 +215,9 @@ const PricingPage = () => {
                   }
                 }}
                 className={`w-full py-3 rounded-lg font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
-                  plan.popular
+                  plan.key === 'enterprise'
+                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                    : plan.popular
                     ? 'bg-brand-600 text-white hover:bg-brand-700'
                     : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600'
                 }`}

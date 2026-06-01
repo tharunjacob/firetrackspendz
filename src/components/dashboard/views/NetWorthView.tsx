@@ -9,6 +9,8 @@ import { canAccessFeature } from '@/config/plans';
 import { UpgradePrompt } from '@/components/common/UpgradePrompt';
 import { calculatePersonalInflation, calculateFireMetrics } from '@/services/analysis';
 import { FIRE_MULTIPLIER } from './fire/shared';
+import { loadSnapshots as loadMasterSnapshots } from '@/services/assetStorage';
+import type { AssetSnapshot } from '@/types/assets';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
@@ -87,17 +89,73 @@ const monthLabel = (dateStr: string) =>
 
 export const NetWorthView = () => {
   useEffect(() => { logEvent(EVENTS.FEATURE_NET_WORTH_OPENED); }, []);
-  const { transactions, currency, plan } = useApp();
+  const { transactions, currency, plan, userId } = useApp();
 
-  const [entries, setEntries] = useState<NWEntry[]>(() => loadEntries());
-  const [snapshots, setSnapshots] = useState<NWSnapshot[]>(() => loadSnapshots());
+  const [localEntries, setLocalEntries] = useState<NWEntry[]>(() => loadEntries());
+  const [localSnapshots, setLocalSnapshots] = useState<NWSnapshot[]>(() => loadSnapshots());
+  const [masterSnapshots, setMasterSnapshots] = useState<AssetSnapshot[]>([]);
 
   // form state
   const [showForm, setShowForm] = useState<'asset' | 'liability' | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [draft, setDraft] = useState({ name: '', category: '', value: '' });
 
-  useEffect(() => { persistEntries(entries); }, [entries]);
+  useEffect(() => {
+    loadMasterSnapshots(userId || undefined)
+      .then(snaps => {
+        setMasterSnapshots(snaps);
+      })
+      .catch(e => {
+        console.warn('[NetWorthView] Failed to load master snapshots:', e);
+      });
+  }, [userId]);
+
+  const hasMasterData = masterSnapshots.length > 0;
+
+  useEffect(() => {
+    if (!hasMasterData) {
+      persistEntries(localEntries);
+    }
+  }, [localEntries, hasMasterData]);
+
+  // Derived master entries & snapshots
+  const derivedEntries = useMemo(() => {
+    if (!hasMasterData) return [];
+    const latestDate = [...new Set(masterSnapshots.map(s => s.date))].sort().pop();
+    if (!latestDate) return [];
+    return masterSnapshots.filter(s => s.date === latestDate).map(s => ({
+      id: s.id,
+      name: `${s.owner} — ${s.category}`,
+      category: s.category,
+      kind: (s.current_value >= 0 ? 'asset' : 'liability') as 'asset' | 'liability',
+      value: Math.abs(s.current_value),
+    }));
+  }, [masterSnapshots, hasMasterData]);
+
+  const derivedSnapshots = useMemo(() => {
+    if (!hasMasterData) return [];
+    const grouped = new Map<string, { totalAssets: number; totalLiabilities: number }>();
+    masterSnapshots.forEach(s => {
+      const date = s.date.substring(0, 7) + '-01';
+      const current = grouped.get(date) || { totalAssets: 0, totalLiabilities: 0 };
+      if (s.current_value >= 0) {
+        current.totalAssets += s.current_value;
+      } else {
+        current.totalLiabilities += Math.abs(s.current_value);
+      }
+      grouped.set(date, current);
+    });
+    return Array.from(grouped.entries()).map(([date, v]) => ({
+      date,
+      totalAssets: v.totalAssets,
+      totalLiabilities: v.totalLiabilities,
+      netWorth: v.totalAssets - v.totalLiabilities,
+    })).sort((a, b) => a.date.localeCompare(b.date));
+  }, [masterSnapshots, hasMasterData]);
+
+  const entries = hasMasterData ? derivedEntries : localEntries;
+  const snapshots = hasMasterData ? derivedSnapshots : localSnapshots;
+  const setEntries = setLocalEntries;
 
   // ── Derived ──────────────────────────────────────────────────
 
@@ -205,8 +263,8 @@ export const NetWorthView = () => {
   const saveSnapshot = () => {
     const key = thisMonthKey();
     const snap: NWSnapshot = { date: key, totalAssets, totalLiabilities, netWorth };
-    setSnapshots(prev => {
-      const updated = [...prev.filter(s => s.date !== key), snap]
+    setLocalSnapshots((prev: NWSnapshot[]) => {
+      const updated = [...prev.filter((s: NWSnapshot) => s.date !== key), snap]
         .sort((a, b) => a.date.localeCompare(b.date));
       persistSnapshots(updated);
       return updated;
@@ -326,6 +384,26 @@ export const NetWorthView = () => {
         </div>
       )}
 
+      {/* ── Master Assets Connection Banner ── */}
+      {hasMasterData && (
+        <div className="card p-4 border border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-900/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Icon name="chart" className="w-5 h-5 text-brand-600 dark:text-brand-400 shrink-0" />
+            <div>
+              <p className="text-sm text-slate-850 dark:text-slate-200 font-semibold">
+                Connected to Net Asset Tracker
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Automatically displaying wealth snapshots from your master tracker.
+              </p>
+            </div>
+          </div>
+          <Link to={ROUTES.ASSETS} className="btn-primary text-xs px-3 py-1.5 whitespace-nowrap shrink-0">
+            Manage Asset Records
+          </Link>
+        </div>
+      )}
+
       {/* ── Historical chart ── */}
       {chartData.length >= 2 && (
         <div className="card p-5">
@@ -430,9 +508,11 @@ export const NetWorthView = () => {
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Assets</h3>
               <p className="text-xs text-slate-500 mt-0.5">{formatAmount(totalAssets, currency)} total</p>
             </div>
-            <button onClick={() => openAdd('asset')} className="btn-primary text-xs px-3 py-1.5">
-              <Icon name="plus" className="w-3 h-3 inline mr-1" />Add
-            </button>
+            {!hasMasterData && (
+              <button onClick={() => openAdd('asset')} className="btn-primary text-xs px-3 py-1.5">
+                <Icon name="plus" className="w-3 h-3 inline mr-1" />Add
+              </button>
+            )}
           </div>
 
           {assetEntries.length === 0 ? (
@@ -456,12 +536,16 @@ export const NetWorthView = () => {
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-100 tabular-nums">
                       {formatAmount(e.value, currency)}
                     </p>
-                    <button onClick={() => openEdit(e)} className="text-slate-300 hover:text-brand-500 transition-colors" title="Edit">
-                      <Icon name="pencil" className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={() => removeEntry(e.id)} className="text-slate-300 hover:text-red-500 transition-colors" title="Delete">
-                      <Icon name="trash" className="w-3.5 h-3.5" />
-                    </button>
+                    {!hasMasterData && (
+                      <>
+                        <button onClick={() => openEdit(e)} className="text-slate-300 hover:text-brand-500 transition-colors" title="Edit">
+                          <Icon name="pencil" className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => removeEntry(e.id)} className="text-slate-300 hover:text-red-500 transition-colors" title="Delete">
+                          <Icon name="trash" className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -476,12 +560,14 @@ export const NetWorthView = () => {
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Liabilities</h3>
               <p className="text-xs text-slate-500 mt-0.5">{formatAmount(totalLiabilities, currency)} total</p>
             </div>
-            <button
-              onClick={() => openAdd('liability')}
-              className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-            >
-              <Icon name="plus" className="w-3 h-3 inline mr-1" />Add
-            </button>
+            {!hasMasterData && (
+              <button
+                onClick={() => openAdd('liability')}
+                className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              >
+                <Icon name="plus" className="w-3 h-3 inline mr-1" />Add
+              </button>
+            )}
           </div>
 
           {liabilityEntries.length === 0 ? (
@@ -505,12 +591,16 @@ export const NetWorthView = () => {
                     <p className="text-sm font-bold text-red-600 dark:text-red-400 tabular-nums">
                       −{formatAmount(e.value, currency)}
                     </p>
-                    <button onClick={() => openEdit(e)} className="text-slate-300 hover:text-brand-500 transition-colors" title="Edit">
-                      <Icon name="pencil" className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={() => removeEntry(e.id)} className="text-slate-300 hover:text-red-500 transition-colors" title="Delete">
-                      <Icon name="trash" className="w-3.5 h-3.5" />
-                    </button>
+                    {!hasMasterData && (
+                      <>
+                        <button onClick={() => openEdit(e)} className="text-slate-300 hover:text-brand-500 transition-colors" title="Edit">
+                          <Icon name="pencil" className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => removeEntry(e.id)} className="text-slate-300 hover:text-red-500 transition-colors" title="Delete">
+                          <Icon name="trash" className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -520,28 +610,30 @@ export const NetWorthView = () => {
       </div>
 
       {/* ── Monthly snapshot ── */}
-      <div className="card p-4 flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/50">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-            {thisMonthSaved ? '✓ Snapshot saved for this month' : "Record this month's net worth"}
-          </p>
-          <p className="text-xs text-slate-500 mt-0.5 truncate">
-            {thisMonthSaved
-              ? `${formatAmount(snapshots.find(s => s.date === thisMonthKey())?.netWorth ?? 0, currency)} recorded · ${snapshots.length} snapshot${snapshots.length !== 1 ? 's' : ''} total`
-              : 'Save monthly snapshots to track growth and see the inflation trend chart.'}
-          </p>
+      {!hasMasterData && (
+        <div className="card p-4 flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/50">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              {thisMonthSaved ? '✓ Snapshot saved for this month' : "Record this month's net worth"}
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5 truncate">
+              {thisMonthSaved
+                ? `${formatAmount(snapshots.find(s => s.date === thisMonthKey())?.netWorth ?? 0, currency)} recorded · ${snapshots.length} snapshot${snapshots.length !== 1 ? 's' : ''} total`
+                : 'Save monthly snapshots to track growth and see the inflation trend chart.'}
+            </p>
+          </div>
+          <button
+            onClick={saveSnapshot}
+            className={`text-sm px-4 py-2 rounded-lg font-semibold flex-shrink-0 transition-colors ${
+              thisMonthSaved
+                ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+                : 'btn-primary'
+            }`}
+          >
+            {thisMonthSaved ? 'Update' : 'Save Snapshot'}
+          </button>
         </div>
-        <button
-          onClick={saveSnapshot}
-          className={`text-sm px-4 py-2 rounded-lg font-semibold flex-shrink-0 transition-colors ${
-            thisMonthSaved
-              ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
-              : 'btn-primary'
-          }`}
-        >
-          {thisMonthSaved ? 'Update' : 'Save Snapshot'}
-        </button>
-      </div>
+      )}
 
       {/* ── Link to full tracker ── */}
       <div className="rounded-2xl p-4 bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 flex items-center justify-between gap-4">

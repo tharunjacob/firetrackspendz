@@ -53,7 +53,10 @@ export const saveSnapshots = async (snapshots: AssetSnapshot[], userId?: string)
   const tx = db.transaction(STORE_NAME, 'readwrite');
   const store = tx.objectStore(STORE_NAME);
   for (const s of snapshots) store.put(s);
-  await new Promise<void>((res, rej) => { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
+  await new Promise<void>((res, rej) => {
+    tx.oncomplete = () => { db.close(); res(); };
+    tx.onerror = () => { db.close(); rej(tx.error); };
+  });
 
   // Cloud (if logged in)
   if (userId) {
@@ -101,8 +104,8 @@ export const loadSnapshots = async (userId?: string): Promise<AssetSnapshot[]> =
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readonly');
     const req = tx.objectStore(STORE_NAME).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
+    req.onsuccess = () => { db.close(); resolve(req.result || []); };
+    req.onerror = () => { db.close(); reject(req.error); };
   });
 };
 
@@ -111,7 +114,10 @@ export const deleteSnapshots = async (ids: string[], userId?: string): Promise<v
   const tx = db.transaction(STORE_NAME, 'readwrite');
   const store = tx.objectStore(STORE_NAME);
   for (const id of ids) store.delete(id);
-  await new Promise<void>((res, rej) => { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
+  await new Promise<void>((res, rej) => {
+    tx.oncomplete = () => { db.close(); res(); };
+    tx.onerror = () => { db.close(); rej(tx.error); };
+  });
 
   if (userId) {
     try {
@@ -133,7 +139,10 @@ export const deleteSnapshotsByDate = async (date: string, userId?: string): Prom
     const cursor = req.result;
     if (cursor) { ids.push(cursor.value.id); cursor.delete(); cursor.continue(); }
   };
-  await new Promise<void>((res, rej) => { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
+  await new Promise<void>((res, rej) => {
+    tx.oncomplete = () => { db.close(); res(); };
+    tx.onerror = () => { db.close(); rej(tx.error); };
+  });
 
   if (userId && ids.length > 0) {
     try { await getSupabase().from(TABLES.ASSET_SNAPSHOTS).delete().in('id', ids); } catch (e) { console.error('[assetStorage] Failed to delete cloud snapshots:', e); }

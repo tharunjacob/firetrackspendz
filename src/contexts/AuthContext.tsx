@@ -7,6 +7,7 @@ import { logEvent, EVENTS } from '@/services/logger';
 import { claimReferral } from '@/services/referral';
 import { getSupabase, isCloudEnabled } from '@/services/supabase';
 import { RPC } from '@/config/database';
+import { useUI } from './UIContext';
 
 // ============================================================
 // Auth Context â€” Handles user authentication state ONLY
@@ -151,9 +152,48 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
   }, [isMimicMode, onSignIn, onSignOut]);
 
   const logout = useCallback(async () => {
-    logEvent(EVENTS.AUTH_LOGOUT, { email: userEmail });
-    await authSignOut();
+    try {
+      logEvent(EVENTS.AUTH_LOGOUT, { email: userEmail });
+      await authSignOut();
+    } catch (e) {
+      console.error('Logout error:', e);
+    } finally {
+      window.location.href = '/';
+    }
   }, [userEmail]);
+
+  const { currency, setCurrency } = useUI();
+
+  // Sync DB currency to UI on sign-in
+  useEffect(() => {
+    if (profile?.preferred_currency && profile.preferred_currency !== currency) {
+      setCurrency(profile.preferred_currency);
+    }
+  }, [profile?.preferred_currency, currency, setCurrency]);
+
+  // Sync UI currency changes back to DB
+  useEffect(() => {
+    if (!userId || !profile) return;
+    if (profile.preferred_currency === currency) return;
+
+    const updateDbCurrency = async () => {
+      try {
+        const supabase = getSupabase();
+        if (supabase) {
+          await supabase
+            .from('user_profiles')
+            .update({ preferred_currency: currency })
+            .eq('id', userId);
+          // Also update local profile state to prevent loop
+          setProfile(prev => prev ? { ...prev, preferred_currency: currency } : null);
+        }
+      } catch (e) {
+        console.warn('Failed to update preferred currency in DB:', e);
+      }
+    };
+
+    updateDbCurrency();
+  }, [currency, userId, profile, setProfile]);
 
   const value = useMemo(
     () => ({

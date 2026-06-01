@@ -19,7 +19,23 @@ export const CategoriesView = ({ data }: { data?: import('@/types').Transaction[
   const categories = useMemo(() => getCategoryBreakdown(txns, viewType), [txns, viewType]);
   const top5 = categories.slice(0, 5);
   const othersTotal = categories.slice(5).reduce((s, c) => s + c.value, 0);
-  const pieData = othersTotal > 0 ? [...top5, { name: 'Others', value: othersTotal, percentage: 0 }] : top5;
+  const totalValue = categories.reduce((s, c) => s + c.value, 0);
+  const othersPercentage = totalValue > 0 ? (othersTotal / totalValue) * 100 : 0;
+  const pieData = othersTotal > 0 ? [...top5, { name: 'Others', value: othersTotal, percentage: othersPercentage }] : top5;
+
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+    if (percent < 0.03) return null; // Only show for > 3% to avoid clutter
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="text-[10px] font-bold">
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -50,7 +66,7 @@ export const CategoriesView = ({ data }: { data?: import('@/types').Transaction[
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Distribution</h3>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={95} dataKey="value" paddingAngle={2}>
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={95} dataKey="value" paddingAngle={2} label={renderCustomizedLabel} labelLine={false}>
                 {pieData.map((_, i) => <Cell key={i} fill={COLORS.categories[i % COLORS.categories.length]} />)}
               </Pie>
               <Tooltip formatter={(v: number) => formatAmount(v, currency)} />
@@ -66,7 +82,11 @@ export const CategoriesView = ({ data }: { data?: import('@/types').Transaction[
               <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={v => v >= 1e3 ? (v / 1e3).toFixed(0) + 'K' : String(v)} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={72} />
               <Tooltip formatter={(v: number) => formatAmount(v, currency)} />
-              <Bar dataKey="value" fill={viewType === 'Expense' ? COLORS.expense.medium : COLORS.income.medium} radius={[0, 4, 4, 0]} />
+              <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                {categories.slice(0, 10).map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS.categories[index % COLORS.categories.length]} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

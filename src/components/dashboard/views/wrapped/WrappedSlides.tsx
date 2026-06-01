@@ -19,10 +19,11 @@ const StatCard = ({ label, value, sub, accent }: {
 
 const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
+  const rawRate = payload[0].payload.rawRate ?? payload[0].value;
   return (
     <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 text-sm">
       <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">{label}</p>
-      <p className="text-brand-600 font-mono">{payload[0].value.toFixed(1)}%</p>
+      <p className="text-brand-600 font-mono">{rawRate.toFixed(1)}%</p>
     </div>
   );
 };

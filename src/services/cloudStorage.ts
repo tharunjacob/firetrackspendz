@@ -124,10 +124,12 @@ export const cloudLoad = async (targetUserId?: string): Promise<Transaction[]> =
     userId = user.id;
   }
 
-  // Paginate for large datasets
+  // Paginate for large datasets. Using 1000 instead of 5000 because Supabase's
+  // default server-side limit is 1000 rows. If pageSize > 1000, data.length < pageSize
+  // evaluates to true on the first page, breaking the loop prematurely.
   const allData: TransactionRow[] = [];
   let from = 0;
-  const pageSize = 5000;
+  const pageSize = 1000;
 
   while (true) {
     const { data, error } = await withRetry(async () => {

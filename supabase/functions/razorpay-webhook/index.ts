@@ -187,6 +187,17 @@ serve(async (req: Request) => {
     return jsonResponse({ received: true, ignored: event.event });
   }
 
+  // Enrich the patch with subscription period and currency from notes if available
+  const finalPatch = { ...patch };
+  const period = subEntity?.notes?.period;
+  const currency = subEntity?.notes?.currency;
+  if (period) {
+    finalPatch.subscription_period = period;
+  }
+  if (currency) {
+    finalPatch.preferred_currency = currency;
+  }
+
   // ─── Out-of-order delivery guard ────────────────────────────────────────────
   // Razorpay does NOT guarantee webhook delivery order. A delayed
   // 'subscription.charged' (or 'activated'/'resumed') can arrive AFTER a
@@ -220,7 +231,7 @@ serve(async (req: Request) => {
     return jsonResponse({ received: true, skipped: 'terminal_state', event: event.event });
   }
 
-  const target = supabase.from('user_profiles').update(patch);
+  const target = supabase.from('user_profiles').update(finalPatch);
   if (profile?.id) {
     await target.eq('id', profile.id);
   } else {

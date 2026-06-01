@@ -65,7 +65,10 @@ export const BudgetsView = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Budget Tracker</h2>
+        <div>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Budget Tracker</h2>
+          <p className="text-sm text-slate-500 mt-0.5">Track your spending against monthly limits for the current calendar month.</p>
+        </div>
         <button
           onClick={() => setShowAdd(!showAdd)}
           disabled={!canSave}
@@ -89,7 +92,7 @@ export const BudgetsView = () => {
               <option value="">Select category</option>
               {DEFAULT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <input type="number" placeholder="Monthly limit" value={newBudget.limit} onChange={e => setNewBudget(p => ({ ...p, limit: e.target.value }))} className="input-field" />
+            <input type="number" placeholder="Monthly budget limit" value={newBudget.limit} onChange={e => setNewBudget(p => ({ ...p, limit: e.target.value }))} className="input-field" />
             <div className="flex gap-2">
               <button onClick={addBudget} className="btn-primary flex-1">Add</button>
               <button onClick={() => setShowAdd(false)} className="btn-secondary px-3">Cancel</button>

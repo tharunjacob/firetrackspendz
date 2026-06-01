@@ -84,9 +84,9 @@ export const WrappedSummary = ({ stats, currency, plan }: Props) => {
     const statsY = 560;
     const colW = W / 2;
     const statsItems = [
-      { label: 'Total Saved', value: formatAmount(stats.netSavings, currency) },
       { label: 'Top Category', value: stats.topCategory.name },
-      { label: 'Transactions', value: String(stats.totalTransactions) },
+      { label: 'Category Share', value: `${stats.topCategory.pct.toFixed(1)}%` },
+      { label: 'Total Transactions', value: String(stats.totalTransactions) },
       { label: 'Unique Merchants', value: String(stats.uniqueMerchants) },
     ];
 

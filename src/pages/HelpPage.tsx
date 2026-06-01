@@ -196,8 +196,8 @@ const sections: HelpSection[] = [
     content: (
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <p><strong className="text-slate-800 dark:text-slate-200">Free:</strong> Up to 500 transactions, basic categorization, monthly breakdowns, local storage.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">Pro ($49/year):</strong> Unlimited transactions, AI advisor, FIRE calculator, net worth, budgets, cloud sync, trend analysis, anomaly detection.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">Enterprise ($149/year):</strong> Everything in Pro plus household tracking (up to 5 profiles), consolidated budgets &amp; goals, custom categories &amp; rules, and CSV/JSON data exports.</p>
+        <p><strong className="text-slate-800 dark:text-slate-200">Pro ($49.99/year or ₹1,499/year):</strong> Unlimited transactions, AI advisor, FIRE calculator, net worth, budgets, cloud sync, trend analysis, anomaly detection.</p>
+        <p><strong className="text-slate-800 dark:text-slate-200">Enterprise (Coming Soon):</strong> Everything in Pro plus household tracking (up to 5 profiles), consolidated budgets &amp; goals, custom categories &amp; rules, and CSV/JSON data exports.</p>
         <p>You can try the app free without signing up — upload a statement and explore all views instantly. <Link to="/pricing" className="text-brand-600 hover:underline">View full pricing →</Link></p>
       </div>
     ),

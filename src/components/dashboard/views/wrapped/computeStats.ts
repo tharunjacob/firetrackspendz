@@ -38,10 +38,14 @@ export function computeWrappedStats(transactions: Transaction[], year: number): 
     }
   });
 
-  const monthlySavingsRates = monthlyData.map((d, i) => ({
-    month: MONTH_LABELS[i],
-    rate: d.income > 0 ? ((d.income - d.expense) / d.income) * 100 : 0,
-  }));
+  const monthlySavingsRates = monthlyData.map((d, i) => {
+    const rawRate = d.income > 0 ? ((d.income - d.expense) / d.income) * 100 : 0;
+    return {
+      month: MONTH_LABELS[i],
+      rate: Math.max(-10, rawRate), // Clamp visual rate to -10% min to avoid squishing chart
+      rawRate,
+    };
+  });
 
   const monthlySavings = monthlyData.map((d, i) => ({
     month: MONTH_LABELS[i],

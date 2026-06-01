@@ -356,6 +356,16 @@ export const detectRecurring = (data: Transaction[]): RecurringTransaction[] => 
     if (!isMonthly && !isWeekly && !isQuarterly && !isYearly) return;
     if (stdDevDays >= 8) return;
 
+    // Filter out false positives (e.g. weekly hotel stays or random monthly purchases)
+    // by requiring more occurrences for shorter cycles unless it is a subscription.
+    const hasSubSignal = entries.some(e => {
+      const name = e.displayName.toLowerCase();
+      return name.includes('subscription') || name.includes('streaming') ||
+        ['netflix', 'spotify', 'prime', 'youtube', 'apple', 'icloud', 'disney', 'hotstar', 'zee5', 'sonyliv', 'jiocinema', 'crunchyroll', 'audible', 'premium', 'membership', 'plan'].some(k => name.includes(k));
+    });
+    const minOccurrences = hasSubSignal ? 2 : (isWeekly ? 4 : (isMonthly ? 3 : 2));
+    if (entries.length < minOccurrences) return;
+
     const amounts = entries.map(e => e.amount);
     const avgAmt = amounts.reduce((a, b) => a + b, 0) / amounts.length;
     const amtStdDev = Math.sqrt(amounts.reduce((a, b) => a + Math.pow(b - avgAmt, 2), 0) / amounts.length);

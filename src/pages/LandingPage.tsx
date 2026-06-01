@@ -401,10 +401,13 @@ const LandingPage = () => {
             </div>
 
             {/* Enterprise */}
-            <div className="card p-6">
+            <div className="card p-6 border border-dashed border-slate-300 dark:border-slate-700 opacity-90 relative overflow-hidden">
+              <div className="absolute top-2 right-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded">
+                Coming Soon
+              </div>
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Enterprise</p>
-              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.enterprise.price}<span className="text-base font-normal text-slate-500">{pricing.enterprise.period}</span></div>
-              <p className="text-xs text-slate-500 mb-5">Up to 5 profiles</p>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">Coming Soon</div>
+              <p className="text-xs text-slate-500 mb-5">Household & family profiles</p>
               <ul className="space-y-2 mb-6">
                 {[
                   'Everything in Pro',
@@ -419,9 +422,9 @@ const LandingPage = () => {
                   </li>
                 ))}
               </ul>
-              <Link to="/pricing" className="btn-secondary block text-center w-full text-sm py-2.5">
-                View all plans
-              </Link>
+              <button disabled className="w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-sm py-2.5 rounded-lg font-semibold cursor-not-allowed">
+                Coming Soon
+              </button>
             </div>
           </div>
 
