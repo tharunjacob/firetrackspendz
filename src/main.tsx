@@ -18,22 +18,27 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>
 );
 
-// Register Service Worker for offline support
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  // Self-heal: purge old caches (v2, v3) that may have been left by previous SW versions
-  if (window.caches) {
-    caches.delete('trackspendz-v2').catch(() => {});
-    caches.delete('trackspendz-v3').catch(() => {});
-    caches.keys().then(keys => {
-      keys.forEach(key => {
-        caches.open(key).then(cache => {
-          cache.delete('/sw.js').catch(() => {});
-        });
+// Self-heal: Completely unregister service workers and clear cache storage
+// Since TrackSpendZ requires an active network connection (Supabase, Gemini API),
+// the offline service worker was causing stale client bundles and infinite loading spinner bugs on redeployments.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister().then((success) => {
+        if (success) {
+          console.log('[SW] Successfully unregistered service worker');
+          // Reload to instantly clear the SW controller gate
+          window.location.reload();
+        }
       });
-    });
-  }
+    }
+  }).catch(err => console.warn('[SW] Failed to get registrations:', err));
+}
 
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW registration failed:', err));
-  });
+if (window.caches) {
+  caches.keys().then((keys) => {
+    keys.forEach((key) => {
+      caches.delete(key).catch(() => {});
+    });
+  }).catch(err => console.warn('[Cache] Failed to clear caches:', err));
 }
