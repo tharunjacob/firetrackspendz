@@ -228,12 +228,6 @@ const PricingPage = () => {
           ))}
         </div>
 
-        {!pricing.isIndia && (
-          <p className="text-xs text-slate-500 mt-6 max-w-xl mx-auto">
-            Billing is processed in INR by Razorpay. International cards are accepted —
-            your statement will show the INR-equivalent charge.
-          </p>
-        )}
       </section>
 
       {/* FAQ */}

@@ -40,6 +40,17 @@ serve(async (req: Request) => {
   try {
     const { user, serviceClient } = await authenticateUser(req);
 
+    const rzpKeyId = Deno.env.get('RAZORPAY_KEY_ID') ?? '';
+    const rzpKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET') ?? '';
+    console.log('[razorpay-create-subscription] Debug credentials:', {
+      hasKeyId: !!rzpKeyId,
+      keyIdLength: rzpKeyId.length,
+      keyIdStart: rzpKeyId.substring(0, 12),
+      hasSecret: !!rzpKeySecret,
+      secretLength: rzpKeySecret.length,
+      secretStart: rzpKeySecret.substring(0, 4),
+    });
+
     const body = await req.json().catch(() => ({})) as {
       tier?: 'pro' | 'enterprise';
       currency?: 'INR' | 'USD';
