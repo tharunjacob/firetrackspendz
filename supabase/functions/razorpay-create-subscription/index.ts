@@ -68,6 +68,12 @@ serve(async (req: Request) => {
     }
 
     const planId = getPlanId(body.tier, body.currency, body.period);
+    console.log('[razorpay-create-subscription] Plan details:', {
+      tier: body.tier,
+      currency: body.currency,
+      period: body.period,
+      planId,
+    });
     if (!planId) {
       return jsonResponse({
         error: `No Razorpay plan configured for ${body.tier}/${body.currency}/${body.period}. ` +
