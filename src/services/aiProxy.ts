@@ -9,7 +9,7 @@ const SUPABASE_FUNCTIONS_URL = cleanSupabaseUrl
   : null;
 
 // Dev fallback — only used when there is no Supabase URL configured (local dev without Supabase)
-const DEV_GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+// No global VITE_GEMINI_API_KEY assignment to avoid compiling it in the production bundle.
 
 export type GeminiContents = {
   role: 'user';
@@ -72,34 +72,42 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
     }
   }
 
-  // Dev fallback: call Gemini directly (only when no Supabase URL or in DEV mode)
-  if (!DEV_GEMINI_API_KEY) {
-    throw new Error('AI unavailable: no VITE_GEMINI_API_KEY set and no Supabase Edge Function configured.');
+  // Dev fallback: call Gemini directly (only compiled in DEV mode)
+  if (import.meta.env.DEV) {
+    const devKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    if (!devKey) {
+      throw new Error('AI unavailable: no VITE_GEMINI_API_KEY set and no Supabase Edge Function configured.');
+    }
+
+    const model = 'gemini-2.5-flash';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${devKey}`;
+    const body: Record<string, unknown> = { contents: payload.contents };
+    if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
+
+    const devController = new AbortController();
+    const devTimeoutId = setTimeout(() => devController.abort(), 120000); // 120 s max
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: devController.signal,
+      });
+    } finally {
+      clearTimeout(devTimeoutId);
+    }
+    if (!res.ok) throw new Error(`Gemini API error ${res.status}`);
+    const data = await res.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
   }
 
-  const model = 'gemini-2.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${DEV_GEMINI_API_KEY}`;
-  const body: Record<string, unknown> = { contents: payload.contents };
-  if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
-
-  const devController = new AbortController();
-  const devTimeoutId = setTimeout(() => devController.abort(), 120000); // 120 s max
-  let res: Response;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: devController.signal,
-    });
-  } finally {
-    clearTimeout(devTimeoutId);
-  }
-  if (!res.ok) throw new Error(`Gemini API error ${res.status}`);
-  const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+  throw new Error('AI features are currently unavailable in production. Please try again later.');
 };
 
 export const isAIProxyAvailable = (): boolean => {
-  return !!(SUPABASE_FUNCTIONS_URL || DEV_GEMINI_API_KEY);
+  if (import.meta.env.DEV) {
+    return !!(SUPABASE_FUNCTIONS_URL || import.meta.env.VITE_GEMINI_API_KEY);
+  }
+  return !!SUPABASE_FUNCTIONS_URL;
 };
