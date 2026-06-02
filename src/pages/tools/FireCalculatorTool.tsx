@@ -153,7 +153,7 @@ const FireCalculatorTool: React.FC = () => {
   const labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Hero */}
       <section className="bg-gradient-to-br from-brand-600 to-brand-800 text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
@@ -355,7 +355,7 @@ const FireCalculatorTool: React.FC = () => {
           </Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import type { Transaction, TransactionType, FileMapping } from '@/types';
-import * as XLSX from 'xlsx';
 import { getFileMappingFromAI, detectFileStructure, extractTransactionsFromPDF } from './gemini';
 import { getStoredMapping, saveMapping, getLearnedCategory, applyRules } from './learningRules';
 
@@ -612,6 +611,7 @@ export const transformData = async (
     reader.onload = async (e) => {
       try {
         const data = e.target?.result;
+        const XLSX = await import('xlsx');
         const workbook = XLSX.read(data, { type: 'array', cellDates: true, dateNF: 'yyyy-mm-dd' });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows: any[][] = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });

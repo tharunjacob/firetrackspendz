@@ -108,7 +108,7 @@ const SavingsRateTool: React.FC = () => {
   const barPosition = results ? Math.max(0, Math.min(100, results.savingsRate)) : 0;
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Hero */}
       <section className="bg-gradient-to-br from-brand-600 to-brand-800 text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
@@ -287,7 +287,7 @@ const SavingsRateTool: React.FC = () => {
           </Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 

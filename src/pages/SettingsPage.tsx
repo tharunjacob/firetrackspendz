@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Icon } from '@/components/common/Icons';
 import { CURRENCIES } from '@/utils/constants';
@@ -66,7 +66,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Settings</h1>
 
       {/* Profile */}
@@ -222,7 +222,7 @@ const SettingsPage = () => {
           </div>
         )}
       </section>
-    </main>
+    </div>
   );
 };
 

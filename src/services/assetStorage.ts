@@ -2,7 +2,6 @@ import { getSupabase } from '@/services/supabase';
 import type { AssetSnapshot, NetAssetConfig, MonthlyNetWorth, CategoryReturn, AssetFileMapping } from '@/types/assets';
 import { DEFAULT_TIERS, DEFAULT_CATEGORIES } from '@/types/assets';
 import { TABLES } from '@/config/database';
-import * as XLSX from 'xlsx';
 
 // ============================================================
 // Asset Storage Service
@@ -277,8 +276,8 @@ export interface SheetData {
   rows: any[][];
 }
 
-/** Parse an Excel file buffer into sheets of raw 2D arrays */
-export const parseExcelToSheets = (buffer: ArrayBuffer): SheetData[] => {
+export const parseExcelToSheets = async (buffer: ArrayBuffer): Promise<SheetData[]> => {
+  const XLSX = await import('xlsx');
   const wb = XLSX.read(buffer, { type: 'array', cellDates: true });
   return wb.SheetNames.map(name => {
     const sheet = wb.Sheets[name];

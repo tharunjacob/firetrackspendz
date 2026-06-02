@@ -68,7 +68,7 @@ export const AssetCSVImport: React.FC<Props> = ({ config: _config, currency, onI
     setSheetOptions([]);
     try {
       const buffer = await file.arrayBuffer();
-      const sheets = parseExcelToSheets(buffer);
+      const sheets = await parseExcelToSheets(buffer);
 
       if (sheets.length === 0) {
         setError('No data found in the Excel file.');

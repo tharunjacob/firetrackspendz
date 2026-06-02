@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Icon } from '@/components/common/Icons';
 import { AssetEntryForm } from '@/components/assets/AssetEntryForm';
@@ -93,7 +93,7 @@ const NetAssetPage = () => {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 safe-bottom">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 safe-bottom">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Net Asset Tracker</h1>
@@ -136,7 +136,7 @@ const NetAssetPage = () => {
       {tab === 'fire' && (
         <AssetFireBridge snapshots={snapshots} config={config} currency={currency} />
       )}
-    </main>
+    </div>
   );
 };
 

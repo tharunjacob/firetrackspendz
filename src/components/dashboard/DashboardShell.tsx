@@ -288,7 +288,7 @@ export const DashboardShell = () => {
           />
         </div>
 
-        <main className="flex-1 flex flex-col h-full overflow-hidden relative w-full">
+        <div className="flex-1 flex flex-col h-full overflow-hidden relative w-full">
           <div className="lg:hidden flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0 min-h-[52px]">
             <span className="font-bold text-slate-800 dark:text-slate-100 text-base">TrackSpendZ</span>
             {transactions.length > 0 && (
@@ -457,7 +457,7 @@ export const DashboardShell = () => {
               setMoreSheetOpen={setMoreSheetOpen}
             />
           )}
-        </main>
+        </div>
       </div>
 
       <FilterPanel

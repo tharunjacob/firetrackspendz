@@ -55,7 +55,7 @@ function App() {
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       <PageTracker />
       <Navbar />
-      <div className="flex-1 min-h-0">
+      <main className="flex-1 min-h-0" id="main-content">
       <Suspense fallback={<Loading />}>
         <Routes>
           {/* Public routes */}
@@ -86,7 +86,7 @@ function App() {
           <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
         </Routes>
       </Suspense>
-      </div>
+      </main>
 
       {toast.visible && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
       {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} />}
