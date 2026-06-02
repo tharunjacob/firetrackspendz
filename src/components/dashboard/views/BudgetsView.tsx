@@ -88,11 +88,25 @@ export const BudgetsView = () => {
       {showAdd && (
         <div className="card p-5 border-2 border-brand-200 animate-slide-up">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <select value={newBudget.category} onChange={e => setNewBudget(p => ({ ...p, category: e.target.value }))} className="input-field">
+            <select
+              id="budget-category"
+              name="budget-category"
+              value={newBudget.category}
+              onChange={e => setNewBudget(p => ({ ...p, category: e.target.value }))}
+              className="input-field"
+            >
               <option value="">Select category</option>
               {DEFAULT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <input type="number" placeholder="Monthly budget limit" value={newBudget.limit} onChange={e => setNewBudget(p => ({ ...p, limit: e.target.value }))} className="input-field" />
+            <input
+              id="budget-limit"
+              name="budget-limit"
+              type="number"
+              placeholder="Monthly budget limit"
+              value={newBudget.limit}
+              onChange={e => setNewBudget(p => ({ ...p, limit: e.target.value }))}
+              className="input-field"
+            />
             <div className="flex gap-2">
               <button onClick={addBudget} className="btn-primary flex-1">Add</button>
               <button onClick={() => setShowAdd(false)} className="btn-secondary px-3">Cancel</button>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useUI } from '@/contexts/UIContext';
 import {
   PLAN_PRICING,
   getMonthlyEquivalent,
@@ -9,28 +10,29 @@ import {
 /**
  * Region-aware pricing hook.
  *
- * Detects whether the user is in India (via timezone) and returns INR or USD
- * pricing accordingly. Supports both monthly and yearly billing periods.
- *
- * Note: timezone detection isn't IP-accurate — Indians abroad on IST get INR,
- * Americans visiting India on US time get USD. Good enough for a price-display
- * heuristic; actual billing currency is set by the Razorpay plan, not this hook.
+ * Subscribes to the app-wide UIContext currency setting and falls back
+ * to local timezone detection. Returns pricing details accordingly.
  */
 export const useLocalPricing = () => {
-  const [isIndia, setIsIndia] = useState(false);
+  const { currency: uiCurrency } = useUI();
+  const [isIndiaTz, setIsIndiaTz] = useState(false);
 
   useEffect(() => {
     try {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       if (tz === 'Asia/Calcutta' || tz === 'Asia/Kolkata') {
-        setIsIndia(true);
+        setIsIndiaTz(true);
       }
     } catch {
       // Older browsers — fall back to USD pricing.
     }
   }, []);
 
-  const currency: BillingCurrency = isIndia ? 'INR' : 'USD';
+  const billingCurrency: BillingCurrency = uiCurrency === 'INR'
+    ? 'INR'
+    : (uiCurrency === 'USD' ? 'USD' : (isIndiaTz ? 'INR' : 'USD'));
+
+  const isIndia = billingCurrency === 'INR';
   const currencyKey = isIndia ? 'inr' : 'usd';
 
   const get = (tier: 'pro' | 'enterprise', period: BillingPeriod) => {
@@ -39,13 +41,13 @@ export const useLocalPricing = () => {
       price: t.label,
       period: t.period,
       amount: t.amount,
-      sub: period === 'yearly' ? getMonthlyEquivalent(tier, currency) : null,
+      sub: period === 'yearly' ? getMonthlyEquivalent(tier, billingCurrency) : null,
     };
   };
 
   return {
     isIndia,
-    currency,
+    currency: billingCurrency,
     pro: {
       monthly: get('pro', 'monthly'),
       yearly: get('pro', 'yearly'),
