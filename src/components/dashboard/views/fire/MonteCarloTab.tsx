@@ -32,7 +32,7 @@ export const MonteCarloTab = ({ fire, currency, multiplier: _multiplier, netWort
     withdrawalRate: 4,
     expectedReturn: 8,
     returnStdDev: 15,
-    inflationRate: fire.personalInflation * 100 || 6,
+    inflationRate: Number((fire.personalInflation * 100 || 6).toFixed(1)),
   });
   const [result, setResult] = useState<MonteCarloResult | null>(null);
   const [running, setRunning] = useState(false);

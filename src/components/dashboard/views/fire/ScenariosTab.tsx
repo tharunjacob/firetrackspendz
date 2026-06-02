@@ -51,7 +51,7 @@ export const ScenariosTab = ({ fire, currency, multiplier, transactions, netWort
     expectedReturn: defaults.returnRate,
     retirementAge: 50,
     currentAge: 30,
-    inflationRate: fire.personalInflation * 100 || defaults.inflation,
+    inflationRate: Math.max(2, Math.min(12, Number((fire.personalInflation * 100 || defaults.inflation).toFixed(1)))),
     partTimeIncome: Math.round(fire.avgMonthlyExpense * 0.5),
     currentSavings: netWorthTotal ?? 0,
   });

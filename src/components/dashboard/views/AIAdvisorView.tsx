@@ -17,12 +17,37 @@ export const AIAdvisorView = () => {
   useEffect(() => { logEvent(EVENTS.FEATURE_AI_ADVISOR_OPENED); }, []);
   const { transactions, currency, plan } = useApp();
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const saved = sessionStorage.getItem('tsz_ai_messages');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [insights, setInsights] = useState<string>('');
+  const [insights, setInsights] = useState<string>(() => {
+    try {
+      return sessionStorage.getItem('tsz_ai_insights') || '';
+    } catch {
+      return '';
+    }
+  });
   const [insightsLoading, setInsightsLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('tsz_ai_messages', JSON.stringify(messages));
+    } catch { /* ignore */ }
+  }, [messages]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('tsz_ai_insights', insights);
+    } catch { /* ignore */ }
+  }, [insights]);
 
   const summary = useMemo(() => generateSummaryText(transactions, CURRENCIES[currency].symbol), [transactions, currency]);
 
@@ -134,6 +159,8 @@ export const AIAdvisorView = () => {
         <div className="p-4 border-t border-slate-100 dark:border-slate-700">
           <form onSubmit={e => { e.preventDefault(); sendMessage(); }} className="flex gap-2">
             <input
+              id="ai-cfo-question"
+              name="ai-cfo-question"
               type="text" value={input} onChange={e => setInput(e.target.value)}
               placeholder="Ask about your finances..."
               className="input-field flex-1"
