@@ -17,30 +17,28 @@ You need:
 
 ---
 
-## 2. Create the four (or eight) Plans in Razorpay
+## 2. Create the Plans in Razorpay
 
-Razorpay Plans are reusable billing templates. We need one per
-(tier, currency, period) combination. Minimum 4 plans (INR only).
+Razorpay Plans are reusable billing templates. We need one per active
+(tier, currency, period) combination. Since the **Enterprise** tier is marked "Coming Soon" on the frontend and disabled, you **only** need to create the **Pro** plans.
 
 **Dashboard → Subscriptions → Plans → Create Plan.**
 
+### Required INR Plans
 | Plan name in dashboard       | Period  | Interval | Amount (paise) | Currency |
 |------------------------------|---------|----------|----------------|----------|
 | TrackSpendZ Pro – Monthly    | monthly | 1        | 14900          | INR      |
 | TrackSpendZ Pro – Yearly     | yearly  | 1        | 149900         | INR      |
-| TrackSpendZ Enterprise – Mo  | monthly | 1        | 49900          | INR      |
-| TrackSpendZ Enterprise – Yr  | yearly  | 1        | 399900         | INR      |
 
 > Razorpay amounts are in **paise** (₹1 = 100 paise). 14900 paise = ₹149.
 
-**Optional USD plans** (only if International Payments is enabled):
+### Optional USD Plans (Required if International Payments is enabled)
+| Plan name                          | Period  | Interval | Amount (cents) | Currency |
+|------------------------------------|---------|----------|----------------|----------|
+| TrackSpendZ Pro – Monthly (USD)    | monthly | 1        | 499            | USD      |
+| TrackSpendZ Pro – Yearly (USD)     | yearly  | 1        | 4999           | USD      |
 
-| Plan name                          | Period  | Amount (cents) | Currency |
-|------------------------------------|---------|----------------|----------|
-| TrackSpendZ Pro – Monthly (USD)    | monthly | 499            | USD      |
-| TrackSpendZ Pro – Yearly (USD)     | yearly  | 4900           | USD      |
-| TrackSpendZ Enterprise – Mo (USD)  | monthly | 1499           | USD      |
-| TrackSpendZ Enterprise – Yr (USD)  | yearly  | 14900          | USD      |
+> USD amounts are in **cents** ($1 = 100 cents). 4999 cents = $49.99.
 
 After creating each plan, copy its **Plan ID** (format: `plan_xxxxxxxxxxxxxx`).
 
@@ -87,17 +85,17 @@ supabase secrets set RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxx
 supabase secrets set RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxx
 supabase secrets set RAZORPAY_WEBHOOK_SECRET=<the random string from step 4>
 
-# Plan IDs from step 2 — minimum: the 4 INR plans
+# Plan IDs - Pro Plans (INR and USD)
 supabase secrets set RAZORPAY_PLAN_PRO_INR_MONTHLY=plan_xxx
 supabase secrets set RAZORPAY_PLAN_PRO_INR_YEARLY=plan_xxx
-supabase secrets set RAZORPAY_PLAN_ENTERPRISE_INR_MONTHLY=plan_xxx
-supabase secrets set RAZORPAY_PLAN_ENTERPRISE_INR_YEARLY=plan_xxx
-
-# Optional USD plans
 supabase secrets set RAZORPAY_PLAN_PRO_USD_MONTHLY=plan_xxx
 supabase secrets set RAZORPAY_PLAN_PRO_USD_YEARLY=plan_xxx
-supabase secrets set RAZORPAY_PLAN_ENTERPRISE_USD_MONTHLY=plan_xxx
-supabase secrets set RAZORPAY_PLAN_ENTERPRISE_USD_YEARLY=plan_xxx
+
+# Enterprise Plans (Optional, since Enterprise is Coming Soon)
+# supabase secrets set RAZORPAY_PLAN_ENTERPRISE_INR_MONTHLY=plan_xxx
+# supabase secrets set RAZORPAY_PLAN_ENTERPRISE_INR_YEARLY=plan_xxx
+# supabase secrets set RAZORPAY_PLAN_ENTERPRISE_USD_MONTHLY=plan_xxx
+# supabase secrets set RAZORPAY_PLAN_ENTERPRISE_USD_YEARLY=plan_xxx
 ```
 
 > Without the USD plan secrets, USD-priced users are silently charged the
