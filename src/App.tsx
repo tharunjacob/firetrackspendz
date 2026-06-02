@@ -5,7 +5,6 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Toast } from '@/components/common/Toast';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { FeedbackButton } from '@/components/common/FeedbackButton';
-import { ConsentBanner } from '@/components/common/ConsentBanner';
 import { ROUTES } from '@/config/routes';
 import { logPageView } from '@/services/logger';
 
@@ -92,7 +91,6 @@ function App() {
       {toast.visible && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
       {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} />}
       <FeedbackButton />
-      <ConsentBanner />
     </div>
   );
 }

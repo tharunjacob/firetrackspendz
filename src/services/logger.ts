@@ -149,8 +149,6 @@ export const logEvent = async (
   metadata: Record<string, unknown> = {},
   level: 'info' | 'error' | 'warn' = 'info'
 ): Promise<void> => {
-  try { if (localStorage.getItem('tsz_consent') === 'false') return; } catch { /* not available */ }
-
   if (import.meta.env.DEV) {
     const color = level === 'error' ? 'color:#c00' : level === 'warn' ? 'color:#a60' : 'color:#33c';
     console.log(`%c[${level}] ${eventName}`, color, metadata);
