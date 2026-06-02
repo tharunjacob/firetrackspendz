@@ -26,12 +26,12 @@ Razorpay Plans are reusable billing templates. We need one per
 
 | Plan name in dashboard       | Period  | Interval | Amount (paise) | Currency |
 |------------------------------|---------|----------|----------------|----------|
-| TrackSpendZ Pro – Monthly    | monthly | 1        | 19900          | INR      |
+| TrackSpendZ Pro – Monthly    | monthly | 1        | 14900          | INR      |
 | TrackSpendZ Pro – Yearly     | yearly  | 1        | 149900         | INR      |
 | TrackSpendZ Enterprise – Mo  | monthly | 1        | 49900          | INR      |
 | TrackSpendZ Enterprise – Yr  | yearly  | 1        | 399900         | INR      |
 
-> Razorpay amounts are in **paise** (₹1 = 100 paise). 19900 paise = ₹199.
+> Razorpay amounts are in **paise** (₹1 = 100 paise). 14900 paise = ₹149.
 
 **Optional USD plans** (only if International Payments is enabled):
 

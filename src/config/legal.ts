@@ -20,7 +20,7 @@ export const LEGAL = {
 
   // Legal entity name exactly as registered with Razorpay / your bank.
   // If you operate as an individual / sole proprietor, use your full legal name.
-  businessName: 'KREXO',
+  businessName: 'Krexo LLP',
 
   // Registered business / operating address. Razorpay requires a real address.
   // Keep it as a single string with line breaks ("\n") between lines.
