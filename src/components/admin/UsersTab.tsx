@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { PlanBadge } from './shared/Badges';
 import { computeHealthScore, churnRiskColor, scoreColor } from './shared/healthScore';
 import type { UserProfile, AppLog } from '@/types';
@@ -37,7 +37,7 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>('all');
   const [riskFilter, setRiskFilter] = useState<RiskFilter>('all');
 
-  // Pre-compute health scores for all users (memoised â€” only recalcs when users/logs change)
+  // Pre-compute health scores for all users (memoized — only recalcs when users/logs change)
   const healthScores = useMemo(() => {
     const map = new Map<string, ReturnType<typeof computeHealthScore>>();
     users.forEach(u => {
@@ -166,7 +166,7 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
                     <td className="px-4 py-3">
                       <p className="font-medium text-slate-800">{u.email}</p>
                       <p className="text-xs text-slate-500">
-                        {u.full_name || 'â€”'} Â· {u.id.substring(0, 8)}...
+                        {u.full_name || '—'} · {u.id.substring(0, 8)}...
                         {isNewUser(u) && (
                           <span className="ml-1.5 px-1.5 py-0.5 rounded text-xs font-bold bg-brand-100 text-brand-700">NEW</span>
                         )}
@@ -180,17 +180,17 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
                         <span className={`text-sm font-bold ${scoreColor(hs.score)}`}>
                           {hs.score}
                         </span>
-                      ) : 'â€”'}
+                      ) : '—'}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {hs ? (
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full capitalize ${churnRiskColor(hs.churnRisk)}`}>
                           {hs.churnRisk}
                         </span>
-                      ) : 'â€”'}
+                      ) : '—'}
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-500">
-                      {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'â€”'}
+                      {u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button onClick={e => { e.stopPropagation(); loadUserDetail(u); }}
@@ -208,12 +208,12 @@ export const UsersTab = ({ users, logs, loadUserDetail }: Props) => {
         {filteredUsers.length > PAGE_SIZE && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
             <button disabled={userPage === 0} onClick={() => setUserPage(p => p - 1)}
-              className="text-sm text-brand-600 disabled:text-slate-300">â† Previous</button>
+              className="text-sm text-brand-600 disabled:text-slate-300">← Previous</button>
             <span className="text-xs text-slate-500">
               Page {userPage + 1} of {Math.ceil(filteredUsers.length / PAGE_SIZE)}
             </span>
             <button disabled={(userPage + 1) * PAGE_SIZE >= filteredUsers.length} onClick={() => setUserPage(p => p + 1)}
-              className="text-sm text-brand-600 disabled:text-slate-300">Next â†’</button>
+              className="text-sm text-brand-600 disabled:text-slate-300">Next →</button>
           </div>
         )}
       </div>

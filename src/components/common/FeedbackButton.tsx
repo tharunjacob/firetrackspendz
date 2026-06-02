@@ -1,9 +1,9 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
 
 // ============================================================
-// Floating Feedback Button â€” Always visible on every page
+// Floating Feedback Button — Always visible on every page
 // ============================================================
 //
 // WHY THIS EXISTS:

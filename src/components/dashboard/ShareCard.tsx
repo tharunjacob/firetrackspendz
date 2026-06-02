@@ -1,15 +1,15 @@
-﻿import { useRef, useMemo, useState, useCallback } from 'react';
+import { useRef, useMemo, useState, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getCategoryBreakdown } from '@/services/analysis';
 import { Icon } from '@/components/common/Icons';
 
 // ============================================================
-// Social Media Share Card â€” Exportable spending breakdown image
+// Social Media Share Card — Exportable spending breakdown image
 // ============================================================
 //
 // HOW IT WORKS:
 // 1. Generates a visually appealing spending breakdown card
-// 2. Shows ONLY percentages â€” never absolute dollar amounts (privacy)
+// 2. Shows ONLY percentages — never absolute dollar amounts (privacy)
 // 3. User can export as PNG image for social media sharing
 // 4. Includes TrackSpendZ branding as a subtle watermark
 //
@@ -201,7 +201,7 @@ export const ShareCard = () => {
     ctx.fillText('TrackSpendZ', CARD_WIDTH / 2, footerY + 30);
     ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
     ctx.font = '16px -apple-system, sans-serif';
-    ctx.fillText('trackspendz.com â€” Know where your money goes', CARD_WIDTH / 2, footerY + 56);
+    ctx.fillText('trackspendz.com — Know where your money goes', CARD_WIDTH / 2, footerY + 56);
   }, [breakdown, months]);
 
   const handleGenerate = () => {
@@ -253,7 +253,7 @@ export const ShareCard = () => {
           </div>
           <h3 className="text-lg font-bold text-slate-800 mb-2">Share Your Spending DNA</h3>
           <p className="text-sm text-slate-500 mb-4">
-            Generate a beautiful, privacy-safe image showing your spending breakdown as percentages â€” no actual amounts shown.
+            Generate a beautiful, privacy-safe image showing your spending breakdown as percentages — no actual amounts shown.
           </p>
           <button onClick={handleGenerate} className="btn-primary px-6 py-2.5 text-sm">
             Generate Share Card
@@ -280,7 +280,7 @@ export const ShareCard = () => {
             />
           </div>
           <p className="text-xs text-slate-500 text-center">
-            Only percentages are shown â€” your actual amounts stay private.
+            Only percentages are shown — your actual amounts stay private.
           </p>
         </div>
       )}

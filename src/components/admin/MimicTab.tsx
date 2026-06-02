@@ -1,4 +1,4 @@
-﻿import type { UserProfile } from '@/types';
+import type { UserProfile } from '@/types';
 
 interface UserDetail extends UserProfile {
   transactionCount?: number;
@@ -49,8 +49,8 @@ export const MimicTab = ({ users, mimicEmail, setMimicEmail, startMimic }: Props
               <div>
                 <p className="text-sm font-semibold text-slate-800">{targetUser.email}</p>
                 <p className="text-xs text-slate-500">
-                  {targetUser.full_name || 'No name'} Â· Plan: <strong>{targetUser.subscription_plan || 'free'}</strong>
-                  {targetUser.transactionCount !== undefined && ` Â· ${targetUser.transactionCount} txns`}
+                  {targetUser.full_name || 'No name'} · Plan: <strong>{targetUser.subscription_plan || 'free'}</strong>
+                  {targetUser.transactionCount !== undefined && ` · ${targetUser.transactionCount} txns`}
                 </p>
               </div>
             </div>

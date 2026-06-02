@@ -9,7 +9,7 @@ import { logEvent, EVENTS } from '@/services/logger';
 import { LIMITS } from '@/config/storage';
 
 // ============================================================
-// Data Context â€” Handles transaction data state ONLY
+// Data Context — Handles transaction data state ONLY
 // ============================================================
 //
 // WHAT THIS CONTEXT MANAGES:
@@ -21,14 +21,14 @@ import { LIMITS } from '@/config/storage';
 //   - Loading states (isLoading, isProcessing, processingProgress)
 //
 // WHAT THIS CONTEXT DOES NOT MANAGE:
-//   - Who is logged in â†’ see AuthContext
-//   - UI state (toasts, tabs) â†’ see UIContext
+//   - Who is logged in → see AuthContext
+//   - UI state (toasts, tabs) → see UIContext
 //
-// KEY DESIGN DECISION â€” Anonymous Preview:
+// KEY DESIGN DECISION — Anonymous Preview:
 //   When no user is signed in, we still allow file upload.
 //   We store ALL parsed transactions in allTransactionsRaw (memory only).
 //   We show only the most recent 500 in the visible transactions[].
-//   When user signs up, we promote allTransactionsRaw â†’ cloud storage.
+//   When user signs up, we promote allTransactionsRaw → cloud storage.
 //
 // CONSUMED BY: DashboardShell, PaywallBanner, DataView, all chart views
 // ============================================================

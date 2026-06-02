@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { HealthCard } from './shared/Badges';
 import { ErrorTimeline, TopErrors, FeatureUsage } from './shared/Charts';
 import type { AppLog } from '@/types';
@@ -28,7 +28,7 @@ export const HealthTab = ({ stats, logs, onRefresh }: Props) => {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [autoRefresh, onRefresh]);
 
-  // Error spike detection â€” compare last-hour vs avg hourly over 24h
+  // Error spike detection — compare last-hour vs avg hourly over 24h
   const spikeAlert = useMemo(() => {
     const now = Date.now();
     const oneHourAgo  = new Date(now - 3_600_000).toISOString();
@@ -66,7 +66,7 @@ export const HealthTab = ({ stats, logs, onRefresh }: Props) => {
           {onRefresh && (
             <button onClick={onRefresh}
               className="text-sm px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600">
-              â†» Refresh now
+              ↻ Refresh now
             </button>
           )}
         </div>
@@ -75,12 +75,12 @@ export const HealthTab = ({ stats, logs, onRefresh }: Props) => {
       {/* Error Spike Alert */}
       {spikeAlert && (
         <div className="bg-red-50 border border-red-300 rounded-lg px-5 py-4 flex items-start gap-3">
-          <span className="text-2xl">ðŸš¨</span>
+          <span className="text-2xl">🚨</span>
           <div>
             <p className="font-bold text-red-700 text-sm">Error Spike Detected</p>
             <p className="text-red-600 text-xs mt-0.5">
-              <strong>{spikeAlert.recentErrors} errors</strong> in the last hour â€” that's{' '}
-              {Math.round(spikeAlert.recentErrors / Number(spikeAlert.avgHourly))}Ã— the 24-hour average of{' '}
+              <strong>{spikeAlert.recentErrors} errors</strong> in the last hour — that's{' '}
+              {Math.round(spikeAlert.recentErrors / Number(spikeAlert.avgHourly))}× the 24-hour average of{' '}
               {spikeAlert.avgHourly}/hr. Investigate immediately.
             </p>
           </div>
@@ -108,7 +108,7 @@ export const HealthTab = ({ stats, logs, onRefresh }: Props) => {
 
       {/* Charts */}
       <div className="card p-5">
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Error Events â€” Last 7 Days</h3>
+        <h3 className="text-sm font-bold text-slate-700 mb-3">Error Events — Last 7 Days</h3>
         <ErrorTimeline logs={logs} />
       </div>
 

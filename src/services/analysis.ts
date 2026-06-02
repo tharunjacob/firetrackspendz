@@ -230,6 +230,10 @@ export const detectRecurring = (data: Transaction[]): RecurringTransaction[] => 
   const expenses = data.filter(t => t.type === 'Expense');
   if (expenses.length === 0) return [];
 
+  // Find the latest transaction date in the entire dataset to calculate relative recency
+  const latestTxDateStr = data.reduce((max, t) => t.date > max ? t.date : max, '');
+  const latestTxDate = latestTxDateStr ? new Date(latestTxDateStr) : new Date();
+
   // ── PASS 1: category-level commitment detection ───────────────────────────
   // Priority-ordered so the first keyword match wins (e.g. "Home Loan" → EMI, not Housing).
   const COMMITMENT_CATS: Array<{ keywords: string[]; label: string; cvLimit: number }> = [
@@ -281,6 +285,12 @@ export const detectRecurring = (data: Transaction[]): RecurringTransaction[] => 
     const cv = stdDev / avg;
 
     if (cv > entry.cvLimit) return;
+
+    // Recency filter: For category-level monthly commitments, the last charge date
+    // must be within the last 45 days of the latest transaction in the dataset.
+    const lastCharge = new Date(entry.lastDate);
+    const diffDays = (latestTxDate.getTime() - lastCharge.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDays > 45) return;
 
     results.push({
       name: label,
@@ -378,10 +388,19 @@ export const detectRecurring = (data: Transaction[]): RecurringTransaction[] => 
     // Avoid duplicating something already captured at category level
     if (pass1Labels.has(prettified.toLowerCase())) return;
 
+    const lastCharge = entries[entries.length - 1].date;
+    const diffDays = (latestTxDate.getTime() - lastCharge.getTime()) / (1000 * 60 * 60 * 24);
+    const frequency = Math.round(avgInterval);
+
+    // Recency filter: last charge should be within 1.5 cycles of the latest date
+    // in the dataset, with a minimum buffer of 30 days.
+    const limit = Math.max(30, frequency * 1.5);
+    if (diffDays > limit) return;
+
     results.push({
       name: prettified,
       avgAmount: Math.round(avgAmt),
-      frequency: Math.round(avgInterval),
+      frequency,
       confidence: Math.max(0, 100 - stdDevDays * 4 - amtVariation * 150),
       lastDate: entries[entries.length - 1].date.toISOString().split('T')[0],
     });

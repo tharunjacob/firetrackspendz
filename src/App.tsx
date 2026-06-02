@@ -15,22 +15,24 @@ const PageTracker = () => {
   return null;
 };
 
+// Static imports for core user pages to enable seamless transitions
+import DashboardPage from '@/pages/DashboardPage';
+import NetAssetPage from '@/pages/NetAssetPage';
+import SettingsPage from '@/pages/SettingsPage';
+import HelpPage from '@/pages/HelpPage';
+import FamilyDashboard from '@/pages/FamilyDashboard';
+
 // Lazy load pages
 const LandingPage = lazy(() => import('@/pages/LandingPage'));
 const PricingPage = lazy(() => import('@/pages/PricingPage'));
 const FeaturesPage = lazy(() => import('@/pages/FeaturesPage'));
 const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
-const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const AdminPage = lazy(() => import('@/pages/AdminPage'));
-const NetAssetPage = lazy(() => import('@/pages/NetAssetPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const TermsPage = lazy(() => import('@/pages/TermsPage'));
 const RefundPolicyPage = lazy(() => import('@/pages/RefundPolicyPage'));
 const ShippingPolicyPage = lazy(() => import('@/pages/ShippingPolicyPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
-const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
-const HelpPage = lazy(() => import('@/pages/HelpPage'));
-const FamilyDashboard = lazy(() => import('@/pages/FamilyDashboard'));
 const FeedbackPage = lazy(() => import('@/pages/FeedbackPage'));
 const FireCalculatorTool = lazy(() => import('@/pages/tools/FireCalculatorTool'));
 const SavingsRateTool = lazy(() => import('@/pages/tools/SavingsRateTool'));
@@ -73,10 +75,10 @@ function App() {
           <Route path={ROUTES.FIRE_CALCULATOR_TOOL} element={<FireCalculatorTool />} />
           <Route path={ROUTES.SAVINGS_RATE_TOOL} element={<SavingsRateTool />} />
 
-          {/* Dashboard â€” open to all (upload-first experience) */}
+          {/* Dashboard — open to all (upload-first experience) */}
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
 
-          {/* Protected routes â€” require sign-in */}
+          {/* Protected routes — require sign-in */}
           <Route path={ROUTES.ASSETS} element={user ? <NetAssetPage /> : <Navigate to={ROUTES.HOME} replace />} />
           <Route path={ROUTES.SETTINGS} element={user ? <SettingsPage /> : <Navigate to={ROUTES.HOME} replace />} />
           <Route path={ROUTES.FAMILY} element={user ? <FamilyDashboard /> : <Navigate to={ROUTES.HOME} replace />} />

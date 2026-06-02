@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getSupabase } from '@/services/supabase';
 import { TABLES } from '@/config/database';
 import { Icon } from '@/components/common/Icons';
@@ -36,7 +36,7 @@ export interface UserDetail extends UserProfile {
 }
 
 // ============================================================
-// AdminLayout â€” owns all state and data fetching
+// AdminLayout — owns all state and data fetching
 // ============================================================
 
 interface Props {
@@ -77,7 +77,7 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
   const [mimicEmail, setMimicEmail] = useState('');
   const [logSearch, setLogSearch] = useState('');
 
-  // â”€â”€ Data loaders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Data loaders ────────────────────────────
 
   const loadUsers = useCallback(async () => {
     const { data: profiles } = await supabase.from(TABLES.USER_PROFILES).select('*').order('created_at', { ascending: false });
@@ -150,7 +150,7 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  // â”€â”€ Mutations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Mutations ───────────────────────────────
 
   const resolveFeedback = async (id: string) => {
     const { error } = await supabase.from(TABLES.FEEDBACK).update({ status: 'resolved' }).eq('id', id);
@@ -179,7 +179,7 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
   };
 
   const deleteRule = async (rule: LearningRule) => {
-    if (!confirm(`Delete rule "${rule.keyword} â†’ ${rule.value}"?`)) return;
+    if (!confirm(`Delete rule "${rule.keyword} → ${rule.value}"?`)) return;
     const { error } = await supabase.from(TABLES.CATEGORY_RULES).delete().eq('id', rule.id);
     if (!error) {
       setRules(prev => prev.filter(r => r.id !== rule.id));
@@ -217,7 +217,7 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
     window.open(url.toString(), '_blank');
   };
 
-  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render ──────────────────────────────────
 
   const renderTab = () => {
     switch (activeTab) {
@@ -246,7 +246,7 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Control Room</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Admin access â€” {adminEmail}</p>
+          <p className="text-xs text-slate-500 mt-0.5">Admin access — {adminEmail}</p>
         </div>
         <button onClick={loadAll} disabled={loading}
           className="flex items-center gap-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors disabled:opacity-50">

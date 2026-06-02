@@ -1,4 +1,4 @@
-﻿import { StatCard } from './shared/StatCard';
+import { StatCard } from './shared/StatCard';
 import type { AppLog } from '@/types';
 
 interface AdminStats {
@@ -29,11 +29,11 @@ export const OverviewTab = ({ stats, logs }: { stats: AdminStats; logs: AppLog[]
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-brand-50 rounded-lg p-4 text-center">
           <p className="text-2xl font-bold text-brand-700">${stats.proUsers * 49}</p>
-          <p className="text-xs text-brand-500 mt-1">{stats.proUsers} Pro Ã— $49/yr</p>
+          <p className="text-xs text-brand-500 mt-1">{stats.proUsers} Pro × $49/yr</p>
         </div>
         <div className="bg-amber-50 rounded-lg p-4 text-center">
           <p className="text-2xl font-bold text-amber-700">${stats.enterpriseUsers * 149}</p>
-          <p className="text-xs text-amber-500 mt-1">{stats.enterpriseUsers} Enterprise Ã— $149/yr</p>
+          <p className="text-xs text-amber-500 mt-1">{stats.enterpriseUsers} Enterprise × $149/yr</p>
         </div>
         <div className="bg-green-50 rounded-lg p-4 text-center">
           <p className="text-2xl font-bold text-green-700">${stats.totalRevenue}</p>
@@ -50,7 +50,7 @@ export const OverviewTab = ({ stats, logs }: { stats: AdminStats; logs: AppLog[]
             <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 shrink-0">ERROR</span>
             <div className="min-w-0 flex-1">
               <p className="font-medium text-slate-700 truncate">{log.event}</p>
-              <p className="text-xs text-slate-500">{log.email || 'System'} â€” {new Date(log.created_at).toLocaleString()}</p>
+              <p className="text-xs text-slate-500">{log.email || 'System'} — {new Date(log.created_at).toLocaleString()}</p>
             </div>
           </div>
         ))}

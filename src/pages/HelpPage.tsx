@@ -138,16 +138,118 @@ const sections: HelpSection[] = [
     ),
   },
   {
+    id: 'recurring',
+    icon: 'chart',
+    title: 'Recurring Transactions',
+    summary: 'How TrackSpendZ detects subscriptions, bills, and recurring payments.',
+    content: (
+      <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <p>The <strong className="text-slate-800 dark:text-slate-200">Recurring</strong> tab automatically detects transactions that repeat at regular intervals.</p>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">How detection works:</strong></p>
+        <ul className="list-disc pl-4 space-y-1 text-xs">
+          <li>Transactions are grouped by similar description (fuzzy matching ignores minor differences like reference numbers).</li>
+          <li>For each group, the system calculates the average gap between consecutive occurrences.</li>
+          <li>If the gap is consistent (low variance) and the group has at least <strong>3 occurrences</strong>, it&rsquo;s flagged as recurring.</li>
+          <li>The amounts must also be reasonably consistent (within 20% variance) to qualify.</li>
+        </ul>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Frequency labels:</strong></p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          {[
+            ['Weekly', '~7 days'],
+            ['Monthly', '~30 days'],
+            ['Quarterly', '~91 days'],
+            ['Yearly', '~365 days'],
+          ].map(([label, gap]) => (
+            <div key={label} className="bg-slate-50 dark:bg-slate-700 rounded px-3 py-2 text-center border border-slate-100 dark:border-slate-600">
+              <p className="font-semibold text-slate-700 dark:text-slate-200">{label}</p>
+              <p className="text-slate-500 dark:text-slate-400">{gap}</p>
+            </div>
+          ))}
+        </div>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">FIRE integration:</strong> Recurring expenses form your baseline monthly cost on the FIRE Calculator&rsquo;s &ldquo;Recurring Commitments&rdquo; card, with smart category icons (🏠 Rent, 💳 EMIs, ⚡ Utilities, 🌐 Internet, etc.).</p>
+
+        <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-lg p-4 mt-2">
+          <p className="text-brand-800 dark:text-brand-300 text-xs font-medium">Tip: The Recurring tab also provides a baseline spending view &mdash; showing your estimated monthly fixed costs by category, with trend indicators showing if each category is rising or falling.</p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: 'debt-payoff',
+    icon: 'wallet',
+    title: 'Debt Payoff Planner',
+    summary: 'Snowball or Avalanche — find your fastest path to debt freedom.',
+    content: (
+      <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <p>The <strong className="text-slate-800 dark:text-slate-200">Debt Payoff</strong> tab (Pro) helps you build a month-by-month repayment plan for multiple debts.</p>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Two strategies:</strong></p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
+            <p className="font-semibold text-slate-800 dark:text-slate-100 text-xs">❄️ Snowball</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Pay off the smallest balance first. Quick wins build motivation. Best for staying consistent.</p>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
+            <p className="font-semibold text-slate-800 dark:text-slate-100 text-xs">🏔️ Avalanche</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Pay off the highest interest rate first. Mathematically optimal &mdash; saves the most in total interest.</p>
+          </div>
+        </div>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">How it works:</strong> Enter each debt (name, balance, interest rate, minimum payment). Set your total monthly budget for debt. The planner allocates minimum payments to all debts and directs the surplus to the priority debt. Once that debt is paid off, the surplus &ldquo;snowballs&rdquo; into the next.</p>
+
+        <p>You&rsquo;ll see your debt-free date, total interest paid, and a full month-by-month schedule showing each debt&rsquo;s balance over time.</p>
+      </div>
+    ),
+  },
+  {
     id: 'fire',
     icon: 'fire',
     title: 'FIRE Calculator',
-    summary: 'Calculate your path to financial independence.',
+    summary: 'Calculate your path to financial independence with data-driven projections.',
     content: (
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <p>The FIRE (Financial Independence, Retire Early) calculator estimates when you can stop working, based on your actual expense data.</p>
-        <p><strong className="text-slate-800 dark:text-slate-200">How it works:</strong> We calculate your average annual expenses, apply your personal inflation rate (derived from your data), and project how much you need invested at various withdrawal rates (3–6%).</p>
-        <p>Adjust the assumptions — annual income, expected returns, inflation — and see how each change moves your FIRE date.</p>
-        <p>Transactions can be excluded from FIRE calculations (e.g. one-time purchases) by toggling them in the Data view.</p>
+        <p>The FIRE (Financial Independence, Retire Early) calculator estimates when you can stop working, based on your <em>actual</em> spending data&mdash;not generic averages.</p>
+
+        <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-lg p-4">
+          <p className="text-brand-800 dark:text-brand-300 text-xs font-medium mb-1">Quick summary & Multipliers</p>
+          <p className="text-brand-700 dark:text-brand-300 text-xs">
+            <strong>Freedom Number = Annual Expenses &times; Multiplier</strong>. This is the corpus needed so that returns alone cover your living costs.
+          </p>
+          <ul className="text-xs text-brand-700 dark:text-brand-300 mt-2 list-disc pl-4 space-y-1">
+            <li><strong>INR (Indian Rupee):</strong> Applies a <strong>33× multiplier</strong> (approx. 3% Safe Withdrawal Rate) to account for India's historically higher inflation and lower real returns.</li>
+            <li><strong>USD & Other Currencies:</strong> Applies a <strong>25× multiplier</strong> (classic 4% Safe Withdrawal Rate) based on developed-market historical benchmarks.</li>
+          </ul>
+        </div>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Three tabs</strong> give you different lenses:</p>
+
+        <div className="space-y-3 mt-2">
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
+            <p className="font-semibold text-slate-800 dark:text-slate-100 text-xs">My FIRE &mdash; Your personalised dashboard</p>
+            <ul className="text-xs text-slate-500 dark:text-slate-400 mt-1 space-y-1 list-disc pl-4">
+              <li><strong>Freedom Number:</strong> Annual expenses &times; multiplier. Adjust your average monthly spend and the number recalculates instantly.</li>
+              <li><strong>Personal Inflation:</strong> Calculated directly from your transaction history by comparing spending category-by-category across matching months in consecutive years (e.g. comparing Jan-May of last year to Jan-May of this year) to avoid seasonal/partial-year biases.</li>
+              <li><strong>Required Capital projections:</strong> Shows what you&rsquo;d need in 1, 5, 7, 10, and 15 years (both nominal and today&rsquo;s-money values). Calculations project your wealth using a compound return rate (default 8% for INR, 7% for USD/others) adjusted by personal inflation.</li>
+              <li><strong>Big Ticket Expenses:</strong> Add future one-off costs (wedding, home, education). Each is inflated to its future value and converted to the corpus needed using the 4% rule (25&times;).</li>
+              <li><strong>Recurring Commitments:</strong> Auto-detected subscriptions and fixed bills that form your baseline monthly cost.</li>
+              <li><strong>Real Income Growth:</strong> Your income growth minus personal inflation&mdash;shows whether your purchasing power is truly increasing.</li>
+              <li><strong>Balanced Spender:</strong> Analyses spending distribution across weekdays. &ldquo;Stable&rdquo; means even spending; &ldquo;Volatile&rdquo; means it&rsquo;s concentrated on specific days.</li>
+            </ul>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
+            <p className="font-semibold text-slate-800 dark:text-slate-100 text-xs">Scenarios &mdash; What-if analysis</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Build multiple retirement scenarios by adjusting monthly savings, expected returns, and inflation. Compare them side-by-side to see how changes in lifestyle or investment strategy affect your FIRE date.</p>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
+            <p className="font-semibold text-slate-800 dark:text-slate-100 text-xs">Monte Carlo &mdash; Stress-test your plan</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Runs 1,000 simulated market scenarios with randomised returns to show the probability of your corpus lasting through retirement. Results are shown as a probability chart and percentile bands (10th, 50th, 90th) so you can see best-case, median, and worst-case outcomes.</p>
+          </div>
+        </div>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Progress bar:</strong> If you&rsquo;ve added assets in the Net Worth tab, your current net worth is automatically pulled into the FIRE progress bar. Otherwise, enter a manual &ldquo;Starting Net Worth&rdquo; figure on the My FIRE tab.</p>
       </div>
     ),
   },
@@ -155,11 +257,43 @@ const sections: HelpSection[] = [
     id: 'net-worth',
     icon: 'wallet',
     title: 'Net Worth Tracking',
-    summary: 'Add assets and liabilities to see your complete picture.',
+    summary: 'Track assets and liabilities to see your full financial picture over time.',
     content: (
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <p>Navigate to the <strong className="text-slate-800 dark:text-slate-200">Net Worth</strong> page from the top bar to add savings accounts, investments, property, crypto, vehicles, and more.</p>
-        <p>Each asset has a type, value, and currency. The dashboard shows a breakdown by type and a timeline of net worth changes.</p>
+        <p>Navigate to the <strong className="text-slate-800 dark:text-slate-200">Net Worth</strong> tab to record what you own and owe. The dashboard calculates your net worth as <code className="text-xs bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">Total Assets &minus; Total Liabilities</code>.</p>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Asset categories and accessibility:</strong></p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {[
+            ['🏦', 'Savings', 'Bank savings accounts, Cash, FDs, RDs (Liquid: instant access, zero penalty)'],
+            ['📈', 'Investments', 'Mutual funds, Stocks, ETFs, Bonds (Investments: 2-3 days liquidation time)'],
+            ['🏠', 'Real Estate', 'Property market valuation (Investments: long-term, illiquid)'],
+            ['✨', 'Gold', 'Physical gold, gold ETFs, Sovereign Gold Bonds (Investments)'],
+            ['₿', 'Crypto', 'Bitcoin, Ethereum, other crypto holdings (Investments)'],
+            ['📦', 'Other Assets', 'Vehicles, collectibles, valuables (Investments)'],
+            ['💳', 'Liabilities', 'Home loans, car loans, credit card balances, mortgages (Owed amounts)'],
+          ].map(([icon, name, desc]) => (
+            <div key={name} className="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 border border-slate-100 dark:border-slate-600">
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{icon} {name}</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Accessibility Tiers:</strong> When managing assets via the Full Tracker, you can categorise wealth into accessibility tiers:</p>
+        <ul className="text-xs text-slate-500 dark:text-slate-400 pl-4 list-disc space-y-1">
+          <li><strong>Liquid:</strong> Funds you can access within 24–48 hours (e.g., cash, savings accounts).</li>
+          <li><strong>Investment:</strong> Mid-to-long term wealth builders that can be liquidated but are subject to market volatility or moderate delay (e.g., Stocks, Mutual Funds, Real Estate).</li>
+          <li><strong>Retirement:</strong> Locked or tax-restricted accounts (EPF, PPF, NPS, or 401k/IRA). Excluded from immediate liquid calculation but tracked for overall long-term net worth.</li>
+        </ul>
+
+        <p><strong className="text-slate-800 dark:text-slate-250">Monthly snapshots:</strong> Each time you save, a timestamped snapshot is recorded. Over time, these snapshots build a historical chart showing your net worth trajectory.</p>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Inflation Baseline:</strong> The net worth chart plots a dashed "Inflation Baseline". Starting from your very first snapshot, it grows exponentially at your computed **Personal Inflation Rate**. If your actual net worth line is steeper than the baseline, you are growing your wealth in real purchasing power terms. If it falls below, inflation is eroding your wealth's purchasing power.</p>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">FIRE integration:</strong> Your total net worth automatically feeds into the FIRE Calculator&rsquo;s progress bar, so you can see how far you are from your Freedom Number without entering it manually.</p>
+
+        <p><strong className="text-slate-800 dark:text-slate-200">Month-over-month change:</strong> Shown as both an absolute amount and a percentage, so you can track growth momentum at a glance.</p>
       </div>
     ),
   },

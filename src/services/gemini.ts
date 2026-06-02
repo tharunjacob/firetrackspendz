@@ -102,21 +102,31 @@ export const getFileMappingFromAI = async (headers: string[], sampleRows: any[][
   try {
     const prompt = `
       You are a bank statement column mapper. Map the file's columns to standard fields.
-      Return JSON with these fields:
+
+      Return a SINGLE valid JSON object with EXACTLY these top-level fields:
         dateColumn, dateFormat, amountColumn, categoryColumn, subcategoryColumn, descriptionColumn,
-        typeColumn, projectColumn, isCreditDebitSeparate (boolean), creditColumn, debitColumn,
+        typeColumn, projectColumn, isCreditDebitSeparate, creditColumn, debitColumn,
         expenseTransferColumn, incomeTransferColumn,
-        confidence (object: { dateColumn: 0-1, amountColumn: 0-1, creditDebitSplit: 0-1 }).
+        confidence (object with numeric fields: { dateColumn: 0-1, amountColumn: 0-1, creditDebitSplit: 0-1 }).
 
-      Headers may be in any language (German "Buchungstag"/"Betrag", French "Date d'opération"/
-      "Montant", Spanish "Fecha"/"Importe", Japanese "日付"/"金額", Hindi "तारीख"/"राशि", etc.).
-      Map them to the standard English field names above. Use the EXACT original header
-      text from the file as the value for each *Column field.
+      IMPORTANT OUTPUT RULES:
+      - Output ONLY raw JSON, with no surrounding text, comments, or markdown.
+      - For every *Column field:
+        - Use either EXACTLY one of the provided header strings, OR
+        - null (or empty string) if that semantic field does not exist.
+      - Do NOT invent new column names that are not present in the headers.
+      - Use boolean true/false for isCreditDebitSeparate.
 
-      dateFormat must be one of: "DMY" (e.g., 25/03/2025), "MDY" (e.g., 03/25/2025), or "YMD"
-      (e.g., 2025-03-25). Infer it from the sample dates — if any date has the first part > 12
-      it must be DMY; if the second part > 12 it must be MDY. When ambiguous, use the format
-      most common in the file's apparent locale.
+      Headers may be in any language (German "Buchungstag"/"Betrag", French "Date d'opération"/"Montant",
+      Spanish "Fecha"/"Importe", Japanese "日付"/"金額", Hindi "तारीख"/"राशि", etc.).
+      Map them to the standard English field names above.
+
+      dateFormat must be one of: "DMY" (25/03/2025), "MDY" (03/25/2025), or "YMD" (2025-03-25).
+      Infer it from the sample dates:
+      - If any date has the first part > 12 → "DMY".
+      - Else if the second part > 12 → "MDY".
+      - Else, use the format that is most common for the apparent locale in the sample.
+      - If some dates are already ISO (YYYY-MM-DD), and others are ambiguous, prefer the majority format.
 
       ====== FORMAT PATTERNS — distinguish carefully ======
 
@@ -125,36 +135,47 @@ export const getFileMappingFromAI = async (headers: string[], sampleRows: any[][
                          "Withdrawal Amt." / "Deposit Amt.", "Money Out" / "Money In",
                          "Dr Amount" / "Cr Amount", "Soll" / "Haben" (German).
         Each row has a number in ONE of the two columns, blank in the other.
-        → Set isCreditDebitSeparate=true, creditColumn=<deposit/credit header>, debitColumn=<withdrawal/debit header>.
-        → amountColumn should usually be EMPTY for this format.
+        → Set isCreditDebitSeparate = true.
+        → creditColumn = <deposit/credit header>, debitColumn = <withdrawal/debit header>.
+        → amountColumn should usually be null/empty for this format.
 
       FORMAT B — Transfer-account / envelope format (columns hold ACCOUNT NAMES, NOT amounts):
         Typical headers: "Expense(Transfer Out)" / "Income(Transfer In)",
                          "From Account" / "To Account".
         Values look like: "HDFC Savings", "Cash", "Credit Card" — NOT numbers.
         There is ALWAYS a separate numeric "Amount" column with positive values only.
-        → Set isCreditDebitSeparate=FALSE.
-        → Set expenseTransferColumn=<expense/from header>, incomeTransferColumn=<income/to header>.
-        → Set amountColumn=<the numeric amount header>.
+        → Set isCreditDebitSeparate = false.
+        → expenseTransferColumn = <expense/from header>, incomeTransferColumn = <income/to header>.
+        → amountColumn = <the numeric amount header>.
+        → creditColumn and debitColumn MUST be null/empty.
 
       FORMAT C — Single signed-amount column (the most common bank export):
         One numeric column with both positive and negative values.
         Convention: NEGATIVE = expense (money out), POSITIVE = income (money in).
-        Common in US (Chase, BofA), UK, and European banks (German "Betrag").
-        → Set amountColumn=<header>, leave isCreditDebitSeparate=false, no creditColumn/debitColumn.
+        Common in US, UK, and European banks (e.g., German "Betrag").
+        → amountColumn = <header>.
+        → isCreditDebitSeparate = false.
+        → creditColumn and debitColumn MUST be null/empty.
 
       FORMAT D — All-positive amount with a separate Type / Dr-Cr indicator column:
         Amount values are all positive; a separate column says "Dr"/"Cr" or "Debit"/"Credit".
-        → Set amountColumn=<numeric header>, typeColumn=<Dr/Cr header>.
+        → amountColumn = <numeric header>.
+        → typeColumn = <Dr/Cr or Debit/Credit header>.
+        → isCreditDebitSeparate = false.
 
       ====== HARD RULES — do not violate ======
-      - NEVER set isCreditDebitSeparate=true unless both candidate columns contain NUMBERS
+      - NEVER set isCreditDebitSeparate = true unless BOTH candidate columns contain NUMBERS
         in the sample data. If the column contains account names or text, it is NOT credit/debit.
       - The "Balance" / "Running Balance" / "Available Balance" / "Saldo" / "Solde" column is
         NOT an amount. Leave it UNMAPPED (do not assign it to amountColumn).
-      - A "Category" / "Sub-Category" column is NOT a typeColumn. typeColumn only applies to
-        columns that explicitly indicate Debit vs Credit (e.g., "Dr/Cr", "Direction", "Type").
-      - For Format B (transfer-account), creditColumn and debitColumn MUST be undefined/empty.
+      - Any column that looks like a running balance or limit must remain unmapped.
+      - Columns that have the same value in every row (e.g., account number, IBAN, currency)
+        should remain unmapped.
+      - A "Category" / "Sub-Category" column is NOT a typeColumn.
+        typeColumn only applies to columns that explicitly indicate Debit vs Credit
+        (e.g., "Dr/Cr", "Direction", "Debit/Credit", "Type" when it clearly means direction).
+      - If there is no match for a semantic field (e.g., no category in the file),
+        set that *Column to null/empty rather than guessing.
 
       Headers: ${JSON.stringify(headers)}
       Sample Data (${sampleRows.length} rows): ${JSON.stringify(sampleRows)}
@@ -180,10 +201,79 @@ export const detectFileStructure = async (rawRows: any[][]): Promise<{ headerInd
   if (!isAIProxyAvailable()) return null;
   try {
     const prompt = `
-      I have a raw financial file. First 50 rows: ${JSON.stringify(rawRows)}
-      1. Identify the 0-based header row index.
-      2. Create a column mapping based on that header.
-      Return JSON: { "headerIndex": number, "mapping": { dateColumn, amountColumn, categoryColumn, subcategoryColumn, descriptionColumn, typeColumn, projectColumn, isCreditDebitSeparate, creditColumn, debitColumn, expenseTransferColumn, incomeTransferColumn } }
+      You are a bank statement structure detector for CSV/Excel-like files.
+
+      I will give you the FIRST 50 RAW ROWS of the file, as arrays of cell values.
+      Some of the initial rows may be bank logos, addresses, metadata, or blank lines
+      before the actual transaction table begins.
+
+      Your tasks:
+      1. Identify which row index (0-based) is the header row for the main transaction table.
+      2. Create a column mapping based on that header row, using the same schema and logic
+         as the column-mapper prompt (Formats A–D and hard rules).
+
+      Return a SINGLE valid JSON object of the form:
+      {
+        "headerIndex": number,
+        "mapping": {
+          "dateColumn": string or null,
+          "amountColumn": string or null,
+          "categoryColumn": string or null,
+          "subcategoryColumn": string or null,
+          "descriptionColumn": string or null,
+          "typeColumn": string or null,
+          "projectColumn": string or null,
+          "isCreditDebitSeparate": boolean,
+          "creditColumn": string or null,
+          "debitColumn": string or null,
+          "expenseTransferColumn": string or null,
+          "incomeTransferColumn": string or null
+        }
+      }
+
+      IMPORTANT OUTPUT RULES:
+      - Output ONLY raw JSON, with no surrounding text, comments, or markdown.
+      - headerIndex MUST be a non-negative integer (0, 1, 2, ...).
+      - For each *Column field in mapping:
+        - Use EXACTLY one of the header strings from the detected header row, OR
+        - null/empty if that semantic field does not exist.
+      - Do NOT invent column names that are not present in the header row.
+
+      HEADER ROW DETECTION GUIDELINES:
+      - A true header row typically has:
+        - Multiple non-empty cells, each short and label-like (e.g., "Date", "Amount", "Description").
+        - Different values across columns.
+      - Rows that are likely NOT headers:
+        - Rows with only one long free-text cell (e.g., bank address, marketing text).
+        - Rows with account holder name, address, IFSC, IBAN, or statement period.
+        - Rows with page numbers, footers, or terms and conditions.
+      - If more than one row could be a header, choose the one whose cells best look like column labels
+        for a transaction table (Date, Amount, Description, etc.).
+      - If there is no perfect header row, choose the best candidate and still return a headerIndex.
+
+      COLUMN MAPPING GUIDELINES (apply the same logic as in the column-mapper prompt):
+
+      - Detect whether the file uses:
+        - FORMAT A: separate numeric Debit and Credit columns (isCreditDebitSeparate = true).
+        - FORMAT B: transfer-account style (Expense/Income account names + separate numeric Amount).
+        - FORMAT C: single signed-amount column.
+        - FORMAT D: all-positive Amount column plus a Dr/Cr or Debit/Credit direction column.
+
+      - Follow these rules:
+        - Never mark isCreditDebitSeparate = true unless both candidate columns contain numeric
+          monetary values in the sample data.
+        - Balance / Running Balance / Available Balance / Saldo / Solde columns are NOT amountColumn.
+        - Columns holding constant metadata (account numbers, IBAN, currency) should remain unmapped.
+        - typeColumn is only for explicit direction columns ("Dr/Cr", "Debit/Credit", "Direction"),
+          not for category or text labels.
+
+      Use the provided first 50 rows to:
+      - Choose headerIndex.
+      - Read the header row to get the exact header strings.
+      - Build the mapping object according to these rules.
+
+      First 50 rows:
+      ${JSON.stringify(rawRows)}
     `;
     const text = await callAIProxy({ contents: [{ role: 'user', parts: [{ text: prompt }] }], jsonMode: true });
     if (!text) return null;
@@ -207,50 +297,125 @@ export const extractTransactionsFromPDF = async (dataInput: string, isRawText: b
 OUTPUT FORMAT — one transaction per line, exactly 5 fields:
 YYYY-MM-DD|Description|Amount|Type|Category
 
-FIELD RULES:
+No extra text.
+No headers.
+No markdown fences.
+No explanations.
 
-Date — always output YYYY-MM-DD regardless of the input format:
-  - DD/MM/YYYY (India, UK, Australia): 15/03/2025 → 2025-03-15
-  - MM/DD/YYYY (US): 03/15/2025 → 2025-03-15
+If you cannot confidently identify BOTH a date and an amount for a row, SKIP that row.
+
+FIELD RULES
+
+Date — always output in format YYYY-MM-DD, regardless of how it appears:
+  - DD/MM/YYYY: 15/03/2025 → 2025-03-15
+  - MM/DD/YYYY: 03/15/2025 → 2025-03-15
   - DD-Mon-YYYY: 15-Mar-2025 → 2025-03-15
   - ISO already correct: 2025-03-15 → 2025-03-15
 
-Description — use the readable merchant or payee name only:
-  - Strip transaction IDs, reference numbers, cheque numbers, long numeric codes
+Additional date rules:
+  - If there is both a Transaction Date and a Posting/Value Date, prefer the Transaction Date.
+  - If only one date appears for the row, use that date.
+  - If the date is shown once at the start of a group of continuation lines, apply that same date to all continuation lines merged into that transaction.
+
+Description — short, human-readable transaction text:
+  - Focus on the merchant / counterparty / main purpose.
+  - Strip transaction IDs, long reference numbers, cheque numbers, and technical codes where possible.
   - UPI narration "UPI/SWIGGY/9876543210/SWIG00" → "Swiggy"
   - UPI narration "UPI-ACME CORP INC-SAL" → "ACME Corp Salary"
   - "NEFT/HDFC/SALARY ACME" → "Salary ACME"
   - "ATM CASH WDL 001 SBI ATM" → "ATM Cash Withdrawal"
-  - Keep names short and readable (max ~40 chars)
+  - If you cannot infer a clean merchant or purpose, fall back to a trimmed version of the original narration, removing only obvious noise (IDs, excessive codes).
+  - Keep descriptions concise and readable (around 40 characters where possible).
+  - Include “Self Transfer”, “Credit Card Payment”, “FD Creation”, etc. where that is clearly the purpose.
 
-Amount — positive number, no currency symbols, no commas, no signs:
+Multi-line / wrapped rows:
+  - If a single transaction is split across multiple lines (only the first line has the date and amount, later lines are continuation text), merge all lines into one description and output a single transaction line.
+
+Amount — positive number only, no signs, no currency symbols, no commas:
   - ₹1,234.56 → 1234.56
-  - -45.99 → 45.99 (sign goes in Type field)
-  - For split Debit/Credit columns: use whichever column has a value
+  - -45.99 → 45.99 (the sign goes in Type)
+  - Always use the account’s posting amount (not points, units, etc.).
+
+When statement has separate Debit and Credit / Withdrawal and Deposit columns:
+  - Use whichever column has a non-empty value for that row.
+  - Take the absolute value (no plus/minus sign in the Amount field).
+  - The direction (inflow vs outflow) is captured in Type.
+
+When statement has a single Amount column:
+  - If there is a sign, ignore the sign in Amount and use it only to decide Type.
+  - If there is no sign, infer direction from column headings and description:
+    * Bank statements:
+      Words like DEBIT, DR, Withdrawal, Payment, POS, Purchase, ATM, Fee, Interest Charged, EMI → treat as outflow.
+      Words like CREDIT, CR, Deposit, Salary, Refund, Reversal, Cashback, Interest Income → treat as inflow.
+    * Credit card statements:
+      Under headings like “Purchases”, “Debits”, “Charges” → outflow (you are being charged).
+      Under headings like “Payments & Credits”, “Credits”, “Payment Received”, “Refund”, “Reversal”, “Cashback” → inflow to the card (reduces what you owe).
+  - Again, Amount is always positive. Direction is handled in the Type field.
 
 Type — exactly one of: Income | Expense | Transfer
-  Income: salary, wage, interest, refund, cashback, dividend, bonus, credit entry (Cr),
-          inward NEFT/IMPS/UPI, deposit, government benefit, tax refund
-  Expense: purchase, bill, EMI, loan payment, insurance premium, ATM withdrawal,
-           debit entry (Dr), outward payment to merchant
-  Transfer: UPI/NEFT/IMPS/RTGS to own account, internal fund move, FD creation,
-            savings account top-up, wallet load, "self transfer", credit card bill payment
-  When unsure between Expense and Transfer: use the description — merchant name = Expense,
-  account number or "self" = Transfer.
+Interpret Type from the account holder’s point of view:
+  - Income — money coming in:
+    * Salary/wage, bonus, incentives.
+    * Interest income, dividends, cashbacks, rewards credited.
+    * Refunds or reversals that increase your bank balance or reduce your credit card due.
+    * Inward NEFT/RTGS/IMPS/UPI, deposits, government benefits, tax refunds.
+  - Expense — money going out (spending or cost):
+    * Purchases and POS transactions (online or offline).
+    * Bills, utilities, subscriptions (Netflix, Spotify, electricity, mobile, etc.).
+    * EMI charges, loan payments, insurance premiums.
+    * ATM cash withdrawals.
+    * Bank and card charges, penalties, yearly fees, interest charged on loans/credit cards.
+    * Any merchant purchase in a credit card statement under “Purchases” / “Charges” / “Debits”.
+  - Transfer — movement between your own accounts or into investments:
+    * UPI/NEFT/RTGS/IMPS to your own accounts or own credit cards.
+    * Internal transfers between accounts in the same bank.
+    * FD/RD creation, mutual fund or brokerage funding, wallet loads (Paytm, PhonePe, etc.).
+    * “Self transfer”, “Own account transfer”, “Savings top-up”.
+    * Credit card bill payments (from bank account to card).
+  - If unsure between Expense and Transfer:
+    * Merchant / brand / service name → Expense.
+    * Clear account number, “self”, “own account”, “credit card payment”, “FD”, “MF”, “wallet load” → Transfer.
 
-Category — use ONLY these values (pick the best match):
+Category — use ONLY these values (pick the single best match):
   Food | Groceries | Transport | Shopping | Utilities | Entertainment |
   Health | Education | Investment | Salary | Income | Housing | EMI |
   Transfer | Cash | Unclassified
 
-SKIP these rows entirely (do not output a line for them):
-  - Opening balance, closing balance, running balance rows
-  - Account number, IFSC, branch, statement period rows
-  - Column header rows (Date, Particulars, Debit, Credit, Balance, etc.)
-  - Sub-total or total rows
-  - Any row with no recognisable amount
+Guidelines:
+  - Salary / regular monthly pay: Category = Salary, Type = Income.
+  - Other inflows (interest, cashback, tax refund, generic credits): Category = Income, Type = Income.
+  - Mutual fund, stock, FD/RD, brokerage funding: Category = Investment.
+    * If it’s a move to your own investment account, Type = Transfer.
+  - Wallet loads and internal transfers: Category = Transfer, Type = Transfer.
+  - ATM cash withdrawal: Category = Cash, Type = Expense.
+  - Loan EMIs and BNPL EMIs: Category = EMI, usually Type = Expense (or Transfer if clearly to your own loan account).
+  - Rent, home loan EMI, society maintenance: Category = Housing.
+  - Mobile, electricity, gas, water, DTH, broadband: Category = Utilities.
+  - Restaurants, food delivery, cafes: Category = Food.
+  - Supermarkets, kirana, general groceries: Category = Groceries.
+  - Cabs, fuel, metro, tolls, parking: Category = Transport.
+  - Clothing, electronics, general e-commerce, other shopping: Category = Shopping.
+  - OTT subscriptions, movies, events: Category = Entertainment.
+  - Medical, pharmacy, hospital, insurance premium for health: Category = Health.
+  - Tuition, school, college, courses, exams: Category = Education.
+  - If you are not reasonably sure of the category, use Unclassified.
 
-EXAMPLES (one per bank style):
+ROWS TO SKIP ENTIRELY
+Do not output lines for:
+  - Opening balance, closing balance, running balance rows.
+  - Account / card details, IFSC, branch, statement period, customer info.
+  - Column headers (Date, Particulars, Debit, Credit, Charges, Payments, Balance, etc.).
+  - Section totals or subtotals, e.g. “Total Purchases”, “Total Payments & Credits”, “Interest this period”, “Fees this period”.
+  - Lines with only page numbers, marketing messages, offers, footers, or disclaimers.
+  - Any row where you cannot confidently identify BOTH a date and an amount.
+
+SPECIAL NOTES FOR CREDIT CARD STATEMENTS
+  - Treat purchases, fees, cash advances, interest charges as Expense.
+  - Treat payments made to the card, credits, refunds, reversals, cashbacks as Income (if it is truly money gained) or Transfer (typical for card bill payments from your bank account).
+    * Example: “NEFT PAYMENT RECEIVED” or “AutoPay from HDFC Bank” → Type = Transfer, Category = Transfer.
+    * “AMAZON REFUND” → Type = Income, Category = Income or Shopping (choose best).
+
+EXAMPLES (format only)
 2025-03-15|Swiggy|450.00|Expense|Food
 2025-03-16|ACME Corp Salary|85000.00|Income|Salary
 2025-03-17|ATM Cash Withdrawal|5000.00|Expense|Cash
@@ -258,9 +423,11 @@ EXAMPLES (one per bank style):
 2025-03-19|Transfer to Savings|10000.00|Transfer|Transfer
 2025-03-20|HDFC Credit Card Payment|15000.00|Transfer|Transfer
 2025-03-21|Income Tax Refund|12500.00|Income|Income
-2025-03-22|Zerodha MF Purchase|5000.00|Expense|Investment
+2025-03-22|Zerodha MF Purchase|5000.00|Transfer|Investment
 
-No markdown fences. No column headers in output. Only the pipe-delimited transaction lines.`;
+Remember:
+Output only the pipe-delimited transaction lines, one per transaction.
+No headers. No extra text. No markdown.`;
 
 
   try {

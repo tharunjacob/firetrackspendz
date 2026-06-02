@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ScopeBadge } from './shared/Badges';
 import type { LearningRule } from '@/types';
 
@@ -22,7 +22,7 @@ export const RulesTab = ({ rules, promoteRule, deleteRule }: Props) => {
         <input type="text" value={ruleSearch} onChange={e => setRuleSearch(e.target.value)}
           placeholder="Search rules by keyword or category..." className="input-field flex-1" />
         <div className="text-sm text-slate-500 whitespace-nowrap">
-          {filteredRules.length} rule{filteredRules.length !== 1 ? 's' : ''} Â·{' '}
+          {filteredRules.length} rule{filteredRules.length !== 1 ? 's' : ''} ·{' '}
           {rules.filter(r => r.scope === 'system').length} system
         </div>
       </div>
@@ -47,7 +47,7 @@ export const RulesTab = ({ rules, promoteRule, deleteRule }: Props) => {
                   <td className="px-4 py-3 font-medium text-slate-700">{r.value}</td>
                   <td className="px-4 py-3 text-xs text-slate-500">{r.target_field}</td>
                   <td className="px-4 py-3"><ScopeBadge scope={r.scope || r.source} /></td>
-                  <td className="px-4 py-3 text-slate-500 text-xs font-mono">{r.user_id?.substring(0, 8) || 'â€”'}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs font-mono">{r.user_id?.substring(0, 8) || '—'}</td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-2">
                       {r.scope !== 'system' && r.source !== 'system' && (

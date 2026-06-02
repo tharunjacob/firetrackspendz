@@ -33,3 +33,6 @@ yarn-error.log*
 
 # Supabase CLI temp files
 supabase/.temp/
+
+# Chrome Debug Temp Folder
+.chrome-debug/

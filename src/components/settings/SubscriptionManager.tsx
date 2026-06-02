@@ -25,7 +25,7 @@ const formatDate = (unix: number | null): string => {
 };
 
 export const SubscriptionManager = () => {
-  const { plan, profile, showToast } = useApp();
+  const { plan, profile, showToast, refreshProfile } = useApp();
   const [details, setDetails] = useState<SubscriptionDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
@@ -69,6 +69,7 @@ export const SubscriptionManager = () => {
       // Re-fetch so the UI reflects the new state.
       const updated = await fetchSubscriptionDetails(session.access_token);
       setDetails(updated);
+      await refreshProfile();
     } catch (e) {
       showToast?.(e instanceof Error ? e.message : 'Could not cancel subscription', 'error');
     } finally {

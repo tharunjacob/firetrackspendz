@@ -97,7 +97,11 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
     } finally {
       clearTimeout(devTimeoutId);
     }
-    if (!res.ok) throw new Error(`Gemini API error ${res.status}`);
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      console.error(`Gemini API direct call failed (status ${res.status}):`, errText);
+      throw new Error(`Gemini API error ${res.status}: ${errText}`);
+    }
     const data = await res.json();
     return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
   }

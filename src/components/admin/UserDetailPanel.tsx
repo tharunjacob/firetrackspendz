@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { PlanBadge, LevelBadge } from './shared/Badges';
 import { MiniStat } from './shared/StatCard';
 import { computeHealthScore, scoreColor, churnRiskColor } from './shared/healthScore';
@@ -19,7 +19,7 @@ interface Props {
   setLogSearch: (q: string) => void;
 }
 
-// â”€â”€ Timeline helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Timeline helpers ────────────────────────
 
 type EventCategory = 'auth' | 'upload' | 'feature' | 'error' | 'admin' | 'general';
 
@@ -33,18 +33,18 @@ const categoriseEvent = (event: string): EventCategory => {
 };
 
 const CATEGORY_STYLES: Record<EventCategory, { dot: string; icon: string; label: string }> = {
-  auth:    { dot: 'bg-brand-500',   icon: 'ðŸ”', label: 'Auth' },
-  upload:  { dot: 'bg-brand-500', icon: 'ðŸ“¤', label: 'Upload' },
-  feature: { dot: 'bg-teal-500',   icon: 'âœ¨', label: 'Feature' },
-  error:   { dot: 'bg-red-500',    icon: 'âš ï¸', label: 'Error' },
-  admin:   { dot: 'bg-amber-500',  icon: 'ðŸ›¡ï¸', label: 'Admin' },
-  general: { dot: 'bg-slate-400',  icon: 'ðŸ“Œ', label: 'General' },
+  auth:    { dot: 'bg-brand-500',   icon: '🔑', label: 'Auth' },
+  upload:  { dot: 'bg-brand-500',   icon: '📤', label: 'Upload' },
+  feature: { dot: 'bg-teal-500',    icon: '✨', label: 'Feature' },
+  error:   { dot: 'bg-red-500',     icon: '⚠️', label: 'Error' },
+  admin:   { dot: 'bg-amber-500',   icon: '🛡️', label: 'Admin' },
+  general: { dot: 'bg-slate-400',   icon: '📌', label: 'General' },
 };
 
 const formatMeta = (meta: Record<string, unknown>): string => {
   const keys = Object.keys(meta);
   if (keys.length === 0) return '';
-  return keys.slice(0, 3).map(k => `${k}: ${String(meta[k])}`).join(' Â· ');
+  return keys.slice(0, 3).map(k => `${k}: ${String(meta[k])}`).join(' · ');
 };
 
 export const UserDetailPanel = ({
@@ -60,7 +60,7 @@ export const UserDetailPanel = ({
   return (
     <div className="space-y-6">
       <button onClick={() => setActiveTab('users')} className="text-sm text-brand-600 hover:underline">
-        â† Back to Users
+        ← Back to Users
       </button>
 
       {/* User Info */}
@@ -71,7 +71,7 @@ export const UserDetailPanel = ({
               {(selectedUser.email || 'U')[0].toUpperCase()}
             </div>
             <h2 className="text-xl font-bold text-slate-800">{selectedUser.email}</h2>
-            <p className="text-sm text-slate-500">{selectedUser.full_name || 'No name'} Â· ID: {selectedUser.id}</p>
+            <p className="text-sm text-slate-500">{selectedUser.full_name || 'No name'} · ID: {selectedUser.id}</p>
           </div>
           <div className="flex flex-col gap-2">
             <PlanBadge plan={selectedUser.subscription_plan} />
@@ -91,7 +91,7 @@ export const UserDetailPanel = ({
           <MiniStat label="Transactions" value={selectedUser.transactionCount || 0} />
           <MiniStat label="Files Uploaded" value={selectedUser.fileCount || 0} />
           <MiniStat label="Currency" value={selectedUser.preferred_currency || 'INR'} />
-          <MiniStat label="Joined" value={selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'â€”'} />
+          <MiniStat label="Joined" value={selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : '—'} />
         </div>
 
         {/* Health Score */}
@@ -225,7 +225,7 @@ export const UserDetailPanel = ({
               {selectedUserTxns.map((t, i) => (
                 <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                   <td className="px-3 py-2 whitespace-nowrap">{t.date}</td>
-                  <td className="px-3 py-2 truncate max-w-[200px]">{t.notes || t.original_description || 'â€”'}</td>
+                  <td className="px-3 py-2 truncate max-w-[200px]">{t.notes || t.original_description || '—'}</td>
                   <td className="px-3 py-2">{t.category}</td>
                   <td className="px-3 py-2">
                     <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${

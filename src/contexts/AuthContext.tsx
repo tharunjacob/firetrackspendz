@@ -10,7 +10,7 @@ import { RPC } from '@/config/database';
 import { useUI } from './UIContext';
 
 // ============================================================
-// Auth Context â€” Handles user authentication state ONLY
+// Auth Context — Handles user authentication state ONLY
 // ============================================================
 //
 // WHAT THIS CONTEXT MANAGES:
@@ -21,8 +21,8 @@ import { useUI } from './UIContext';
 //   - isMimicMode (admin viewing as another user)
 //
 // WHAT THIS CONTEXT DOES NOT MANAGE:
-//   - Transactions â†’ see DataContext
-//   - UI state (toasts, tabs, currency) â†’ see UIContext
+//   - Transactions → see DataContext
+//   - UI state (toasts, tabs, currency) → see UIContext
 //
 // WHY SPLIT:
 //   If we change how auth works (e.g., switch from Supabase to Clerk),
@@ -43,6 +43,7 @@ interface AuthState {
   isMimicMode: boolean;
   isAuthReady: boolean;
   isAdmin: boolean;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -197,12 +198,27 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
     updateDbCurrency();
   }, [currency, userId, profile?.preferred_currency, setProfile]);
 
+  const refreshProfile = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const prof = await getProfile(userId);
+      if (prof) {
+        setProfile(prof);
+        if (prof.preferred_currency) {
+          setCurrency(prof.preferred_currency);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to refresh profile:', e);
+    }
+  }, [userId, setCurrency]);
+
   const value = useMemo(
     () => ({
       userId: effectiveUserId, userEmail: effectiveEmail, profile, plan, isAuthOpen, setIsAuthOpen,
-      user, logout, isMimicMode, isAuthReady, isAdmin,
+      user, logout, isMimicMode, isAuthReady, isAdmin, refreshProfile,
     }),
-    [effectiveUserId, effectiveEmail, profile, plan, isAuthOpen, user, logout, isMimicMode, isAuthReady, isAdmin],
+    [effectiveUserId, effectiveEmail, profile, plan, isAuthOpen, user, logout, isMimicMode, isAuthReady, isAdmin, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

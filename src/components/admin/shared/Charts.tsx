@@ -1,4 +1,4 @@
-﻿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import type { AppLog } from '@/types';
 
 export const ErrorTimeline = ({ logs }: { logs: AppLog[] }) => {
@@ -58,7 +58,7 @@ export const TopErrors = ({ logs }: { logs: AppLog[] }) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium text-slate-700 truncate">{event}</p>
-              <span className="text-xs text-red-500 font-bold shrink-0">Ã—{count}</span>
+              <span className="text-xs text-red-500 font-bold shrink-0">×{count}</span>
             </div>
             <div className="h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden">
               <div className="h-full bg-red-400 rounded-full" style={{ width: `${(count / topErrors[0][1]) * 100}%` }} />

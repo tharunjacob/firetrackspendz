@@ -1,10 +1,10 @@
-﻿import { type ReactNode, type MutableRefObject, useCallback, useRef } from 'react';
+import { type ReactNode, type MutableRefObject, useCallback, useRef } from 'react';
 import { AuthProvider, useAuth } from './AuthContext';
 import { DataProvider } from './DataContext';
 import { UIProvider, useUI } from './UIContext';
 
 // ============================================================
-// Combined App Provider â€” Wraps Auth + Data + UI providers
+// Combined App Provider — Wraps Auth + Data + UI providers
 // ============================================================
 //
 // PURPOSE:
@@ -13,8 +13,8 @@ import { UIProvider, useUI } from './UIContext';
 // and wires the cross-context communication (e.g., when user signs
 // in, DataContext needs to load their cloud data).
 //
-// PROVIDER ORDER (outermost â†’ innermost):
-//   UIProvider â†’ AuthProvider â†’ DataBridge
+// PROVIDER ORDER (outermost → innermost):
+//   UIProvider → AuthProvider → DataBridge
 //   - UI is outermost because showToast is used by both Auth and Data
 //   - Auth is next because Data needs userId to decide storage
 //   - DataBridge is innermost because it reads from both Auth and UI

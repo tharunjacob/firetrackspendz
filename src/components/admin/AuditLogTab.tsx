@@ -1,23 +1,23 @@
-﻿import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { getSupabase } from '@/services/supabase';
 import { TABLES } from '@/config/database';
 import type { AdminAuditEntry } from '@/types';
 
 // ============================================================
-// Audit Log Tab â€” every admin action, who did it, and when
+// Audit Log Tab — every admin action, who did it, and when
 // ============================================================
 
 const ACTION_STYLES: Record<string, { bg: string; text: string; icon: string }> = {
-  toggle_flag:    { bg: 'bg-brand-100',   text: 'text-brand-700',   icon: 'ðŸš©' },
-  plan_changed:   { bg: 'bg-brand-100', text: 'text-brand-700', icon: 'ðŸ’³' },
-  rule_promoted:  { bg: 'bg-green-100',  text: 'text-green-700',  icon: 'â¬†ï¸' },
-  rule_deleted:   { bg: 'bg-red-100',    text: 'text-red-700',    icon: 'ðŸ—‘ï¸' },
-  mimic_started:  { bg: 'bg-amber-100',  text: 'text-amber-700',  icon: 'ðŸ‘ï¸' },
-  feedback_resolved: { bg: 'bg-teal-100', text: 'text-teal-700',  icon: 'âœ…' },
+  toggle_flag:    { bg: 'bg-brand-100',   text: 'text-brand-700',   icon: '🚩' },
+  plan_changed:   { bg: 'bg-brand-100',   text: 'text-brand-700',   icon: '💳' },
+  rule_promoted:  { bg: 'bg-green-100',   text: 'text-green-700',   icon: '⬆️' },
+  rule_deleted:   { bg: 'bg-red-100',     text: 'text-red-700',     icon: '🗑️' },
+  mimic_started:  { bg: 'bg-amber-100',   text: 'text-amber-700',   icon: '👁️' },
+  feedback_resolved: { bg: 'bg-teal-100', text: 'text-teal-700',    icon: '✅' },
 };
 
 const getActionStyle = (action: string) =>
-  ACTION_STYLES[action] || { bg: 'bg-slate-100', text: 'text-slate-700', icon: 'ðŸ“‹' };
+  ACTION_STYLES[action] || { bg: 'bg-slate-100', text: 'text-slate-700', icon: '📋' };
 
 const PAGE_SIZE = 50;
 
@@ -68,7 +68,7 @@ export const AuditLogTab = () => {
   if (error && entries.length === 0) {
     return (
       <div className="card p-8 text-center border-2 border-dashed border-slate-200">
-        <div className="text-4xl mb-3">ðŸ”</div>
+        <div className="text-4xl mb-3">🔍</div>
         <h3 className="text-lg font-bold text-slate-700 mb-2">Admin Audit Log</h3>
         <p className="text-sm text-slate-500 max-w-md mx-auto">{error}</p>
       </div>
@@ -80,7 +80,7 @@ export const AuditLogTab = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold text-slate-700">Admin Audit Log</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Every admin mutation â€” plan changes, flag toggles, rule actions, mimic sessions.</p>
+          <p className="text-xs text-slate-500 mt-0.5">Every admin mutation — plan changes, flag toggles, rule actions, mimic sessions.</p>
         </div>
         <span className="text-xs text-slate-500">{filtered.length} entries</span>
       </div>
@@ -95,7 +95,7 @@ export const AuditLogTab = () => {
 
       {entries.length === 0 ? (
         <div className="card p-10 text-center">
-          <p className="text-4xl mb-3">ðŸ“­</p>
+          <p className="text-4xl mb-3">📥</p>
           <p className="text-sm font-bold text-slate-600">No audit entries yet</p>
           <p className="text-xs text-slate-500 mt-1">Admin actions (plan changes, flag toggles, etc.) will appear here.</p>
         </div>
@@ -123,7 +123,7 @@ export const AuditLogTab = () => {
                         </td>
                         <td className="px-4 py-3">
                           <p className="text-xs font-medium text-slate-700 truncate max-w-[140px]">{entry.admin_email}</p>
-                          <p className="text-xs text-slate-300 font-mono">{entry.admin_id.substring(0, 8)}â€¦</p>
+                          <p className="text-xs text-slate-300 font-mono">{entry.admin_id.substring(0, 8)}…</p>
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded ${style.bg} ${style.text}`}>
@@ -132,13 +132,13 @@ export const AuditLogTab = () => {
                         </td>
                         <td className="px-4 py-3 text-xs text-slate-500">
                           <span className="font-medium">{entry.target_type}</span>
-                          <span className="text-slate-300 font-mono ml-1">{entry.target_id.substring(0, 10)}â€¦</span>
+                          <span className="text-slate-300 font-mono ml-1">{entry.target_id.substring(0, 10)}…</span>
                         </td>
                         <td className="px-4 py-3 text-xs text-slate-500 truncate max-w-[200px]">
                           {Object.entries(entry.details || {})
                             .slice(0, 3)
                             .map(([k, v]) => `${k}: ${String(v)}`)
-                            .join(' Â· ')}
+                            .join(' · ')}
                         </td>
                       </tr>
                     );
@@ -149,12 +149,12 @@ export const AuditLogTab = () => {
             {filtered.length > PAGE_SIZE && (
               <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
                 <button disabled={page === 0} onClick={() => setPage(p => p - 1)}
-                  className="text-sm text-brand-600 disabled:text-slate-300">â† Previous</button>
+                  className="text-sm text-brand-600 disabled:text-slate-300">← Previous</button>
                 <span className="text-xs text-slate-500">
                   Page {page + 1} of {Math.ceil(filtered.length / PAGE_SIZE)}
                 </span>
                 <button disabled={(page + 1) * PAGE_SIZE >= filtered.length} onClick={() => setPage(p => p + 1)}
-                  className="text-sm text-brand-600 disabled:text-slate-300">Next â†’</button>
+                  className="text-sm text-brand-600 disabled:text-slate-300">Next →</button>
               </div>
             )}
           </div>

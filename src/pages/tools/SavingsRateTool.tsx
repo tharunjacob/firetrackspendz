@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/config/routes';
@@ -12,6 +12,37 @@ interface Results {
   annualSavings: number;
   interpretation: { label: string; color: string; description: string };
 }
+
+const FAQ_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is a savings rate?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Your savings rate is the percentage of your net income that you save. It is calculated by dividing your monthly savings (Income - Expenses) by your total net income.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is a good savings rate?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A traditional recommended savings rate is 10% to 20% of your income. However, for those on the FIRE (Financial Independence, Retire Early) path, a savings rate of 40% to 50% or higher is commonly targeted to accelerate retirement timelines.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does savings rate affect retirement time?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Your savings rate is the single most important factor determining your time to retirement. A 10% savings rate means you must work 9 years to support 1 year of retirement. A 50% savings rate means 1 year of work funds 1 year of retirement, letting you retire in about 15-17 years from scratch.',
+      },
+    },
+  ],
+};
 
 const getInterpretation = (rate: number) => {
   if (rate < 0) {
@@ -65,6 +96,19 @@ const SavingsRateTool: React.FC = () => {
       'Free savings rate calculator. Enter your income and expenses to see your savings rate and how it compares. Essential for FIRE planning.',
     canonical: '/tools/savings-rate',
   });
+
+  // Inject JSON-LD FAQ schema
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'savings-faq-jsonld';
+    script.textContent = JSON.stringify(FAQ_JSON_LD);
+    document.head.appendChild(script);
+    return () => {
+      const el = document.getElementById('savings-faq-jsonld');
+      if (el) el.remove();
+    };
+  }, []);
 
   const [monthlyIncome, setMonthlyIncome] = useState('');
   const [monthlyExpenses, setMonthlyExpenses] = useState('');

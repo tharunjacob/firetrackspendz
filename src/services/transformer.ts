@@ -747,6 +747,28 @@ export const transformData = async (
           } catch (err) { console.error('AI Recovery Failed:', err); }
         }
 
+        // 6. Absolute worst-case: treat CSV/Excel as raw text and pass it to Gemini's direct statement parser
+        if (transactions.length === 0) {
+          try {
+            console.log('Layout mapping failed. Serializing CSV/Excel to raw text for direct AI extraction fallback...');
+            const rawTextContent = rows
+              .map(row => row.map(cell => String(cell ?? '')).join(','))
+              .join('\n');
+            const trimmedText = rawTextContent.length > 80000 ? rawTextContent.slice(0, 80000) : rawTextContent;
+            const rawParsed = await extractTransactionsFromPDF(trimmedText, true);
+            if (rawParsed && rawParsed.length > 0) {
+              transactions = rawParsed.map((t: any, i: number) => ({
+                id: `${owner.replace(/[^a-z0-9]/gi, '')}-${t.date}-${t.amount}-${(t.description || '').substring(0, 10).replace(/[^a-z0-9]/gi, '')}-${i}`,
+                owner, type: t.type as TransactionType, date: t.date, time: null,
+                category: t.category, subCategory: '', notes: t.description, amount: t.amount, project: null,
+              }));
+              auditExtractedTransactions(transactions, 'ai-raw-text-fallback');
+            }
+          } catch (err) {
+            console.warn('AI Raw Text Fallback Failed:', err);
+          }
+        }
+
         if (transactions.length === 0) throw new Error('Could not extract transactions. Check if file has Date and Amount columns.');
         resolve({ transactions, lastHeaders: usedHeaders });
       } catch (err: any) { reject(err); }
