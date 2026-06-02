@@ -13,6 +13,71 @@ interface ChatMessage {
   text: string;
 }
 
+const formatInline = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={idx} className="font-bold text-slate-900 dark:text-slate-100">{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+};
+
+const MarkdownText = ({ text }: { text: string }) => {
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let currentList: React.ReactNode[] = [];
+  let listType: 'ol' | 'ul' | null = null;
+
+  const flushList = (key: number) => {
+    if (currentList.length > 0) {
+      if (listType === 'ul') {
+        elements.push(<ul key={`ul-${key}`} className="list-disc pl-5 my-2 space-y-1">{...currentList}</ul>);
+      } else {
+        elements.push(<ol key={`ol-${key}`} className="list-decimal pl-5 my-2 space-y-1">{...currentList}</ol>);
+      }
+      currentList = [];
+      listType = null;
+    }
+  };
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushList(idx);
+      elements.push(<div key={`br-${idx}`} className="h-2" />);
+      return;
+    }
+
+    const bulletMatch = line.match(/^(\s*)[*\-]\s+(.*)$/);
+    if (bulletMatch) {
+      if (listType !== 'ul') {
+        flushList(idx);
+        listType = 'ul';
+      }
+      currentList.push(<li key={`li-${idx}`} className="text-slate-700 dark:text-slate-200">{formatInline(bulletMatch[2])}</li>);
+      return;
+    }
+
+    const numberMatch = line.match(/^(\s*)\d+\.\s+(.*)$/);
+    if (numberMatch) {
+      if (listType !== 'ol') {
+        flushList(idx);
+        listType = 'ol';
+      }
+      currentList.push(<li key={`li-${idx}`} className="text-slate-700 dark:text-slate-200">{formatInline(numberMatch[2])}</li>);
+      return;
+    }
+
+    flushList(idx);
+    elements.push(<p key={`p-${idx}`} className="mb-2 leading-relaxed text-slate-700 dark:text-slate-200">{formatInline(line)}</p>);
+  });
+
+  flushList(lines.length);
+
+  return <div className="space-y-1">{elements}</div>;
+};
+
 export const AIAdvisorView = () => {
   useEffect(() => { logEvent(EVENTS.FEATURE_AI_ADVISOR_OPENED); }, []);
   const { transactions, currency, plan } = useApp();
@@ -102,7 +167,9 @@ export const AIAdvisorView = () => {
           </button>
         </div>
         {insights ? (
-          <div className="prose prose-sm max-w-none text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{insights}</div>
+          <div className="prose prose-sm max-w-none text-slate-600 dark:text-slate-400">
+            <MarkdownText text={insights} />
+          </div>
         ) : (
           <p className="text-sm text-slate-500">Click "Generate Insights" to get personalized financial advice based on your data.</p>
         )}
@@ -137,7 +204,9 @@ export const AIAdvisorView = () => {
                   ? 'bg-brand-600 text-white rounded-br-md'
                   : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-bl-md'
               }`}>
-                <div className="whitespace-pre-wrap">{msg.text}</div>
+                <div className={msg.role === 'user' ? 'whitespace-pre-wrap' : ''}>
+                  {msg.role === 'user' ? msg.text : <MarkdownText text={msg.text} />}
+                </div>
               </div>
             </div>
           ))}
