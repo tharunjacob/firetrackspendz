@@ -11,6 +11,23 @@ const SUPABASE_FUNCTIONS_URL = cleanSupabaseUrl
 // Dev fallback — only used when there is no Supabase URL configured (local dev without Supabase)
 // No global VITE_GEMINI_API_KEY assignment to avoid compiling it in the production bundle.
 
+const promiseWithTimeout = <T>(promise: Promise<T>, ms: number, errorMsg: string): Promise<T> => {
+  return new Promise<T>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(errorMsg));
+    }, ms);
+    promise
+      .then(res => {
+        clearTimeout(timeout);
+        resolve(res);
+      })
+      .catch(err => {
+        clearTimeout(timeout);
+        reject(err);
+      });
+  });
+};
+
 export type GeminiContents = {
   role: 'user';
   parts: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>;
@@ -47,24 +64,25 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
         }
       }
 
-      let res: Response;
       try {
-        res = await fetch(url, {
+        const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
           signal: devController.signal,
         });
+
+        if (!res.ok) {
+          const errText = await res.text().catch(() => '');
+          console.error(`Gemini API direct call failed (status ${res.status}):`, errText);
+          throw new Error(`Gemini API error ${res.status}: ${errText}`);
+        }
+
+        const data = await res.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
       } finally {
         clearTimeout(devTimeoutId);
       }
-      if (!res.ok) {
-        const errText = await res.text().catch(() => '');
-        console.error(`Gemini API direct call failed (status ${res.status}):`, errText);
-        throw new Error(`Gemini API error ${res.status}: ${errText}`);
-      }
-      const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     }
   }
 
@@ -72,7 +90,13 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
   if (SUPABASE_FUNCTIONS_URL && isCloudEnabled()) {
     try {
       const supabase = getSupabase();
-      const { data: { session } } = await supabase.auth.getSession();
+      const sessionPromise = supabase.auth.getSession();
+      const { data: { session } } = await promiseWithTimeout(
+        sessionPromise,
+        10000,
+        'Supabase authentication request timed out. Please check your network connection or sign in again.'
+      );
+
       if (!session) {
         throw new Error('AI features require a free account. Sign in or create an account to continue.');
       }
@@ -93,25 +117,24 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
         }
       }
 
-      let res: Response;
       try {
-        res = await fetch(SUPABASE_FUNCTIONS_URL, {
+        const res = await fetch(SUPABASE_FUNCTIONS_URL, {
           method: 'POST',
           headers,
           body: JSON.stringify({ action: 'generate', payload }),
           signal: controller.signal,
         });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error ?? `AI proxy error ${res.status}`);
+        }
+
+        const data = await res.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
       } finally {
         clearTimeout(timeoutId);
       }
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error ?? `AI proxy error ${res.status}`);
-      }
-
-      const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     } catch (e: any) {
       // Convert AbortError (timeout or manual cancellation) into a user-friendly message
       if (e?.name === 'AbortError') {

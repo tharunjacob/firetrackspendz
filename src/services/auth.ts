@@ -84,7 +84,7 @@ export const signOut = async () => {
   await supabase.auth.signOut();
 };
 
-const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 6000): Promise<T> => {
+const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 15000): Promise<T> => {
   return new Promise<T>((resolve, reject) => {
     const timeout = setTimeout(() => {
       reject(new Error('Supabase request timed out'));

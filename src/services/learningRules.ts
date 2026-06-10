@@ -57,7 +57,7 @@ export const clearStoredMappings = (): void => {
   } catch (e) { console.warn('Failed to clear mappings', e); }
 };
 
-const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 6000): Promise<T> => {
+const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 15000): Promise<T> => {
   return new Promise<T>((resolve, reject) => {
     const timeout = setTimeout(() => {
       reject(new Error('Supabase request timed out'));

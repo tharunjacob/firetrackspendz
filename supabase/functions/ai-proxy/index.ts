@@ -1,7 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 
 const corsHeaders = {
@@ -13,14 +12,35 @@ serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY') ?? '';
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('[ai-proxy] Error: SUPABASE_URL or SUPABASE_ANON_KEY is missing in Deno environment.');
+      return new Response(JSON.stringify({ error: 'Supabase URL/Key config is missing in Edge Function environment.' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!geminiApiKey) {
+      console.error('[ai-proxy] Error: GEMINI_API_KEY secret is not set in this Supabase project.');
+      return new Response(JSON.stringify({ error: 'GEMINI_API_KEY secret is not set in the Supabase project. Please set it using Supabase dashboard or CLI.' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Authenticate the caller — must be a valid Supabase session
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      supabaseUrl,
+      supabaseAnonKey,
       { global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } } }
     );
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) {
+      console.warn('[ai-proxy] Auth verification failed:', error?.message ?? 'No user returned');
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -36,7 +56,7 @@ serve(async (req: Request) => {
     // times and exceeds the client-side 120s abort timeout.
     // thinkingBudget:0 disables thinking entirely, dropping latency to ~5-10s.
     const model = 'gemini-2.5-flash';
-    const endpoint = `${GEMINI_BASE}/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+    const endpoint = `${GEMINI_BASE}/models/${model}:generateContent?key=${geminiApiKey}`;
 
     // Always merge thinkingConfig with any other generationConfig options
     const generationConfig: Record<string, unknown> = {
