@@ -81,7 +81,23 @@ export const signInWithMagicLink = async (email: string) => {
 export const signOut = async () => {
   if (!isCloudEnabled()) return;
   const supabase = getSupabase();
-  await supabase.auth.signOut();
+  try {
+    await promiseWithTimeout(supabase.auth.signOut(), 3000);
+  } catch (e) {
+    console.warn('[auth] signOut timed out or failed, clearing local storage manually', e);
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    } catch (err) {
+      console.error('[auth] Failed to clear local storage manually:', err);
+    }
+  }
 };
 
 const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 15000): Promise<T> => {
