@@ -8,7 +8,7 @@ import { logEvent } from './logger';
 // Storage Gateway - Routes to local or cloud storage
 // ============================================================
 
-const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 6000): Promise<T> => {
+const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 30000): Promise<T> => {
   return new Promise<T>((resolve, reject) => {
     const timeout = setTimeout(() => {
       reject(new Error('Supabase request timed out'));
@@ -41,7 +41,7 @@ const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 6000): Promise<T> =
 const isUserLoggedIn = async (): Promise<boolean> => {
   if (!isCloudEnabled()) return false;
   try {
-    const { data: { session } } = await promiseWithTimeout(getSupabase().auth.getSession(), 6000);
+    const { data: { session } } = await promiseWithTimeout(getSupabase().auth.getSession(), 30000);
     return !!session;
   } catch {
     return false;

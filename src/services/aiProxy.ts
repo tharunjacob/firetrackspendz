@@ -93,7 +93,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
       const sessionPromise = supabase.auth.getSession();
       const { data: { session } } = await promiseWithTimeout(
         sessionPromise,
-        10000,
+        30000,
         'Supabase authentication request timed out. Please check your network connection or sign in again.'
       );
 

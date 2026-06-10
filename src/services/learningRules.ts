@@ -88,7 +88,7 @@ export const initializeRules = async () => {
   try {
     const { data, error } = await promiseWithTimeout(
       supabase.from(TABLES.CATEGORY_RULES).select('*'),
-      6000
+      30000
     );
     if (error) {
       console.warn('Rules init warning:', error.message);

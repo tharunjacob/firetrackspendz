@@ -123,7 +123,7 @@ export const getSession = async () => {
   if (!isCloudEnabled()) return null;
   const supabase = getSupabase();
   try {
-    const { data: { session } } = await promiseWithTimeout(supabase.auth.getSession(), 6000);
+    const { data: { session } } = await promiseWithTimeout(supabase.auth.getSession(), 30000);
     return session;
   } catch (e) {
     console.warn('[auth] getSession timed out or failed, falling back to local', e);
@@ -136,7 +136,7 @@ export const getCurrentUser = async () => {
   if (!isCloudEnabled()) return null;
   const supabase = getSupabase();
   try {
-    const { data: { user } } = await promiseWithTimeout(supabase.auth.getUser(), 6000);
+    const { data: { user } } = await promiseWithTimeout(supabase.auth.getUser(), 30000);
     return user;
   } catch (e) {
     console.warn('[auth] getCurrentUser timed out or failed, falling back to local', e);
@@ -159,7 +159,7 @@ export const getProfile = async (userId: string): Promise<UserProfile | null> =>
         .select('*')
         .eq('id', userId)
         .single(),
-      6000
+      30000
     );
 
     if (error) {
