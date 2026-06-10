@@ -86,6 +86,9 @@ export const initializeRules = async () => {
   if (!supabase) return;
 
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
     const { data, error } = await promiseWithTimeout(
       supabase.from(TABLES.CATEGORY_RULES).select('*'),
       30000

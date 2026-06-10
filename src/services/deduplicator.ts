@@ -153,10 +153,35 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
     return false;
   };
 
-  const remainingIncomes = transactions.filter(t => t.type === 'Income');
-  const remainingExpenses = transactions.filter(t => t.type === 'Expense');
+  // Round 1: Exact matches first
+  let remainingIncomes = transactions.filter(t => t.type === 'Income');
+  let remainingExpenses = transactions.filter(t => t.type === 'Expense');
 
   remainingIncomes.forEach(inc => {
+    if (inc.type !== 'Income') return;
+    const matchIndex = remainingExpenses.findIndex(exp => {
+      if (inc.owner !== exp.owner) return false;
+      if (Math.abs(inc.amount - exp.amount) > 0.01) return false;
+      if (getDateDiffInDays(inc.date, exp.date) > 10) return false;
+
+      const d1 = (inc.notes || '').toLowerCase().trim();
+      const d2 = (exp.notes || '').toLowerCase().trim();
+      return d1 && d2 && d1 === d2;
+    });
+
+    if (matchIndex !== -1) {
+      const exp = remainingExpenses[matchIndex];
+      inc.type = 'Transfer'; inc.category = 'Transfer'; inc.subCategory = 'Refund';
+      exp.type = 'Transfer'; exp.category = 'Transfer'; exp.subCategory = 'Refund';
+      transferCount++;
+      remainingExpenses.splice(matchIndex, 1);
+    }
+  });
+
+  // Round 2: Fuzzy/Heuristic matches for the remainder
+  remainingIncomes = transactions.filter(t => t.type === 'Income');
+  remainingIncomes.forEach(inc => {
+    if (inc.type !== 'Income') return;
     const matchIndex = remainingExpenses.findIndex(exp => {
       if (inc.owner !== exp.owner) return false;
       if (Math.abs(inc.amount - exp.amount) > 0.01) return false;
