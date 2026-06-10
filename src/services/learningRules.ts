@@ -23,6 +23,9 @@ export const getStoredMapping = (headers: string[]): FileMapping | null => {
   try {
     const sig = getFileSignature(headers);
     if (!sig) return null;
+    if (typeof window === 'undefined' || !window.localStorage || typeof window.localStorage.getItem !== 'function') {
+      return null;
+    }
     const stored = window.localStorage.getItem(MAPPING_STORAGE_KEY);
     if (!stored) return null;
     return JSON.parse(stored)[sig] || null;
@@ -34,6 +37,9 @@ export const saveMapping = (headers: string[], mapping: FileMapping): void => {
   try {
     const sig = getFileSignature(headers);
     if (!sig) return;
+    if (typeof window === 'undefined' || !window.localStorage || typeof window.localStorage.getItem !== 'function' || typeof window.localStorage.setItem !== 'function') {
+      return;
+    }
     const stored = window.localStorage.getItem(MAPPING_STORAGE_KEY);
     const mappings = stored ? JSON.parse(stored) : {};
     mappings[sig] = mapping;
@@ -44,8 +50,29 @@ export const saveMapping = (headers: string[], mapping: FileMapping): void => {
 /** Clears all saved column mappings. Called by clearAllData so re-uploads always re-detect format. */
 export const clearStoredMappings = (): void => {
   try {
+    if (typeof window === 'undefined' || !window.localStorage || typeof window.localStorage.removeItem !== 'function') {
+      return;
+    }
     window.localStorage.removeItem(MAPPING_STORAGE_KEY);
   } catch (e) { console.warn('Failed to clear mappings', e); }
+};
+
+const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 6000): Promise<T> => {
+  return new Promise<T>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Supabase request timed out'));
+    }, ms);
+    promise.then(
+      res => {
+        clearTimeout(timeout);
+        resolve(res);
+      },
+      err => {
+        clearTimeout(timeout);
+        reject(err);
+      }
+    );
+  });
 };
 
 // --- Learning Rules ---
@@ -59,7 +86,10 @@ export const initializeRules = async () => {
   if (!supabase) return;
 
   try {
-    const { data, error } = await supabase.from(TABLES.CATEGORY_RULES).select('*');
+    const { data, error } = await promiseWithTimeout(
+      supabase.from(TABLES.CATEGORY_RULES).select('*'),
+      6000
+    );
     if (error) {
       console.warn('Rules init warning:', error.message);
       return;

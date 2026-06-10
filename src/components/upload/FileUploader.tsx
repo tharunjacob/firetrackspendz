@@ -5,6 +5,7 @@ import type { FileJob } from '@/types';
 import { logEvent, EVENTS } from '@/services/logger';
 import { LIMITS } from '@/config/storage';
 import { useAuth } from '@/contexts/AuthContext';
+import { useApp } from '@/contexts/AppContext';
 import { isPlanAtLeast } from '@/config/plans';
 import { isCloudEnabled } from '@/services/supabase';
 
@@ -26,6 +27,7 @@ interface FileUploaderProps {
 
 export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUploaderProps) => {
   const { plan, userId, setIsAuthOpen } = useAuth();
+  const { cancelProcessing } = useApp();
   const maxFileSize = isPlanAtLeast(plan, 'pro') ? LIMITS.MAX_FILE_SIZE_PRO : LIMITS.MAX_FILE_SIZE_FREE;
 
   const [rows, setRows] = useState<FileRow[]>([
@@ -308,8 +310,17 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
           </button>
 
           {isProcessing && (
-            <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-              <div className="bg-brand-600 h-full rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+            <div className="space-y-2 w-full">
+              <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-brand-600 h-full rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+              <button
+                type="button"
+                onClick={cancelProcessing}
+                className="w-full text-center text-xs text-red-500 active:text-red-600 font-semibold py-1.5 transition-colors focus:outline-none"
+              >
+                Cancel Analysis
+              </button>
             </div>
           )}
         </div>
@@ -351,11 +362,11 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
                     </div>
                   )}
 
-                  {/* Status */}
+                  {/* Status — skip if password-protected since PasswordPrompt has its own indicators */}
                   <div className="flex items-center gap-2">
-                    {row.status === 'checking' && <div className="w-5 h-5 border-2 border-brand-300 border-t-brand-600 rounded-full animate-spin" />}
-                    {row.status === 'ready' && <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><Icon name="check" className="w-3 h-3 text-white" /></div>}
-                    {row.status === 'error' && <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shrink-0" title={row.error}><Icon name="close" className="w-3 h-3 text-white" /></div>}
+                    {!row.needsPassword && row.status === 'checking' && <div className="w-5 h-5 border-2 border-brand-300 border-t-brand-600 rounded-full animate-spin" />}
+                    {!row.needsPassword && row.status === 'ready' && <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><Icon name="check" className="w-3 h-3 text-white" /></div>}
+                    {!row.needsPassword && row.status === 'error' && <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shrink-0" title={row.error}><Icon name="close" className="w-3 h-3 text-white" /></div>}
                     {rows.length > 1 && (
                       <button onClick={() => removeRow(row.id)} className="text-slate-500 hover:text-red-500 transition-colors">
                         <Icon name="trash" className="w-5 h-5" />
@@ -392,8 +403,19 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
           </div>
 
           {isProcessing && (
-            <div className="mt-4 w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-              <div className="bg-brand-600 h-full rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+            <div className="mt-4 space-y-2 w-full">
+              <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-brand-600 h-full rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={cancelProcessing}
+                  className="text-xs text-red-500 hover:text-red-600 font-semibold py-1.5 transition-colors focus:outline-none"
+                >
+                  Cancel Analysis
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -81,7 +81,10 @@ export const loadSnapshots = async (userId?: string): Promise<AssetSnapshot[]> =
       const all: AssetSnapshot[] = [];
       let page = 0;
       const pageSize = 5000;
-      while (true) {
+      const MAX_PAGES = 100;
+      let pageCount = 0;
+      while (pageCount < MAX_PAGES) {
+        pageCount++;
         const { data, error } = await getSupabase()
           .from(TABLES.ASSET_SNAPSHOTS)
           .select('*')
@@ -231,13 +234,35 @@ export const computeCategoryReturns = (snapshots: AssetSnapshot[], latestDate?: 
   }).sort((a, b) => b.currentValue - a.currentValue);
 };
 
-// ---- CSV Parsing ----
+const parseCSVLine = (line: string): string[] => {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++; // skip next quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result;
+};
 
 export const parseCSVImport = (csvText: string): Partial<AssetSnapshot>[] => {
-  const lines = csvText.trim().split('\n');
+  const lines = csvText.trim().split(/\r?\n/);
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
   const dateIdx = headers.findIndex(h => h === 'date');
   const ownerIdx = headers.findIndex(h => h === 'owner');
   const categoryIdx = headers.findIndex(h => h === 'category' || h === 'asset type');
@@ -248,8 +273,12 @@ export const parseCSVImport = (csvText: string): Partial<AssetSnapshot>[] => {
   if (dateIdx === -1 || categoryIdx === -1 || currentIdx === -1) return [];
 
   return lines.slice(1).filter(l => l.trim()).map(line => {
-    const cols = line.split(',').map(c => c.trim());
-    const cleanNum = (s: string) => parseFloat(s.replace(/[^0-9.\-]/g, '')) || 0;
+    const cols = parseCSVLine(line).map(c => c.trim());
+    const cleanNum = (s: string) => {
+      // Remove commas, currency symbols, and spaces
+      const cleaned = s.replace(/[^0-9.\-]/g, '');
+      return parseFloat(cleaned) || 0;
+    };
 
     // Parse date — handle multiple formats
     let dateStr = cols[dateIdx] || '';

@@ -5,6 +5,7 @@ import { TAB_GROUPS, TAB_DISPLAY_NAMES } from '@/types';
 import { CURRENCIES } from '@/utils/constants';
 import { Icon } from '@/components/common/Icons';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
 
 // ─── Multi‑Select Chip Component ────────────────────────────
 const MultiSelect = ({ label, options, selected, onChange }: {
@@ -49,6 +50,7 @@ export const DashboardSidebar = ({
   isOpen, setIsOpen, onClear, activeTab, setActiveTab,
 }: SidebarProps) => {
   const { plan, userId, setIsAuthOpen } = useAuth();
+  const { setIsFeedbackOpen } = useUI();
   const showReportCardNotice = !!userId && (plan === 'pro' || plan === 'enterprise');
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -235,6 +237,13 @@ export const DashboardSidebar = ({
               Settings
             </button>
           )}
+          <button
+            onClick={() => { setIsFeedbackOpen(true); setIsOpen(false); }}
+            className="focus-ring w-full text-left flex items-center gap-2 px-3 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
+          >
+            <Icon name="mail" className="w-4 h-4" />
+            Send Feedback
+          </button>
           {onClear && transactions.length > 0 && (
             <button onClick={onClear}
               className="focus-ring w-full text-left flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition font-medium">

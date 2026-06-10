@@ -12,7 +12,7 @@ export const exportToCSV = (transactions: Transaction[], filename?: string): voi
     t.owner || '', t.notes || '', '',
   ]);
 
-  const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(','))].join('\n');
+  const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${(c || '').replace(/"/g, '""').replace(/[\r\n]+/g, ' ')}"`).join(','))].join('\n');
   downloadFile(csv, filename || `trackspendz_export_${dateStamp()}.csv`, 'text/csv');
 };
 
@@ -28,7 +28,7 @@ export const exportAssetSnapshotsToCSV = (snapshots: any[], filename?: string): 
     s.principal.toString(), s.current_value.toString(), s.currency || '', s.notes || '',
   ]);
 
-  const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(','))].join('\n');
+  const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${(c || '').replace(/"/g, '""').replace(/[\r\n]+/g, ' ')}"`).join(','))].join('\n');
   downloadFile(csv, filename || `trackspendz_assets_${dateStamp()}.csv`, 'text/csv');
 };
 

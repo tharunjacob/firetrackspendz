@@ -510,23 +510,58 @@ export const validatePdfPassword = async (file: File, password?: string): Promis
 };
 
 
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = () => reject(reader.error || new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
+const promiseWithTimeout = <T>(promise: Promise<T>, ms: number, errorMsg: string): Promise<T> => {
+  return new Promise<T>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(errorMsg));
+    }, ms);
+    promise
+      .then(res => {
+        clearTimeout(timeout);
+        resolve(res);
+      })
+      .catch(err => {
+        clearTimeout(timeout);
+        reject(err);
+      });
+  });
+};
+
 const extractTextFromEncryptedPDF = async (arrayBuffer: ArrayBuffer, password?: string): Promise<string> => {
   const pdfjs = await getPdfJs();
-  try {
-    const pdf = await pdfjs.getDocument({ data: arrayBuffer, password }).promise;
-    let fullText = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      fullText += textContent.items.map((item: any) => item.str).join('  ') + '\n';
+  const run = async () => {
+    try {
+      const loadingTask = pdfjs.getDocument({ data: arrayBuffer, password, disableFontFace: true });
+      const pdf = await loadingTask.promise;
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        fullText += textContent.items.map((item: any) => item.str).join('  ') + '\n';
+      }
+      return fullText;
+    } catch (error: any) {
+      if (error.name === 'PasswordException' || error.message?.includes('Password') || error.code === 1) {
+        throw new Error(password ? 'Incorrect Password. Please try again.' : 'PASSWORD_REQUIRED');
+      }
+      throw error;
     }
-    return fullText;
-  } catch (error: any) {
-    if (error.name === 'PasswordException' || error.message?.includes('Password') || error.code === 1) {
-      throw new Error(password ? 'Incorrect Password. Please try again.' : 'PASSWORD_REQUIRED');
-    }
-    throw error;
-  }
+  };
+
+  return promiseWithTimeout(run(), 20000, 'PDF text extraction timed out after 20 seconds');
 };
 
 /**
@@ -547,26 +582,20 @@ const extractTextFromEncryptedPDF = async (arrayBuffer: ArrayBuffer, password?: 
 export const transformData = async (
   file: File,
   owner: string,
-  password?: string
+  password?: string,
+  signal?: AbortSignal
 ): Promise<{ transactions: Transaction[]; error?: string; lastHeaders?: string[] }> => {
   // PDF path
   if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+    if (signal?.aborted) throw new Error('CANCELED');
     const arrayBuffer = await file.arrayBuffer();
+    if (signal?.aborted) throw new Error('CANCELED');
     let extractionPayload: { base64?: string; text?: string } = {};
 
     try {
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      const len = bytes.byteLength;
-      const chunk = 8192;
-      for (let i = 0; i < len; i += chunk) {
-        binary += String.fromCharCode.apply(
-          null,
-          bytes.subarray(i, Math.min(i + chunk, len)) as unknown as number[]
-        );
-      }
-      const base64 = btoa(binary);
+      const base64 = await fileToBase64(file);
       extractionPayload.base64 = base64;
+      if (signal?.aborted) throw new Error('CANCELED');
 
       if (password) {
         try {
@@ -579,16 +608,22 @@ export const transformData = async (
           extractionPayload.text = await extractTextFromEncryptedPDF(arrayBuffer);
         } catch (e: any) {
           if (e.message === 'PASSWORD_REQUIRED') throw e;
+          console.warn('extractTextFromEncryptedPDF failed, falling back to base64:', e);
         }
       }
     } catch (err: any) {
+      if (err.message === 'CANCELED' || signal?.aborted) throw new Error('CANCELED');
       if (err.message === 'PASSWORD_REQUIRED' || err.message?.includes('Incorrect Password')) throw err;
       if (password) throw err;
     }
 
+    if (signal?.aborted) throw new Error('CANCELED');
+
     const rawData = extractionPayload.text
-      ? await extractTransactionsFromPDF(extractionPayload.text, true)
-      : await extractTransactionsFromPDF(extractionPayload.base64 || '', false);
+      ? await extractTransactionsFromPDF(extractionPayload.text, true, signal)
+      : await extractTransactionsFromPDF(extractionPayload.base64 || '', false, signal);
+
+    if (signal?.aborted) throw new Error('CANCELED');
 
     if (!rawData?.length) throw new Error('No transactions found in PDF. Try converting to CSV.');
 
@@ -750,12 +785,14 @@ export const transformData = async (
         // 6. Absolute worst-case: treat CSV/Excel as raw text and pass it to Gemini's direct statement parser
         if (transactions.length === 0) {
           try {
+            if (signal?.aborted) throw new Error('CANCELED');
             console.log('Layout mapping failed. Serializing CSV/Excel to raw text for direct AI extraction fallback...');
             const rawTextContent = rows
               .map(row => row.map(cell => String(cell ?? '')).join(','))
               .join('\n');
             const trimmedText = rawTextContent.length > 80000 ? rawTextContent.slice(0, 80000) : rawTextContent;
-            const rawParsed = await extractTransactionsFromPDF(trimmedText, true);
+            if (signal?.aborted) throw new Error('CANCELED');
+            const rawParsed = await extractTransactionsFromPDF(trimmedText, true, signal);
             if (rawParsed && rawParsed.length > 0) {
               transactions = rawParsed.map((t: any, i: number) => ({
                 id: `${owner.replace(/[^a-z0-9]/gi, '')}-${t.date}-${t.amount}-${(t.description || '').substring(0, 10).replace(/[^a-z0-9]/gi, '')}-${i}`,

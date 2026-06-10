@@ -173,10 +173,17 @@ export const persistAchievement = async (
 };
 
 export const loadUserAchievements = async (userId: string): Promise<UserAchievement[]> => {
-  const { data } = await getSupabase()
-    .from(TABLES.USER_ACHIEVEMENTS)
-    .select('*')
-    .eq('user_id', userId)
-    .order('earned_at', { ascending: false });
-  return (data as UserAchievement[]) || [];
+  try {
+    if (!userId) return [];
+    const { data, error } = await getSupabase()
+      .from(TABLES.USER_ACHIEVEMENTS)
+      .select('*')
+      .eq('user_id', userId)
+      .order('earned_at', { ascending: false });
+    if (error) { console.warn('Failed to load achievements:', error.message); return []; }
+    return (data as UserAchievement[]) || [];
+  } catch (e) {
+    console.warn('Failed to load achievements:', e);
+    return [];
+  }
 };

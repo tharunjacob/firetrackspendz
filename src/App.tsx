@@ -5,6 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Toast } from '@/components/common/Toast';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { FeedbackButton } from '@/components/common/FeedbackButton';
+import { FeedbackModal } from '@/components/common/FeedbackModal';
 import { ROUTES } from '@/config/routes';
 import { logPageView } from '@/services/logger';
 
@@ -47,7 +48,7 @@ const Loading = () => (
 );
 
 function App() {
-  const { user, toast, hideToast, isAuthOpen, setIsAuthOpen, isAuthReady } = useApp();
+  const { user, toast, hideToast, isAuthOpen, setIsAuthOpen, isAuthReady, isAdmin } = useApp();
 
   if (!isAuthReady) {
     return <Loading />;
@@ -82,7 +83,7 @@ function App() {
           <Route path={ROUTES.ASSETS} element={user ? <NetAssetPage /> : <Navigate to={ROUTES.HOME} replace />} />
           <Route path={ROUTES.SETTINGS} element={user ? <SettingsPage /> : <Navigate to={ROUTES.HOME} replace />} />
           <Route path={ROUTES.FAMILY} element={user ? <FamilyDashboard /> : <Navigate to={ROUTES.HOME} replace />} />
-          <Route path={ROUTES.ADMIN} element={user ? <AdminPage /> : <Navigate to={ROUTES.HOME} replace />} />
+          <Route path={ROUTES.ADMIN} element={user && isAdmin ? <AdminPage /> : <Navigate to={ROUTES.HOME} replace />} />
 
           {/* Catch all */}
           <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
@@ -93,6 +94,7 @@ function App() {
       {toast.visible && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
       {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} />}
       <FeedbackButton />
+      <FeedbackModal />
     </div>
   );
 }

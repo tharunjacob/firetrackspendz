@@ -55,6 +55,7 @@ interface AppState {
   lastImportHeaders: string[] | null;
   isDemoMode: boolean;
   processFiles: (jobs: FileJob[], ownerOverride?: string) => Promise<void>;
+  cancelProcessing: () => void;
   updateTransactions: (updated: Transaction[]) => Promise<void>;
   deleteTransactions: (ids: string[]) => Promise<void>;
   clearAllData: () => Promise<void>;
@@ -71,6 +72,8 @@ interface AppState {
   toast: { message: string; visible: boolean; type: 'success' | 'error' | 'info' };
   showToast: (message: string, type?: 'success' | 'error' | 'info', duration?: number) => void;
   hideToast: () => void;
+  isFeedbackOpen: boolean;
+  setIsFeedbackOpen: (open: boolean) => void;
 }
 
 /**
@@ -108,6 +111,7 @@ export const useApp = (): AppState => {
     lastImportHeaders: data.lastImportHeaders,
     isDemoMode: data.isDemoMode,
     processFiles: data.processFiles,
+    cancelProcessing: data.cancelProcessing,
     updateTransactions: data.updateTransactions,
     deleteTransactions: data.deleteTransactions,
     clearAllData: data.clearAllData,
@@ -124,6 +128,8 @@ export const useApp = (): AppState => {
     toast: ui.toast,
     showToast: ui.showToast,
     hideToast: ui.hideToast,
+    isFeedbackOpen: ui.isFeedbackOpen,
+    setIsFeedbackOpen: ui.setIsFeedbackOpen,
   };
 };
 

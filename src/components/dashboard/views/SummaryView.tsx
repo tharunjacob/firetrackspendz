@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useTheme } from '@/contexts/UIContext';
 import type { Transaction } from '@/types';
 import { formatAmount, COLORS } from '@/utils/constants';
-import { getMonthlyBreakdown, getDeepInsights, calculateFireMetrics } from '@/services/analysis';
+import { getMonthlyBreakdown, getDeepInsights, calculateFireMetrics, getMonthlySavingsRates } from '@/services/analysis';
 import { MetricCard, type Tone } from '@/components/dashboard/MetricCard';
 import { FIRE_MULTIPLIER } from './fire/shared';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from 'recharts';
@@ -119,6 +119,24 @@ const CustomBarTooltip = ({ active, payload, label, currency }: any) => {
   );
 };
 
+// ─── Rate Tooltip ────────────────────────────────────────────
+const RateTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  const rawRate = payload[0].payload.rawRate ?? payload[0].value;
+  return (
+    <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-lg shadow-md px-4 py-3 text-xs">
+      <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1.5">{label}</p>
+      <div className="flex items-center gap-2 py-0.5">
+        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: payload[0].color || payload[0].fill }} />
+        <span className="text-slate-500 dark:text-slate-400">Savings Rate:</span>
+        <span className={`font-bold ${rawRate >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+          {rawRate.toFixed(1)}%
+        </span>
+      </div>
+    </div>
+  );
+};
+
 // ─── Summary View (matches live dashboard) ──────────────────
 export const SummaryView = ({ data }: { data?: Transaction[] }) => {
   const { transactions, currency, setActiveTab } = useApp();
@@ -140,6 +158,9 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
   }, [txns]);
 
   const monthly = useMemo(() => getMonthlyBreakdown(txns), [txns]);
+  const [chartMode, setChartMode] = useState<'absolute' | 'rate'>('absolute');
+  const chartData = useMemo(() => getMonthlySavingsRates(monthly), [monthly]);
+
   const insights = useMemo(() => getDeepInsights(txns), [txns]);
   const multiplier = FIRE_MULTIPLIER[currency] || 25;
   const fire = useMemo(() => calculateFireMetrics(txns, multiplier), [txns, multiplier]);
@@ -219,9 +240,35 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
 
       {/* Net Savings Trend */}
       <div className="card p-4 sm:p-5">
-        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Net Savings Trend</h3>
+        <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {chartMode === 'absolute' ? 'Net Savings Trend' : 'Savings Rate Trend'}
+          </h3>
+          <div className="flex bg-slate-100 dark:bg-slate-700 p-0.5 rounded-lg text-xs">
+            <button
+              onClick={() => setChartMode('absolute')}
+              className={`px-3 py-1 rounded-md transition-all ${
+                chartMode === 'absolute'
+                  ? 'bg-white dark:bg-slate-600 text-slate-800 dark:text-white font-semibold shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              Absolute
+            </button>
+            <button
+              onClick={() => setChartMode('rate')}
+              className={`px-3 py-1 rounded-md transition-all ${
+                chartMode === 'rate'
+                  ? 'bg-white dark:bg-slate-600 text-slate-800 dark:text-white font-semibold shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              Savings Rate (%)
+            </button>
+          </div>
+        </div>
         <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={monthly}>
+          <LineChart data={chartData}>
             <defs>
               <linearGradient id="savingsGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={COLORS.brand} stopOpacity={0.15} />
@@ -230,11 +277,21 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_COLOR} />
             <XAxis dataKey="month" tick={{ fontSize: 10 }} tickFormatter={m => m.slice(5)} />
-            <YAxis tick={{ fontSize: 10 }} width={38} tickFormatter={v => v >= 1e3 ? (v / 1e3).toFixed(0) + 'K' : v} />
-            <Tooltip content={<CustomBarTooltip currency={currency} />} />
+            {chartMode === 'absolute' ? (
+              <YAxis tick={{ fontSize: 10 }} width={38} tickFormatter={v => v >= 1e3 ? (v / 1e3).toFixed(0) + 'K' : v} />
+            ) : (
+              <YAxis tick={{ fontSize: 10 }} width={38} domain={[-50, 100]} tickFormatter={v => `${v}%`} />
+            )}
+            <Tooltip content={chartMode === 'absolute' ? <CustomBarTooltip currency={currency} /> : <RateTooltip />} />
             <Legend />
-            <Line type="monotone" dataKey="savings" stroke={COLORS.brand} strokeWidth={2.5} dot={{ r: 3, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6, strokeWidth: 2 }} name="Net Savings" animationDuration={1000} />
-            <Line type="monotone" dataKey="expense" stroke={COLORS.expense.medium} strokeWidth={1.5} dot={false} strokeDasharray="4 4" name="Expense" animationDuration={1200} />
+            {chartMode === 'absolute' ? (
+              <>
+                <Line type="monotone" dataKey="savings" stroke={COLORS.brand} strokeWidth={2.5} dot={{ r: 3, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6, strokeWidth: 2 }} name="Net Savings" animationDuration={1000} />
+                <Line type="monotone" dataKey="expense" stroke={COLORS.expense.medium} strokeWidth={1.5} dot={false} strokeDasharray="4 4" name="Expense" animationDuration={1200} />
+              </>
+            ) : (
+              <Line type="monotone" dataKey="rate" stroke={COLORS.brand} strokeWidth={2.5} dot={{ r: 3, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6, strokeWidth: 2 }} name="Savings Rate" animationDuration={1000} />
+            )}
           </LineChart>
         </ResponsiveContainer>
       </div>

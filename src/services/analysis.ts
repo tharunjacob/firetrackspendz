@@ -538,6 +538,27 @@ export const getMonthlyBreakdown = (data: Transaction[]): { month: string; incom
     }));
 };
 
+export interface MonthlySavingsRate {
+  month: string;
+  income: number;
+  expense: number;
+  savings: number;
+  rate: number;
+  rawRate: number;
+}
+
+/** Computes savings rates per month, clamping visually between -50% and 100% for charts. */
+export const getMonthlySavingsRates = (monthlyBreakdown: { month: string; income: number; expense: number; savings: number }[]): MonthlySavingsRate[] => {
+  return monthlyBreakdown.map(m => {
+    const rawRate = m.income > 0 ? ((m.income - m.expense) / m.income) * 100 : 0;
+    return {
+      ...m,
+      rate: Math.max(-50, Math.min(100, rawRate)),
+      rawRate,
+    };
+  });
+};
+
 /** Sums amounts per category for a given transaction type, sorted by value desc. */
 export const getCategoryBreakdown = (data: Transaction[], type: 'Expense' | 'Income' = 'Expense'): { name: string; value: number; percentage: number }[] => {
   const filtered = data.filter(t => t.type === type);

@@ -19,6 +19,7 @@ export type GeminiContents = {
 export interface ProxyRequest {
   contents: GeminiContents;
   jsonMode?: boolean;
+  signal?: AbortSignal;
 }
 
 /**
@@ -26,6 +27,47 @@ export interface ProxyRequest {
  * Returns the text from the first candidate, or throws on error.
  */
 export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
+  // Dev fallback: call Gemini directly (only compiled in DEV mode)
+  if (import.meta.env.DEV) {
+    const devKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    if (devKey) {
+      const model = 'gemini-2.5-flash';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${devKey}`;
+      const body: Record<string, unknown> = { contents: payload.contents };
+      if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
+
+      const devController = new AbortController();
+      const devTimeoutId = setTimeout(() => devController.abort(), 120000); // 120 s max
+
+      if (payload.signal) {
+        if (payload.signal.aborted) {
+          devController.abort();
+        } else {
+          payload.signal.addEventListener('abort', () => devController.abort(), { once: true });
+        }
+      }
+
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: devController.signal,
+        });
+      } finally {
+        clearTimeout(devTimeoutId);
+      }
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        console.error(`Gemini API direct call failed (status ${res.status}):`, errText);
+        throw new Error(`Gemini API error ${res.status}: ${errText}`);
+      }
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    }
+  }
+
   // Production path: call the edge function
   if (SUPABASE_FUNCTIONS_URL && isCloudEnabled()) {
     try {
@@ -42,6 +84,14 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 s max — matches Supabase Edge Function wall-time limit
+
+      if (payload.signal) {
+        if (payload.signal.aborted) {
+          controller.abort();
+        } else {
+          payload.signal.addEventListener('abort', () => controller.abort(), { once: true });
+        }
+      }
 
       let res: Response;
       try {
@@ -63,8 +113,11 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
       const data = await res.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     } catch (e: any) {
-      // Convert AbortError (timeout) into a user-friendly message
+      // Convert AbortError (timeout or manual cancellation) into a user-friendly message
       if (e?.name === 'AbortError') {
+        if (payload.signal?.aborted) {
+          throw new Error('CANCELED');
+        }
         throw new Error('PDF parsing timed out — please try again. If it keeps failing, convert your PDF to CSV first.');
       }
       console.warn('[aiProxy] Edge function call failed, no dev fallback in production:', e);
@@ -72,41 +125,7 @@ export const callAIProxy = async (payload: ProxyRequest): Promise<string> => {
     }
   }
 
-  // Dev fallback: call Gemini directly (only compiled in DEV mode)
-  if (import.meta.env.DEV) {
-    const devKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-    if (!devKey) {
-      throw new Error('AI unavailable: no VITE_GEMINI_API_KEY set and no Supabase Edge Function configured.');
-    }
-
-    const model = 'gemini-2.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${devKey}`;
-    const body: Record<string, unknown> = { contents: payload.contents };
-    if (payload.jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
-
-    const devController = new AbortController();
-    const devTimeoutId = setTimeout(() => devController.abort(), 120000); // 120 s max
-    let res: Response;
-    try {
-      res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: devController.signal,
-      });
-    } finally {
-      clearTimeout(devTimeoutId);
-    }
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
-      console.error(`Gemini API direct call failed (status ${res.status}):`, errText);
-      throw new Error(`Gemini API error ${res.status}: ${errText}`);
-    }
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-  }
-
-  throw new Error('AI features are currently unavailable in production. Please try again later.');
+  throw new Error('AI features are currently unavailable. Please try again later.');
 };
 
 export const isAIProxyAvailable = (): boolean => {

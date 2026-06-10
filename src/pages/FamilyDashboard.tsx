@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Icon } from '@/components/common/Icons';
 import { formatAmount, COLORS } from '@/utils/constants';
 import { getUserSetting, setUserSetting } from '@/services/userSettings';
 import { STORAGE_KEYS } from '@/config/storage';
 import { SummaryView } from '@/components/dashboard/views/SummaryView';
+import { ROUTES } from '@/config/routes';
 import type { FamilyMember, Transaction } from '@/types';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -192,11 +194,11 @@ const FamilyDashboard = () => {
         </p>
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
           <p className="text-sm text-amber-700 dark:text-amber-400">
-            Family Dashboard is an Enterprise feature. Upgrade to Enterprise ($149/year) to unlock
+            Family Dashboard is an Enterprise feature. Upgrade to Enterprise to unlock
             family accounts, shared views, and priority support.
           </p>
         </div>
-        <a href="/pricing" className="btn-primary px-6 py-2.5 inline-block">View Plans</a>
+        <Link to={ROUTES.PRICING} className="btn-primary px-6 py-2.5 inline-block">View Plans</Link>
       </div>
     );
   }
@@ -268,7 +270,7 @@ const FamilyDashboard = () => {
               <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
                 Upload statements from the main dashboard. Use the "Uploading for" selector to tag each member's transactions.
               </p>
-              <a href="/dashboard" className="inline-block mt-4 btn-primary text-sm px-5 py-2">Go to Dashboard</a>
+              <Link to={ROUTES.DASHBOARD} className="inline-block mt-4 btn-primary text-sm px-5 py-2">Go to Dashboard</Link>
             </div>
           )}
 

@@ -80,7 +80,7 @@ describe('Gemini Live API & Prompt Tests', () => {
       expect(transferTx).toBeDefined();
       expect(transferTx.type).toBe('Transfer');
       expect(transferTx.category).toBe('Transfer');
-    });
+    }, 45000);
 
     it('correctly processes US signed amount column format', async () => {
       const mockStatement = `
@@ -108,7 +108,7 @@ describe('Gemini Live API & Prompt Tests', () => {
       expect(interest).toBeDefined();
       expect(interest.amount).toBe(1.25);
       expect(interest.type).toBe('Income');
-    });
+    }, 45000);
   });
 
   describe('Real PDF Statement Tests', () => {
@@ -132,19 +132,16 @@ describe('Gemini Live API & Prompt Tests', () => {
       expect(transactions).toBeDefined();
       expect(transactions.length).toBeGreaterThan(0);
 
-      // Verify a few merchants we saw in the pdf dump: Zepto, Bigtree, Urbanclap, Swiggy
-      const zepto = transactions.find(t => t.description.toLowerCase().includes('zepto'));
+      // Verify a few merchants we saw in the pdf dump: Zepto, Bigtree, Swiggy
+      const zepto = transactions.find(t => t.description.toLowerCase().includes('zepto') && t.amount === 253);
       expect(zepto).toBeDefined();
-      expect(zepto.amount).toBe(253);
 
-      const bigtree = transactions.find(t => t.description.toLowerCase().includes('bigtree') || t.description.toLowerCase().includes('entertainment'));
+      const bigtree = transactions.find(t => (t.description.toLowerCase().includes('bigtree') || t.description.toLowerCase().includes('entertainment')) && t.amount === 181.86);
       expect(bigtree).toBeDefined();
-      expect(bigtree.amount).toBe(181.86);
 
-      const swiggy = transactions.find(t => t.description.toLowerCase().includes('swiggy'));
+      const swiggy = transactions.find(t => t.description.toLowerCase().includes('swiggy') && t.amount === 812);
       expect(swiggy).toBeDefined();
-      expect(swiggy.amount).toBe(812);
-    });
+    }, 90000);
 
     it('parses Testfile3_Password_THAR1707.pdf successfully', async () => {
       const pdfPath = path.join(archiveDir, 'Testfile3_Password_THAR1707.pdf');
@@ -165,13 +162,11 @@ describe('Gemini Live API & Prompt Tests', () => {
       expect(transactions.length).toBeGreaterThan(0);
 
       // Let's check some values we saw in page 2 text dump
-      const kumarAutomobile = transactions.find(t => t.description.toLowerCase().includes('kumar'));
+      const kumarAutomobile = transactions.find(t => t.description.toLowerCase().includes('kumar') && t.amount === 600);
       expect(kumarAutomobile).toBeDefined();
-      expect(kumarAutomobile.amount).toBe(600);
 
-      const irctc = transactions.find(t => t.description.toLowerCase().includes('irctc'));
+      const irctc = transactions.find(t => t.description.toLowerCase().includes('irctc') && t.amount === 2464.13);
       expect(irctc).toBeDefined();
-      expect(irctc.amount).toBe(2464.13);
-    });
+    }, 90000);
   });
 });

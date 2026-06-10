@@ -6,6 +6,7 @@ import {
   getCategoryBreakdown,
   detectRecurring,
   detectAnomalies,
+  getMonthlySavingsRates,
 } from '../analysis';
 import type { Transaction } from '@/types';
 
@@ -192,5 +193,38 @@ describe('detectRecurring', () => {
       tx({ date: '2026-01-22', amount: 67, notes: 'Brunch spot', category: 'Food' }),
     ];
     expect(detectRecurring(data)).toEqual([]);
+  });
+});
+
+describe('getMonthlySavingsRates', () => {
+  it('correctly calculates savings rates under normal conditions', () => {
+    const monthly = [
+      { month: '2026-01', income: 10000, expense: 6000, savings: 4000 },
+      { month: '2026-02', income: 5000, expense: 5000, savings: 0 },
+    ];
+    const out = getMonthlySavingsRates(monthly);
+    expect(out).toHaveLength(2);
+    expect(out[0].rawRate).toBe(40);
+    expect(out[0].rate).toBe(40);
+    expect(out[1].rawRate).toBe(0);
+    expect(out[1].rate).toBe(0);
+  });
+
+  it('clamps extreme negative savings rates to -50% visually', () => {
+    const monthly = [
+      { month: '2026-01', income: 1000, expense: 5000, savings: -4000 },
+    ];
+    const out = getMonthlySavingsRates(monthly);
+    expect(out[0].rawRate).toBe(-400);
+    expect(out[0].rate).toBe(-50);
+  });
+
+  it('handles zero income by returning 0% savings rate', () => {
+    const monthly = [
+      { month: '2026-01', income: 0, expense: 2000, savings: -2000 },
+    ];
+    const out = getMonthlySavingsRates(monthly);
+    expect(out[0].rawRate).toBe(0);
+    expect(out[0].rate).toBe(0);
   });
 });

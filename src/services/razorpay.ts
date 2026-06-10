@@ -124,7 +124,11 @@ async function createSubscription(args: {
   period: BillingPeriod;
   accessToken: string;
 }): Promise<CreateSubscriptionResponse> {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-create-subscription`, {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  let response: Response;
+  try {
+  response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-create-subscription`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -135,7 +139,9 @@ async function createSubscription(args: {
       currency: args.currency,
       period: args.period,
     }),
+    signal: controller.signal,
   });
+  } finally { clearTimeout(timeoutId); }
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
@@ -153,14 +159,20 @@ async function verifySubscription(args: {
   payment: RazorpayCheckoutSuccess;
   accessToken: string;
 }): Promise<{ ok: true }> {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-verify-subscription`, {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  let response: Response;
+  try {
+  response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-verify-subscription`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${args.accessToken}`,
     },
     body: JSON.stringify(args.payment),
+    signal: controller.signal,
   });
+  } finally { clearTimeout(timeoutId); }
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(err.error || 'Could not verify payment');
@@ -177,14 +189,20 @@ export async function cancelSubscription(args: {
   cancelAtCycleEnd: boolean;
   accessToken: string;
 }): Promise<{ status: string }> {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-cancel-subscription`, {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  let response: Response;
+  try {
+  response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-cancel-subscription`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${args.accessToken}`,
     },
     body: JSON.stringify({ cancel_at_cycle_end: args.cancelAtCycleEnd }),
+    signal: controller.signal,
   });
+  } finally { clearTimeout(timeoutId); }
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(err.error || 'Could not cancel subscription');
@@ -209,10 +227,16 @@ export interface SubscriptionDetails {
  * Used by the Subscription Manager UI in /settings.
  */
 export async function fetchSubscriptionDetails(accessToken: string): Promise<SubscriptionDetails | null> {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-get-subscription`, {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  let response: Response;
+  try {
+  response = await fetch(`${SUPABASE_URL}/functions/v1/razorpay-get-subscription`, {
     method: 'GET',
     headers: { Authorization: `Bearer ${accessToken}` },
+    signal: controller.signal,
   });
+  } finally { clearTimeout(timeoutId); }
   if (response.status === 404) return null;
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));

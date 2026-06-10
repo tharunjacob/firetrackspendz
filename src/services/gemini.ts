@@ -289,7 +289,7 @@ export const detectFileStructure = async (rawRows: any[][]): Promise<{ headerInd
  * was decrypted locally) or a base64-encoded PDF (Gemini extracts text itself).
  * Returns [] on failure — the caller throws a user-friendly error instead.
  */
-export const extractTransactionsFromPDF = async (dataInput: string, isRawText: boolean = false): Promise<any[]> => {
+export const extractTransactionsFromPDF = async (dataInput: string, isRawText: boolean = false, signal?: AbortSignal): Promise<any[]> => {
   if (!isAIProxyAvailable()) return [];
 
   const prompt = `You are a bank statement parser. Extract every financial transaction from the statement and output them in strict pipe-delimited format.
@@ -441,7 +441,7 @@ No headers. No extra text. No markdown.`;
       contents = [{ role: 'user', parts: [{ text: prompt }, { inlineData: { mimeType: 'application/pdf', data: dataInput } }] }];
     }
 
-    const rawText = (await callAIProxy({ contents }) || '')
+    const rawText = (await callAIProxy({ contents, signal }) || '')
       .replace(/^```[a-z]*/m, '').replace(/```$/m, '').trim();
     if (!rawText) return [];
 
@@ -504,10 +504,8 @@ No headers. No extra text. No markdown.`;
       };
     }).filter(Boolean);
   } catch (e: any) {
-    // Re-throw auth/account errors so the user sees a clear message
-    if (e?.message?.includes('Sign in') || e?.message?.includes('account')) throw e;
-    console.error('PDF Extraction Error', e);
-    return [];
+    console.error('PDF Extraction Error:', e);
+    throw e;
   }
 };
 

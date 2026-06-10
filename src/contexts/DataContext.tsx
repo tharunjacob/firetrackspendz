@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, type ReactNode, type MutableRefObject } from 'react';
 import type { Transaction, FileJob, SubscriptionPlan } from '@/types';
 import { loadFromStorage, saveToStorage, deleteFromStorage, resetAllData } from '@/services/storage';
+import { localReset } from '@/services/localStorage';
 import { cloudSave, cloudLoad } from '@/services/cloudStorage';
 import { transformData, identifyInterAccountTransfers, deduplicateTransactions } from '@/services/transformer';
 import { clearStoredMappings } from '@/services/learningRules';
@@ -52,6 +53,7 @@ interface DataState {
    */
   lastImportHeaders: string[] | null;
   processFiles: (jobs: FileJob[], ownerOverride?: string) => Promise<void>;
+  cancelProcessing: () => void;
   updateTransactions: (updated: Transaction[]) => Promise<void>;
   deleteTransactions: (ids: string[]) => Promise<void>;
   clearAllData: () => Promise<void>;
@@ -115,6 +117,18 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
   const [loadError, setLoadError] = useState<string | null>(null);
   const [lastImportHeaders, setLastImportHeaders] = useState<string[] | null>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const cancelProcessing = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsProcessing(false);
+    setProcessingProgress(0);
+    showToast('Analysis canceled', 'info');
+  }, [showToast]);
+
   // Mirror for synchronous reads inside processFiles (see the upload guard below).
   const isDemoModeRef = useRef(false);
   useEffect(() => { isDemoModeRef.current = isDemoMode; }, [isDemoMode]);
@@ -170,8 +184,14 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     const load = async () => {
       try {
         const data = await loadFromStorage();
+        setIsDemoMode(false);
         setTransactions(applyPlanCap(data, plan));
         setAllTransactionsRaw(data);
+        if (data.length > 0 && !userId) {
+          setIsAnonymousPreview(true);
+        } else {
+          setIsAnonymousPreview(false);
+        }
         if (!uploadReminderShownRef.current) {
           uploadReminderShownRef.current = true;
           if (checkUploadReminder(data)) {
@@ -198,6 +218,10 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
   const processFiles = useCallback(async (jobs: FileJob[], ownerOverride?: string) => {
     setIsProcessing(true);
     setProcessingProgress(5);
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+    const signal = abortController.signal;
+
     const interval = setInterval(() => setProcessingProgress(p => p >= 95 ? p : p + 2), 1000);
     const startMs = Date.now();
 
@@ -213,6 +237,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     }
 
     try {
+      if (signal.aborted) throw new Error('CANCELED');
       // Merge/dedup against the FULL set (allRawRef), never the capped visible
       // `transactions`. For a free user with >500 transactions, deduping only
       // against the visible 500 let overlapping re-uploads slip duplicate rows of
@@ -227,8 +252,10 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       let importHeaders: string[] | null = null;
 
       for (const job of jobs) {
+        if (signal.aborted) throw new Error('CANCELED');
         try {
-          const res = await transformData(job.file, job.owner, job.password);
+          const res = await transformData(job.file, job.owner, job.password, signal);
+          if (signal.aborted) throw new Error('CANCELED');
           if (res.transactions.length) {
             successCount++;
             // Capture headers from the first file that used a non-cached mapping
@@ -272,6 +299,9 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
             });
           }
         } catch (e: unknown) {
+          if (e instanceof Error && e.message === 'CANCELED') {
+            throw e;
+          }
           const message = e instanceof Error ? e.message : 'Failed to process file';
           logEvent(EVENTS.UPLOAD_ANALYSIS_FAILED, {
             fileName: job.file.name,
@@ -283,8 +313,8 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
         setProcessingProgress(Math.round((completed / jobs.length) * 100));
       }
 
-      // Single persist after all files processed (signed-in users only).
-      if (!isAnon && !isMimicMode && totalNewTransactions > 0 && successCount > 0) {
+      // Single persist after all files processed.
+      if (!isMimicMode && totalNewTransactions > 0 && successCount > 0) {
         try {
           await saveToStorage(fullDataset);
         } catch (e) {
@@ -318,13 +348,24 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
           });
         }
       }
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === 'CANCELED') {
+        console.log('[processFiles] upload analysis canceled');
+      } else {
+        const message = e instanceof Error ? e.message : 'Failed to process files';
+        showToast(message, 'error');
+      }
     } finally {
       clearInterval(interval);
+      abortControllerRef.current = null;
 
-      setProcessingProgress(100);
-      setTimeout(() => setIsProcessing(false), 800);
+      if (!signal.aborted) {
+        setProcessingProgress(100);
+        setTimeout(() => setIsProcessing(false), 800);
+      }
     }
-  }, [transactions, allTransactionsRaw, userId, plan, isMimicMode, showToast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, plan, isMimicMode, showToast]);
 
   const updateTransactions = useCallback(async (updated: Transaction[]) => {
     // Edit against the FULL set (allRawRef) so the visible cap and the total
@@ -371,7 +412,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     } catch (e) {
       console.error('clearAllData failed', e);
     }
-    window.location.reload();
+    // NOTE: callers are responsible for navigation/reload after this returns
   }, []);
 
   const clearLastImportHeaders = useCallback(() => {
@@ -445,6 +486,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     promotionInFlightRef.current = true;
     try {
       await cloudSave(raw);
+      await localReset();
       const cloudData = await cloudLoad();
       // All rows are now safely in the cloud. Free accounts still only VIEW the
       // most-recent 500 (applyPlanCap) — promotion never drops data.
@@ -484,13 +526,13 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       transactions, allTransactionsCount, isLoading, isProcessing, processingProgress,
       isAnonymousPreview, loadError, lastImportHeaders, isDemoMode,
       processFiles, updateTransactions, deleteTransactions, clearAllData, refreshData,
-      clearLastImportHeaders, loadDemoData, clearDemoData,
+      clearLastImportHeaders, loadDemoData, clearDemoData, cancelProcessing,
     }),
     [
       transactions, allTransactionsCount, isLoading, isProcessing, processingProgress,
       isAnonymousPreview, loadError, lastImportHeaders, isDemoMode,
       processFiles, updateTransactions, deleteTransactions, clearAllData, refreshData,
-      clearLastImportHeaders, loadDemoData, clearDemoData,
+      clearLastImportHeaders, loadDemoData, clearDemoData, cancelProcessing,
     ],
   );
 

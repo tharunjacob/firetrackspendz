@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@/config/routes';
+import { useApp } from '@/contexts/AppContext';
 
 // ============================================================
 // Floating Feedback Button — Always visible on every page
@@ -13,20 +12,20 @@ import { ROUTES } from '@/config/routes';
 // DESIGN:
 // - Small pill on the right edge of the screen
 // - Expands on hover to show "Feedback" text
-// - Clicking navigates to /feedback page
+// - Clicking opens the Feedback Modal in-place
 // - Doesn't overlap with the mobile FAB in DashboardShell
 //
-// DEPENDS ON: config/routes
+// DEPENDS ON: AppContext
 // CONSUMED BY: App.tsx (rendered globally)
 // ============================================================
 
 export const FeedbackButton = () => {
-  const navigate = useNavigate();
+  const { setIsFeedbackOpen } = useApp();
   const [hovered, setHovered] = useState(false);
 
   return (
     <button
-      onClick={() => navigate(ROUTES.FEEDBACK)}
+      onClick={() => setIsFeedbackOpen(true)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="fixed right-0 bottom-24 z-40 bg-slate-700 hover:bg-slate-800 text-white rounded-l-xl shadow-md transition-all duration-200 flex items-center gap-2 overflow-hidden group"

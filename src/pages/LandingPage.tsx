@@ -36,33 +36,46 @@ const LandingPage = () => {
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-slate-900 dark:text-slate-100 leading-[1.1] mb-5">
-                See exactly where<br />
-                <span className="text-gradient">your money goes</span>
+                Understand your money<br />
+                <span className="text-gradient">without connecting your bank</span>
               </h1>
 
               <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
-                Upload your bank statement. Get instant spending insights.{' '}
-                <strong className="text-slate-800 dark:text-slate-200 font-semibold">No signup needed.</strong>
+                Upload bank or credit card statements to instantly analyze spending, track net worth, and monitor your progress toward financial independence.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-8">
                 <button
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/dashboard?demo=true')}
                   className="btn-primary text-base px-8 py-3.5 shadow-md shadow-brand-200/60 w-full sm:w-auto"
                 >
-                  Upload Your Statement — Free
+                  Explore Live Demo
+                </button>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="btn-secondary text-base px-8 py-3.5 w-full sm:w-auto border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                >
+                  Upload Statement — Free
                 </button>
               </div>
 
-              {/* Trust badges */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
+              {/* Trust bullets */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto lg:mx-0">
                 <span className="flex items-center gap-1.5">
-                  <Icon name="shield" className="w-4 h-4 text-green-500" />
-                  Secure cloud storage (SSL & RLS)
+                  <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
+                  No bank login required
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Icon name="shield" className="w-4 h-4 text-green-500" />
-                  Your data stays private
+                  <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
+                  Upload only files you choose
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
+                  Account numbers never stored
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
+                  Delete your data anytime
                 </span>
               </div>
             </div>
@@ -88,9 +101,9 @@ const LandingPage = () => {
                   {/* Metric cards */}
                   <div className="grid grid-cols-3 gap-2.5">
                     {[
-                      { label: 'Monthly Spend', value: '₹42,380', sub: '↑ 8% vs last mo', subColor: 'text-red-500' },
+                      { label: 'Monthly Spend', value: '$2,380', sub: '↑ 8% vs last mo', subColor: 'text-red-500' },
                       { label: 'Savings Rate', value: '34%', sub: '↑ On track!', subColor: 'text-green-600' },
-                      { label: 'FIRE Progress', value: '18%', sub: '₹4.2L / ₹23L', subColor: 'text-slate-500' },
+                      { label: 'FIRE Progress', value: '18%', sub: '$42K / $230K', subColor: 'text-slate-500' },
                     ].map(m => (
                       <div key={m.label} className="bg-white dark:bg-slate-800 rounded-lg p-2.5 shadow-sm border border-slate-100 dark:border-slate-700">
                         <p className="text-[10px] text-slate-500 mb-0.5">{m.label}</p>
@@ -138,9 +151,9 @@ const LandingPage = () => {
                       Recent Transactions
                     </p>
                     {[
-                      { name: 'Swiggy', cat: 'Food & Dining', amt: '−₹485', amtColor: 'text-red-500' },
-                      { name: 'Amazon', cat: 'Shopping', amt: '−₹1,299', amtColor: 'text-red-500' },
-                      { name: 'Salary', cat: 'Income', amt: '+₹65,000', amtColor: 'text-green-600' },
+                      { name: 'Uber', cat: 'Transport', amt: '−$45', amtColor: 'text-red-500' },
+                      { name: 'Amazon', cat: 'Shopping', amt: '−$129', amtColor: 'text-red-500' },
+                      { name: 'Salary', cat: 'Income', amt: '+$5,000', amtColor: 'text-green-600' },
                     ].map((tx, i) => (
                       <div key={i} className="flex items-center px-3 py-1.5 border-b border-slate-50 dark:border-slate-700 last:border-0">
                         <div className="flex-1 min-w-0">
@@ -173,7 +186,7 @@ const LandingPage = () => {
                 icon: 'upload',
                 step: '01',
                 title: 'Upload your statement',
-                desc: 'Drop any file from any bank — Excel, CSV, or PDF. Indian and international banks all work.',
+                desc: 'Drop any file from any bank — Excel, CSV, or PDF. Major domestic and international banks all work.',
               },
               {
                 icon: 'ai',
@@ -236,7 +249,7 @@ const LandingPage = () => {
                 icon: 'wallet',
                 color: 'bg-green-50 dark:bg-green-900/20 text-green-600',
                 title: 'Works with any bank',
-                desc: 'HDFC, SBI, ICICI, Axis, or international banks — upload any exported statement and columns are auto-detected.',
+                desc: 'Chase, Bank of America, HSBC, or any international bank — upload any CSV, Excel, or PDF statement and columns are auto-detected.',
               },
               {
                 icon: 'chart',
@@ -357,7 +370,7 @@ const LandingPage = () => {
             {/* Free */}
             <div className="card p-6">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Free</p>
-              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">₹0</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.isIndia ? '₹0' : '$0'}</div>
               <p className="text-xs text-slate-500 mb-5">Forever free</p>
               <ul className="space-y-2 mb-6">
                 {['Up to 500 transactions', 'Unlimited file uploads', 'Core dashboards (5 views)', 'Local storage only'].map(f => (

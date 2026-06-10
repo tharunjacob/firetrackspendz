@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { Link, useSearchParams } from 'react-router-dom';
 import type { FamilyMember } from '@/types';
 import { STORAGE_KEYS } from '@/config/storage';
 import { logEvent, EVENTS } from '@/services/logger';
@@ -38,8 +39,10 @@ export const DashboardShell = () => {
     isDemoMode, loadDemoData, clearDemoData, isLoading,
   } = useApp();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const devPlan = import.meta.env.DEV
-    ? new URLSearchParams(window.location.search).get('dev_plan')
+    ? searchParams.get('dev_plan')
     : null;
 
   const [uploadMemberOverride, setUploadMemberOverride] = useState('');
@@ -118,6 +121,18 @@ export const DashboardShell = () => {
     const cleanUrl = window.location.pathname + (query ? `?${query}` : '') + window.location.hash;
     window.history.replaceState({}, '', cleanUrl);
   }, [showToast]);
+
+  // Load demo data if "?demo=true" query param is present
+  useEffect(() => {
+    if (!isLoading && searchParams.get('demo') === 'true') {
+      if (!isDemoMode && transactions.length === 0) {
+        loadDemoData();
+      }
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('demo');
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, isDemoMode, loadDemoData, transactions.length, isLoading]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [moreSheetOpen, setMoreSheetOpen] = useState(false);
@@ -310,18 +325,31 @@ export const DashboardShell = () => {
           <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div className="w-full max-w-7xl mx-auto pb-24 lg:pb-4">
               {isDemoMode && (
-                <div className="mb-4 p-3 rounded-lg bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 flex items-center justify-between gap-3">
-                  <span className="flex items-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-300">
-                    <Icon name="eye" className="w-4 h-4 shrink-0" />
-                    Sample data — this is a synthetic example, not your own data.
-                  </span>
-                  <button
-                    type="button"
-                    onClick={clearDemoData}
-                    className="focus-ring shrink-0 text-sm font-semibold text-brand-700 dark:text-brand-300 border border-brand-300 dark:border-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors"
-                  >
-                    Clear
-                  </button>
+                <div className="mb-6 p-4 rounded-xl bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-slide-down">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 shrink-0">
+                      <Icon name="eye" className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Viewing with Sample Demo Data</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Ready to analyze your own spending? No data is saved until you upload.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                    <Link
+                      to="/"
+                      className="btn-secondary text-xs px-3.5 py-2 text-center flex-1 sm:flex-none border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                    >
+                      ← Back to Home
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={clearDemoData}
+                      className="btn-primary text-xs px-4 py-2 text-center flex-1 sm:flex-none font-semibold shadow-sm"
+                    >
+                      Exit Demo & Upload Your Own
+                    </button>
+                  </div>
                 </div>
               )}
               {filteredData.length > 0 && (

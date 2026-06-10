@@ -66,16 +66,26 @@ const loadEntries = (): NWEntry[] => {
   catch { return []; }
 };
 
-const persistEntries = (entries: NWEntry[]) =>
-  localStorage.setItem(NW_ENTRIES_KEY, JSON.stringify(entries));
+const persistEntries = (entries: NWEntry[]) => {
+  try {
+    localStorage.setItem(NW_ENTRIES_KEY, JSON.stringify(entries));
+  } catch (e) {
+    console.warn('Failed to persist net worth entries:', e);
+  }
+};
 
 const loadSnapshots = (): NWSnapshot[] => {
   try { return JSON.parse(localStorage.getItem(NW_SNAPSHOTS_KEY) || '[]'); }
   catch { return []; }
 };
 
-const persistSnapshots = (snaps: NWSnapshot[]) =>
-  localStorage.setItem(NW_SNAPSHOTS_KEY, JSON.stringify(snaps));
+const persistSnapshots = (snaps: NWSnapshot[]) => {
+  try {
+    localStorage.setItem(NW_SNAPSHOTS_KEY, JSON.stringify(snaps));
+  } catch (e) {
+    console.warn('Failed to persist net worth snapshots:', e);
+  }
+};
 
 const thisMonthKey = () => {
   const d = new Date();

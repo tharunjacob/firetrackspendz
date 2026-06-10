@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Icon } from '@/components/common/Icons';
 import { getSupabase } from '@/services/supabase';
 import { TABLES } from '@/config/database';
 import { STORAGE_KEYS } from '@/config/storage';
+import { ROUTES } from '@/config/routes';
 import { usePageMeta } from '@/hooks/usePageMeta';
 
 // ============================================================
@@ -57,6 +58,14 @@ const FeedbackPage = () => {
     email: userEmail || '',
   });
   const [submitted, setSubmitted] = useState(false);
+
+  // Sync email from auth when it becomes available (auth may resolve after initial render)
+  useEffect(() => {
+    if (userEmail && !form.email) {
+      setForm(f => ({ ...f, email: userEmail }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userEmail]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,11 +119,9 @@ const FeedbackPage = () => {
 
       if (dbError) {
         console.warn('[FeedbackPage] Supabase save failed, saving locally:', dbError);
-        // Fall back to localStorage
-        saveFeedbackLocally(payload);
       }
 
-      // Also save to localStorage as receipt
+      // Save locally as receipt (once, regardless of DB outcome)
       saveFeedbackLocally(payload);
 
       setSubmitted(true);
@@ -152,7 +159,7 @@ const FeedbackPage = () => {
             <button onClick={() => setSubmitted(false)} className="btn-secondary px-6 py-2 text-sm">
               Send Another
             </button>
-            <Link to="/dashboard" className="btn-primary px-6 py-2 text-sm">
+            <Link to={ROUTES.DASHBOARD} className="btn-primary px-6 py-2 text-sm">
               Back to Dashboard
             </Link>
           </div>
@@ -316,7 +323,7 @@ const FeedbackPage = () => {
         </div>
 
         <div className="text-center mt-6">
-          <Link to="/" className="text-sm text-brand-600 hover:underline">&larr; Back to Home</Link>
+          <Link to={ROUTES.HOME} className="text-sm text-brand-600 hover:underline">&larr; Back to Home</Link>
         </div>
       </div>
     </div>

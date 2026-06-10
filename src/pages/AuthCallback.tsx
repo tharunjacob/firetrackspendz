@@ -1,6 +1,7 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSupabase } from '@/services/supabase';
+import { ROUTES } from '@/config/routes';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -12,13 +13,13 @@ const AuthCallback = () => {
         const { data: { session }, error } = await getSupabase().auth.getSession();
         if (error) throw error;
         if (session) {
-          navigate('/dashboard', { replace: true });
+          navigate(ROUTES.DASHBOARD, { replace: true });
         } else {
-          navigate('/', { replace: true });
+          navigate(ROUTES.HOME, { replace: true });
         }
       } catch (err) {
         console.error('Auth callback error:', err);
-        navigate('/', { replace: true });
+        navigate(ROUTES.HOME, { replace: true });
       }
     };
     handleCallback();

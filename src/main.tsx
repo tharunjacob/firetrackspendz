@@ -21,13 +21,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // Self-heal: Completely unregister service workers and clear cache storage
 // Since TrackSpendZ requires an active network connection (Supabase, Gemini API),
 // the offline service worker was causing stale client bundles and infinite loading spinner bugs on redeployments.
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && !sessionStorage.getItem('tsz_sw_cleaned')) {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     for (const registration of registrations) {
       registration.unregister().then((success) => {
         if (success) {
           console.log('[SW] Successfully unregistered service worker');
-          // Reload to instantly clear the SW controller gate
+          // Set flag to prevent infinite reload loop
+          sessionStorage.setItem('tsz_sw_cleaned', '1');
           window.location.reload();
         }
       });

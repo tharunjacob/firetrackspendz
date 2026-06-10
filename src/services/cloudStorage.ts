@@ -131,7 +131,10 @@ export const cloudLoad = async (targetUserId?: string): Promise<Transaction[]> =
   let from = 0;
   const pageSize = 1000;
 
-  while (true) {
+  const MAX_PAGES = 100;
+  let pageCount = 0;
+  while (pageCount < MAX_PAGES) {
+    pageCount++;
     const { data, error } = await withRetry(async () => {
       return supabase
         .from(TABLES.TRANSACTIONS)

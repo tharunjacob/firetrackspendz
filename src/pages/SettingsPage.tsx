@@ -47,17 +47,22 @@ const SettingsPage = () => {
     if (deleteConfirmText !== 'DELETE') return;
     try {
       setLoading(true);
-      // Clear all local data
-      await clearAllData();
-      // Delete cloud data
+      // Delete cloud data FIRST (before clearing local state or reloading)
       if (userId) {
-        await getSupabase().from(TABLES.TRANSACTIONS).delete().eq('user_id', userId);
-        await getSupabase().from(TABLES.ASSET_SNAPSHOTS).delete().eq('user_id', userId);
-        await getSupabase().from(TABLES.CATEGORY_RULES).delete().eq('user_id', userId);
-        await getSupabase().from(TABLES.USER_PROFILES).delete().eq('id', userId);
+        try {
+          await getSupabase().from(TABLES.TRANSACTIONS).delete().eq('user_id', userId);
+          await getSupabase().from(TABLES.ASSET_SNAPSHOTS).delete().eq('user_id', userId);
+          await getSupabase().from(TABLES.CATEGORY_RULES).delete().eq('user_id', userId);
+          await getSupabase().from(TABLES.USER_PROFILES).delete().eq('id', userId);
+        } catch (cloudErr) {
+          console.warn('Cloud data deletion partially failed:', cloudErr);
+          // Continue — local cleanup + logout should still happen
+        }
       }
+      // Clear all local data (IndexedDB + localStorage)
+      await clearAllData();
+      // Log out and redirect
       await logout();
-      showToast('Account deleted. All your data has been removed.');
     } catch (e: any) {
       showToast(e.message || 'Failed to delete account', 'error');
     } finally {
@@ -188,7 +193,7 @@ const SettingsPage = () => {
       <section className="card p-5 mb-6 border border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10">
         <h2 className="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-4">Clear All Data</h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Remove all transactions from your dashboard. This does not delete your account.</p>
-        <button onClick={() => { clearAllData(); showToast('All data cleared'); }} className="btn-secondary text-sm px-4 py-2 text-amber-700 border-amber-300 hover:bg-amber-100">
+        <button onClick={async () => { await clearAllData(); showToast('All data cleared'); window.location.reload(); }} className="btn-secondary text-sm px-4 py-2 text-amber-700 border-amber-300 hover:bg-amber-100">
           Clear All Transactions
         </button>
       </section>

@@ -517,5 +517,5 @@ export const TAB_GROUPS = [
 ] as const;
 
 export const TAB_DISPLAY_NAMES: Partial<Record<DashboardTab, string>> = {
-  'Data': 'Data (Edit)',
+  'Data': 'Data (Add / Edit)',
 };

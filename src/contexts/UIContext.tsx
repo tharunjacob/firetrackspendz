@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useMemo, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
 import type { Currency, DashboardTab } from '@/types';
 import { detectUserCurrency } from '@/utils/constants';
 
@@ -16,6 +16,8 @@ interface UIState {
   hideToast: () => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  isFeedbackOpen: boolean;
+  setIsFeedbackOpen: (open: boolean) => void;
 }
 
 const UIContext = createContext<UIState | null>(null);
@@ -43,6 +45,8 @@ export const UIProvider = ({ children }: { children: ReactNode }) => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -56,10 +60,13 @@ export const UIProvider = ({ children }: { children: ReactNode }) => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   }, []);
 
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success', duration?: number) => {
     const ms = duration ?? (type === 'error' ? 6000 : 3000);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, visible: true, type });
-    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), ms);
+    toastTimerRef.current = setTimeout(() => setToast(prev => ({ ...prev, visible: false })), ms);
   }, []);
 
   const hideToast = useCallback(() => {
@@ -77,8 +84,10 @@ export const UIProvider = ({ children }: { children: ReactNode }) => {
       hideToast,
       theme,
       toggleTheme,
+      isFeedbackOpen,
+      setIsFeedbackOpen,
     }),
-    [currency, activeTab, toast, showToast, hideToast, theme, toggleTheme]
+    [currency, activeTab, toast, showToast, hideToast, theme, toggleTheme, isFeedbackOpen]
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

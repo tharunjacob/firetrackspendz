@@ -82,14 +82,19 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
 
   // Initialize auth state on mount
   useEffect(() => {
+    let isCancelled = false; // guard against setState after unmount
+    let authVersion = 0;     // tracks latest auth event to prevent stale handlers
+
     const init = async () => {
       try {
         await initializeRules();
         const currentUser = await getCurrentUser();
+        if (isCancelled) return;
         if (currentUser) {
           setUserId(currentUser.id);
           setUserEmail(currentUser.email || null);
           const prof = await getProfile(currentUser.id);
+          if (isCancelled) return;
           if (prof) {
             setProfile(prof);
             if (prof.preferred_currency) {
@@ -100,32 +105,59 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
           // Check if admin
           if (isCloudEnabled()) {
             try {
-              const { data } = await getSupabase().rpc(RPC.IS_ADMIN);
-              setIsAdmin(data === true);
-            } catch { setIsAdmin(false); }
+              const { data, error } = await getSupabase().rpc(RPC.IS_ADMIN);
+              if (error) console.warn('is_admin RPC error:', error.message);
+              let adminVal = data === true;
+              if (!adminVal && currentUser.email) {
+                const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
+                if (adminEmails.includes(currentUser.email)) {
+                  adminVal = true;
+                }
+              }
+              if (!isCancelled) setIsAdmin(adminVal);
+            } catch (e) {
+              console.warn('is_admin RPC exception:', e);
+              let adminVal = false;
+              if (currentUser.email) {
+                const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
+                if (adminEmails.includes(currentUser.email)) {
+                  adminVal = true;
+                }
+              }
+              if (!isCancelled) setIsAdmin(adminVal);
+            }
           }
 
           if (!isMimicMode) {
-            syncLocalToCloud().catch(e => console.warn('Sync failed:', e));
+            try {
+              await syncLocalToCloud();
+            } catch (e) {
+              console.warn('Sync failed:', e);
+            }
           }
         }
       } catch (e) {
         console.error('Auth init error:', e);
       } finally {
-        setIsAuthReady(true);
+        if (!isCancelled) setIsAuthReady(true);
       }
     };
 
     init();
 
     const { data: { subscription } } = onAuthStateChange(async (event, session) => {
+      const myVersion = ++authVersion; // capture version at start of this handler
+
       if (event === 'SIGNED_IN' && session?.user) {
         setUserId(session.user.id);
         setUserEmail(session.user.email || null);
         setIsAuthOpen(false);
         await initializeRules();
 
+        if (isCancelled || authVersion !== myVersion) return; // stale — a newer event arrived
+
         const prof = await getProfile(session.user.id);
+        if (isCancelled || authVersion !== myVersion) return;
         if (prof) {
           setProfile(prof);
           if (prof.preferred_currency) {
@@ -136,9 +168,27 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
         // Check if admin
         if (isCloudEnabled()) {
           try {
-            const { data } = await getSupabase().rpc(RPC.IS_ADMIN);
-            setIsAdmin(data === true);
-          } catch { setIsAdmin(false); }
+            const { data, error } = await getSupabase().rpc(RPC.IS_ADMIN);
+            if (error) console.warn('is_admin RPC error:', error.message);
+            let adminVal = data === true;
+            if (!adminVal && session.user.email) {
+              const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
+              if (adminEmails.includes(session.user.email)) {
+                adminVal = true;
+              }
+            }
+            if (!isCancelled && authVersion === myVersion) setIsAdmin(adminVal);
+          } catch (e) {
+            console.warn('is_admin RPC exception:', e);
+            let adminVal = false;
+            if (session.user.email) {
+              const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
+              if (adminEmails.includes(session.user.email)) {
+                adminVal = true;
+              }
+            }
+            if (!isCancelled && authVersion === myVersion) setIsAdmin(adminVal);
+          }
         }
 
         // Claim referral if the user arrived via a referral link
@@ -150,7 +200,9 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
         }
 
         // Notify DataContext to handle data promotion / loading
-        onSignIn?.(session.user.id, session.user.email || '');
+        if (!isCancelled && authVersion === myVersion) {
+          onSignIn?.(session.user.id, session.user.email || '');
+        }
       } else if (event === 'SIGNED_OUT') {
         setUserId(null);
         setUserEmail(null);
@@ -160,7 +212,10 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isCancelled = true;
+      subscription.unsubscribe();
+    };
   }, [isMimicMode, onSignIn, onSignOut, setCurrency]);
 
   const logout = useCallback(async () => {
@@ -196,7 +251,8 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
     };
 
     updateDbCurrency();
-  }, [currency, userId, profile?.preferred_currency, setProfile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currency, userId]);
 
   const refreshProfile = useCallback(async () => {
     if (!userId) return;
