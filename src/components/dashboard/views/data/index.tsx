@@ -189,6 +189,15 @@ export const DataView = () => {
   const onCloseCategory = useCallback(() => setOpenCategoryId(null), []);
   const onDelete = useCallback((id: string) => deleteTransactions([id]), [deleteTransactions]);
 
+  const handleStartAnalysis = useCallback(async (jobs: any[]) => {
+    try {
+      await processFiles(jobs);
+      setShowUploader(false);
+    } catch (e) {
+      // ignore
+    }
+  }, [processFiles]);
+
   const paginationBar = (
     <Pagination page={page} totalPages={totalPages} totalFiltered={filtered.length} onPageChange={setPage} />
   );
@@ -230,7 +239,7 @@ export const DataView = () => {
 
       {showUploader && (
         <div className="animate-slide-up">
-          <FileUploader onStartAnalysis={processFiles} isProcessing={isProcessing} progress={processingProgress} />
+          <FileUploader onStartAnalysis={handleStartAnalysis} isProcessing={isProcessing} progress={processingProgress} />
         </div>
       )}
 

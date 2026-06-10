@@ -170,3 +170,22 @@ export const cloudDelete = async (ids: string[]): Promise<void> => {
     });
   }
 };
+
+/**
+ * Deletes ALL transactions for the currently-authenticated user from Supabase.
+ * Executes a single direct delete query scoped by user_id.
+ */
+export const cloudResetAllData = async (): Promise<void> => {
+  if (!isCloudEnabled()) return;
+  const supabase = getSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new AuthError('Not authenticated');
+
+  await withRetry(async () => {
+    const { error } = await supabase
+      .from(TABLES.TRANSACTIONS)
+      .delete()
+      .eq('user_id', user.id);
+    if (error) throw error;
+  });
+};

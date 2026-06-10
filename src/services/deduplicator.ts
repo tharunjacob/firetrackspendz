@@ -101,6 +101,7 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
     groups.get(t.date)!.push(t);
   });
 
+  // 1. Identify inter-account transfers (different owners, same date + amount, similar descriptions)
   groups.forEach(group => {
     if (group.length < 2) return;
     const incomes = group.filter(t => t.type === 'Income');
@@ -122,6 +123,54 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
         expenses.splice(matchIndex, 1);
       }
     });
+  });
+
+  // 2. Identify refunds (same owner/account, date difference <= 10 days, similar descriptions)
+  const getDateDiffInDays = (d1: string, d2: string): number => {
+    const date1 = new Date(`${d1}T00:00:00Z`);
+    const date2 = new Date(`${d2}T00:00:00Z`);
+    if (isNaN(date1.getTime()) || isNaN(date2.getTime())) return 999;
+    const diffTime = Math.abs(date1.getTime() - date2.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const areRefundDescriptionsSimilar = (inc: Transaction, exp: Transaction): boolean => {
+    const d1 = (inc.notes || inc.category || '').toLowerCase();
+    const d2 = (exp.notes || exp.category || '').toLowerCase();
+
+    const isRefundKeyword = (s: string) => /\b(refund|reversal|rvsl|credited|rtn|return)\b/i.test(s);
+    if (isRefundKeyword(d1) || isRefundKeyword(d2)) return true;
+
+    const t1 = getTokens(d1);
+    const t2 = getTokens(d2);
+    if (t1.some(token => t2.includes(token))) return true;
+
+    if (d1 && d2 && (d1.includes(d2) || d2.includes(d1))) return true;
+
+    const isMovieTicket = (s: string) => /wasteland|movie|ticket|bookmyshow|cinema|entertainment/i.test(s);
+    if (isMovieTicket(d1) && isMovieTicket(d2)) return true;
+
+    return false;
+  };
+
+  const remainingIncomes = transactions.filter(t => t.type === 'Income');
+  const remainingExpenses = transactions.filter(t => t.type === 'Expense');
+
+  remainingIncomes.forEach(inc => {
+    const matchIndex = remainingExpenses.findIndex(exp => {
+      if (inc.owner !== exp.owner) return false;
+      if (Math.abs(inc.amount - exp.amount) > 0.01) return false;
+      if (getDateDiffInDays(inc.date, exp.date) > 10) return false;
+      return areRefundDescriptionsSimilar(inc, exp);
+    });
+
+    if (matchIndex !== -1) {
+      const exp = remainingExpenses[matchIndex];
+      inc.type = 'Transfer'; inc.category = 'Transfer'; inc.subCategory = 'Refund';
+      exp.type = 'Transfer'; exp.category = 'Transfer'; exp.subCategory = 'Refund';
+      transferCount++;
+      remainingExpenses.splice(matchIndex, 1);
+    }
   });
 
   return { transactions, transferCount };

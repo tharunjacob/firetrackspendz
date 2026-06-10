@@ -1,6 +1,6 @@
 import type { Transaction } from '@/types';
 import { localSave, localLoad, localDelete, localReset } from './localStorage';
-import { cloudSave, cloudLoad, cloudDelete } from './cloudStorage';
+import { cloudSave, cloudLoad, cloudDelete, cloudResetAllData } from './cloudStorage';
 import { isCloudEnabled, getSupabase } from './supabase';
 import { logEvent } from './logger';
 
@@ -159,11 +159,8 @@ export const resetAllData = async (): Promise<void> => {
   await localReset();
   if (await isUserLoggedIn()) {
     try {
-      const allCloud = await cloudLoad();
-      if (allCloud.length > 0) {
-        await cloudDelete(allCloud.map(t => t.id));
-        logEvent('data_reset_cloud', { count: allCloud.length });
-      }
+      await cloudResetAllData();
+      logEvent('data_reset_cloud', { success: true });
     } catch (err) {
       console.error('Storage Gateway Error (Reset Cloud)', err);
     }

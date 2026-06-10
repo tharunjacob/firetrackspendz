@@ -215,3 +215,56 @@ describe('Inter-Account Transfers Detection', () => {
     expect(transferCount).toBe(0);
   });
 });
+
+describe('Refunds Detection', () => {
+  it('detects refunds within the same account', () => {
+    const txns = [
+      createTx('1', 'CreditCard', '2026-05-02', 1622.82, 'Wasteland Entertainmen Gurgaon', 'Expense'),
+      createTx('2', 'CreditCard', '2026-05-07', 1622.82, 'District Movie Ticket Gurugram', 'Income'),
+    ];
+
+    const { transactions, transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(1);
+
+    const exp = transactions.find(t => t.id === '1');
+    const inc = transactions.find(t => t.id === '2');
+
+    expect(exp?.type).toBe('Transfer');
+    expect(exp?.category).toBe('Transfer');
+    expect(exp?.subCategory).toBe('Refund');
+
+    expect(inc?.type).toBe('Transfer');
+    expect(inc?.category).toBe('Transfer');
+    expect(inc?.subCategory).toBe('Refund');
+  });
+
+  it('rejects refund if owner/account is different', () => {
+    const txns = [
+      createTx('1', 'CreditCardA', '2026-05-02', 100, 'Some Merchant', 'Expense'),
+      createTx('2', 'CreditCardB', '2026-05-07', 100, 'Some Merchant Refund', 'Income'),
+    ];
+
+    const { transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(0);
+  });
+
+  it('rejects refund if date difference is > 10 days', () => {
+    const txns = [
+      createTx('1', 'CreditCard', '2026-05-02', 100, 'Some Merchant', 'Expense'),
+      createTx('2', 'CreditCard', '2026-05-13', 100, 'Some Merchant Refund', 'Income'),
+    ];
+
+    const { transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(0);
+  });
+
+  it('rejects refund if descriptions are not similar', () => {
+    const txns = [
+      createTx('1', 'CreditCard', '2026-05-02', 100, 'Some Merchant', 'Expense'),
+      createTx('2', 'CreditCard', '2026-05-07', 100, 'Totally Unrelated Shop', 'Income'),
+    ];
+
+    const { transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(0);
+  });
+});

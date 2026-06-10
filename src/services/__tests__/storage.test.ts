@@ -19,6 +19,7 @@ vi.mock('../cloudStorage', () => ({
   cloudSave: vi.fn().mockResolvedValue(undefined),
   cloudLoad: vi.fn().mockResolvedValue([]),
   cloudDelete: vi.fn().mockResolvedValue(undefined),
+  cloudResetAllData: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../supabase', () => ({
@@ -33,7 +34,7 @@ vi.mock('../supabase', () => ({
 vi.mock('../logger', () => ({ logEvent: vi.fn() }));
 
 // Imports MUST come after vi.mock calls
-import { saveToStorage, loadFromStorage, syncLocalToCloud } from '../storage';
+import { saveToStorage, loadFromStorage, syncLocalToCloud, resetAllData } from '../storage';
 import * as local from '../localStorage';
 import * as cloud from '../cloudStorage';
 
@@ -65,6 +66,7 @@ const resetMocks = () => {
   (cloud.cloudSave as any).mockReset().mockResolvedValue(undefined);
   (cloud.cloudLoad as any).mockReset().mockResolvedValue([]);
   (cloud.cloudDelete as any).mockReset().mockResolvedValue(undefined);
+  (cloud.cloudResetAllData as any).mockReset().mockResolvedValue(undefined);
 };
 
 describe('Storage Gateway', () => {
@@ -164,5 +166,25 @@ describe('syncLocalToCloud', () => {
     await syncLocalToCloud();
     expect(cloud.cloudSave).not.toHaveBeenCalled();
     expect(local.localReset).not.toHaveBeenCalled();
+  });
+});
+
+describe('resetAllData', () => {
+  beforeEach(() => {
+    resetMocks();
+    setLoggedIn(false);
+  });
+
+  it('wipes local and calls cloudResetAllData if logged in', async () => {
+    setLoggedIn(true);
+    await resetAllData();
+    expect(local.localReset).toHaveBeenCalled();
+    expect(cloud.cloudResetAllData).toHaveBeenCalled();
+  });
+
+  it('wipes local only if not logged in', async () => {
+    await resetAllData();
+    expect(local.localReset).toHaveBeenCalled();
+    expect(cloud.cloudResetAllData).not.toHaveBeenCalled();
   });
 });
