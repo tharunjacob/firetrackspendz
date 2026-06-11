@@ -1,0 +1,19 @@
+harden identification + cross-user learning; fix uploader UX; refresh docs
+
+- deduplicator: replace single-token overlap with strongTokenOverlap (>=2 shared
+  tokens or full containment); remove hardcoded movie-ticket heuristic overfit to
+  one user's statement; drop "credited" from refund keywords (too generic, falsely
+  reversed salary/interest income); add chargeback/reversed keywords
+- learning rules: PII-safe normalizeKeyword() strips 4+ digit account/ref numbers
+  before saving; consensus-based cross-user promotion (schema trigger, threshold=3);
+  own-rule-wins tie-breaking so personal edits can't be overridden by crowd defaults;
+  fix promoteRule to set scope='system' (what RLS actually checks); guard
+  createRuleFromEdit against Transfer/Refund/Inter-Account structural types
+- schema.sql: check_rule_consensus trigger + promote_consensus_rules backfill fn
+- DataContext: processFiles returns {successCount, newTransactions}
+- DataView: auto-collapse uploader only on success (1s delay), keep open on error
+- AppContext/FileUploader: type updates for new processFiles signature
+- admin: promote/delete delegate to single service path (killed duplicate)
+- tests: +14 (181->195 passing) covering both-sides refund, overlap dedup,
+  amount parsing edge cases, Transfer rule-skip guard, PII-stripping
+- CLAUDE.md: fix stale model name, Pro price, test count

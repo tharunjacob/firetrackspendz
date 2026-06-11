@@ -46,6 +46,17 @@ interface AuthState {
   refreshProfile: () => Promise<void>;
 }
 
+/**
+ * Races a promise against a timeout, resolving to `fallback` if it doesn't settle in
+ * time. Used so a hung Supabase call (cold start / token-refresh stall) can never
+ * keep the app gated behind the global Loading… spinner.
+ */
+const withTimeout = <T,>(p: PromiseLike<T>, ms: number, fallback: T): Promise<T> =>
+  Promise.race([
+    Promise.resolve(p),
+    new Promise<T>(resolve => setTimeout(() => resolve(fallback), ms)),
+  ]);
+
 const AuthContext = createContext<AuthState | null>(null);
 
 export const useAuth = () => {
@@ -85,48 +96,60 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
     let isCancelled = false; // guard against setState after unmount
     let authVersion = 0;     // tracks latest auth event to prevent stale handlers
 
+    // FAILSAFE — the entire app is gated behind isAuthReady (App.tsx). Never let a
+    // hung Supabase call (cold start, expired refresh token, auth-lock stall) leave
+    // the user stuck on the Loading… spinner forever: reveal the UI within 4s no
+    // matter what. Profile/admin/rules keep loading in the background and re-render
+    // via state when they arrive.
+    const watchdog = setTimeout(() => {
+      if (!isCancelled) setIsAuthReady(true);
+    }, 4000);
+
+    const ADMIN_EMAILS = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
+
+    // Admin check with a hard timeout + email-allowlist fallback. The RPC previously
+    // had NO timeout, so a slow/hung call blocked the whole init() chain.
+    const resolveAdmin = async (email: string | null | undefined): Promise<boolean> => {
+      if (!isCloudEnabled()) return false;
+      try {
+        const { data } = await withTimeout(
+          getSupabase().rpc(RPC.IS_ADMIN),
+          8000,
+          { data: false, error: null } as any,
+        );
+        if (data === true) return true;
+      } catch (e) {
+        console.warn('is_admin RPC exception:', e);
+      }
+      return !!email && ADMIN_EMAILS.includes(email);
+    };
+
     const init = async () => {
       try {
-        await initializeRules();
         const currentUser = await getCurrentUser();
         if (isCancelled) return;
+
         if (currentUser) {
           setUserId(currentUser.id);
           setUserEmail(currentUser.email || null);
+        }
+        // Identity resolved (or confirmed absent) — unblock the UI NOW. Everything
+        // below is non-blocking enrichment that must not gate the spinner.
+        if (!isCancelled) setIsAuthReady(true);
+
+        if (currentUser) {
+          await initializeRules();
+          if (isCancelled) return;
+
           const prof = await getProfile(currentUser.id);
           if (isCancelled) return;
           if (prof) {
             setProfile(prof);
-            if (prof.preferred_currency) {
-              setCurrency(prof.preferred_currency);
-            }
+            if (prof.preferred_currency) setCurrency(prof.preferred_currency);
           }
 
-          // Check if admin
-          if (isCloudEnabled()) {
-            try {
-              const { data, error } = await getSupabase().rpc(RPC.IS_ADMIN);
-              if (error) console.warn('is_admin RPC error:', error.message);
-              let adminVal = data === true;
-              if (!adminVal && currentUser.email) {
-                const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
-                if (adminEmails.includes(currentUser.email)) {
-                  adminVal = true;
-                }
-              }
-              if (!isCancelled) setIsAdmin(adminVal);
-            } catch (e) {
-              console.warn('is_admin RPC exception:', e);
-              let adminVal = false;
-              if (currentUser.email) {
-                const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
-                if (adminEmails.includes(currentUser.email)) {
-                  adminVal = true;
-                }
-              }
-              if (!isCancelled) setIsAdmin(adminVal);
-            }
-          }
+          const adminVal = await resolveAdmin(currentUser.email);
+          if (!isCancelled) setIsAdmin(adminVal);
 
           if (!isMimicMode) {
             try {
@@ -145,64 +168,47 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
 
     init();
 
-    const { data: { subscription } } = onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = onAuthStateChange((event, session) => {
       const myVersion = ++authVersion; // capture version at start of this handler
 
       if (event === 'SIGNED_IN' && session?.user) {
+        // Synchronous, lock-safe state only. Do NOT call supabase.auth.* or run
+        // queries directly here: Supabase holds an internal auth lock while
+        // dispatching this event, and re-entering it (getSession / token refresh)
+        // deadlocks — the classic "stuck after refresh" hang. Defer all async work
+        // to a macrotask so the lock is released first.
         setUserId(session.user.id);
         setUserEmail(session.user.email || null);
         setIsAuthOpen(false);
-        await initializeRules();
 
-        if (isCancelled || authVersion !== myVersion) return; // stale — a newer event arrived
+        const sessionUser = session.user;
+        setTimeout(async () => {
+          await initializeRules();
+          if (isCancelled || authVersion !== myVersion) return; // stale — a newer event arrived
 
-        const prof = await getProfile(session.user.id);
-        if (isCancelled || authVersion !== myVersion) return;
-        if (prof) {
-          setProfile(prof);
-          if (prof.preferred_currency) {
-            setCurrency(prof.preferred_currency);
+          const prof = await getProfile(sessionUser.id);
+          if (isCancelled || authVersion !== myVersion) return;
+          if (prof) {
+            setProfile(prof);
+            if (prof.preferred_currency) setCurrency(prof.preferred_currency);
           }
-        }
 
-        // Check if admin
-        if (isCloudEnabled()) {
-          try {
-            const { data, error } = await getSupabase().rpc(RPC.IS_ADMIN);
-            if (error) console.warn('is_admin RPC error:', error.message);
-            let adminVal = data === true;
-            if (!adminVal && session.user.email) {
-              const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
-              if (adminEmails.includes(session.user.email)) {
-                adminVal = true;
-              }
-            }
-            if (!isCancelled && authVersion === myVersion) setIsAdmin(adminVal);
-          } catch (e) {
-            console.warn('is_admin RPC exception:', e);
-            let adminVal = false;
-            if (session.user.email) {
-              const adminEmails = ['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com'];
-              if (adminEmails.includes(session.user.email)) {
-                adminVal = true;
-              }
-            }
-            if (!isCancelled && authVersion === myVersion) setIsAdmin(adminVal);
+          const adminVal = await resolveAdmin(sessionUser.email);
+          if (!isCancelled && authVersion === myVersion) setIsAdmin(adminVal);
+
+          // Claim referral if the user arrived via a referral link
+          const pendingReferralCode = localStorage.getItem('tsz_referral_code');
+          if (pendingReferralCode) {
+            claimReferral(pendingReferralCode, sessionUser.id)
+              .then(claimed => { if (claimed) localStorage.removeItem('tsz_referral_code'); })
+              .catch(() => {/* fail silently — referral claim must not block sign-in */});
           }
-        }
 
-        // Claim referral if the user arrived via a referral link
-        const pendingReferralCode = localStorage.getItem('tsz_referral_code');
-        if (pendingReferralCode) {
-          claimReferral(pendingReferralCode, session.user.id)
-            .then(claimed => { if (claimed) localStorage.removeItem('tsz_referral_code'); })
-            .catch(() => {/* fail silently — referral claim must not block sign-in */});
-        }
-
-        // Notify DataContext to handle data promotion / loading
-        if (!isCancelled && authVersion === myVersion) {
-          onSignIn?.(session.user.id, session.user.email || '');
-        }
+          // Notify DataContext to handle data promotion / loading
+          if (!isCancelled && authVersion === myVersion) {
+            onSignIn?.(sessionUser.id, sessionUser.email || '');
+          }
+        }, 0);
       } else if (event === 'SIGNED_OUT') {
         setUserId(null);
         setUserEmail(null);
@@ -214,6 +220,7 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
 
     return () => {
       isCancelled = true;
+      clearTimeout(watchdog);
       subscription.unsubscribe();
     };
   }, [isMimicMode, onSignIn, onSignOut, setCurrency]);
