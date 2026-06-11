@@ -1,6 +1,6 @@
 import type { Transaction, UserProfile, Currency, DashboardTab, FileJob, SubscriptionPlan } from '@/types';
 import { useAuth } from './AuthContext';
-import { useData } from './DataContext';
+import { useData, type ProcessFilesResult } from './DataContext';
 import { useUI } from './UIContext';
 
 // ============================================================
@@ -54,7 +54,7 @@ interface AppState {
   loadError: string | null;
   lastImportHeaders: string[] | null;
   isDemoMode: boolean;
-  processFiles: (jobs: FileJob[], ownerOverride?: string) => Promise<void>;
+  processFiles: (jobs: FileJob[], ownerOverride?: string) => Promise<ProcessFilesResult>;
   cancelProcessing: () => void;
   updateTransactions: (updated: Transaction[]) => Promise<void>;
   deleteTransactions: (ids: string[]) => Promise<void>;

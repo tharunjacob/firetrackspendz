@@ -45,12 +45,13 @@ A personal finance web app that lets users upload bank/credit card statements (E
 - `generateFinancialInsights()` — generates insights from transaction summary
 - `getStrategicAdvice()` — chat-style financial advisor
 - `isAIAvailable()` — checks if Gemini API key is configured
-- Model: `gemini-2.0-flash` (NOT 2.5 — copy must match)
+- Model: `gemini-2.5-flash` (set in `services/aiProxy.ts` and `supabase/functions/ai-proxy/index.ts` — keep both in sync)
 
 ### Subscription Plans
 - **Free:** 500 transactions, local storage, basic categorization
 - **Pro:** Unlimited transactions, AI advisor, FIRE calculator, cloud sync, budgets
-  - India: ₹199/mo or ₹1,499/yr — International: $4.99/mo or $49/yr
+  - India: ₹149/mo or ₹1,499/yr — International: $4.99/mo or $49.99/yr
+  - (Source of truth is `PLAN_PRICING` in `config/plans.ts` — update there, not here.)
 - **Enterprise:** Family accounts (5 members), custom categories, tax-ready CSV/PDF export reports, dedicated support
   - India: ₹499/mo or ₹3,999/yr — International: $14.99/mo or $149/yr
   - NOTE: API access is NOT offered — it was advertised pre-launch but never built, and was removed everywhere (plans, pricing, settings, help) in May 2026. Do not re-add without a real backend.
@@ -236,7 +237,9 @@ Defined in `config/routes.ts`, rendered in `App.tsx`:
 
 ## Known Issues & Technical Debt
 
-1. **Test coverage is unit-level only** — Vitest is wired up (`vitest.config.ts`, `npx vitest run`); 167 tests pass across 9 files: `analysis`, `categorizer`, `deduplicator`, `learningRules`, `parser`, `storage`, `transformer`, `userSettings` (all under `services/__tests__/`) and `config/__tests__/plans.test.ts`. Business logic is covered; component/snapshot/integration (E2E) coverage is absent.
+1. **Test coverage is unit-level only** — Vitest is wired up (`vitest.config.ts`); 190 tests pass across 9 files: `analysis`, `categorizer`, `deduplicator`, `learningRules`, `parser`, `storage`, `transformer`, `userSettings` (all under `services/__tests__/`) and `config/__tests__/plans.test.ts`. Business logic is covered; component/snapshot/integration (E2E) coverage is absent.
+   - **Run tests:** `npx vitest run` (one-shot) or `npx vitest` (watch). Type-check with `npx tsc --noEmit`.
+   - There is also `services/__tests__/gemini-live.test.ts` which makes **real Gemini API calls** — it is flaky/network-dependent (503s under load) and is excluded from gating runs: `npx vitest run --exclude "**/gemini-live.test.ts"`.
 2. **`VITE_GEMINI_API_KEY` dev fallback has no client-side rate limiting.** In production, all AI calls route through the Supabase Edge Function (`/functions/v1/ai-proxy`) which holds the server-side key — the client-side `VITE_GEMINI_API_KEY` is only used when no Supabase URL is configured (local dev fallback). For production safety: restrict the dev key to localhost in the Google Cloud Console, and ensure the edge function enforces per-user rate limits. The production path is already secure.
 3. **No CI/CD pipeline** — deploys manually via Vercel. No automated linting, type-checking, or testing.
 4. **Family Dashboard** is minimal — basic multi-member view, needs more household features.

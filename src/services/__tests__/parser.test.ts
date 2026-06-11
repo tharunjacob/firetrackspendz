@@ -152,6 +152,9 @@ describe('cleanAmount', () => {
 
   it('strips currency symbols and INR prefixes', () => {
     expect(cleanAmount('₹ 1,500')).toBe(1500);
+    expect(cleanAmount('₹12,345')).toBe(12345); // no space, comma thousands
+    expect(cleanAmount('$1,234')).toBe(1234);
+    expect(cleanAmount('£1,234')).toBe(1234);
     expect(cleanAmount('Rs. 1,500.50')).toBeCloseTo(1500.5);
     expect(cleanAmount('USD 99.99')).toBeCloseTo(99.99);
   });

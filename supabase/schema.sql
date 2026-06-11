@@ -358,6 +358,88 @@ CREATE POLICY "Users can delete own rules"
   ON category_rules FOR DELETE
   USING (auth.uid() = user_id);
 
+-- ---------------------------------------------------------------------------
+-- CROSS-USER LEARNING — Consensus promotion
+-- ---------------------------------------------------------------------------
+-- "Learn from one person, apply to everyone" is the product's core promise, but
+-- doing it from a SINGLE user's edit is dangerous: it would let one person's typo
+-- (or a malicious mislabel) poison categorization for the whole user base, and it
+-- could leak that user's raw bank text to others.
+--
+-- Instead we promote a (keyword, target_field, value) rule to a shared SYSTEM rule
+-- only once enough DISTINCT users have INDEPENDENTLY created the same active rule.
+-- Consensus = trust. The keyword is already PII-normalized client-side
+-- (normalizeKeyword in learningRules.ts) before it ever reaches this table.
+--
+-- The RLS SELECT policy above shares rows where scope='system', so the moment a
+-- rule is promoted every user picks it up on their next rule hydration. The
+-- function is SECURITY DEFINER so it can count/update across users (bypassing RLS);
+-- it only ever flips scope/source to 'system' and never exposes row contents.
+CREATE OR REPLACE FUNCTION check_rule_consensus()
+RETURNS TRIGGER
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  distinct_users INT;
+  consensus_threshold CONSTANT INT := 3;  -- N independent users → shared default
+BEGIN
+  -- Only user-authored, active, not-yet-shared rules can trigger promotion.
+  IF NEW.status <> 'active' OR NEW.scope = 'system' THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT COUNT(DISTINCT user_id) INTO distinct_users
+  FROM category_rules
+  WHERE lower(keyword) = lower(NEW.keyword)
+    AND target_field = NEW.target_field
+    AND value = NEW.value
+    AND status = 'active';
+
+  IF distinct_users >= consensus_threshold THEN
+    UPDATE category_rules
+    SET scope = 'system', source = 'system', updated_at = now()
+    WHERE lower(keyword) = lower(NEW.keyword)
+      AND target_field = NEW.target_field
+      AND value = NEW.value
+      AND scope <> 'system';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_rule_consensus ON category_rules;
+CREATE TRIGGER trg_rule_consensus
+  AFTER INSERT ON category_rules
+  FOR EACH ROW EXECUTE FUNCTION check_rule_consensus();
+
+-- One-shot backfill / manual sweep an admin can run to promote any rules that
+-- already meet consensus (e.g. after lowering the threshold, or for rows that
+-- predate the trigger). Returns the number of rows promoted.
+CREATE OR REPLACE FUNCTION promote_consensus_rules(min_users INT DEFAULT 3)
+RETURNS INT
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  promoted INT;
+BEGIN
+  WITH consensus AS (
+    SELECT lower(keyword) AS k, target_field AS f, value AS v
+    FROM category_rules
+    WHERE status = 'active' AND scope <> 'system'
+    GROUP BY lower(keyword), target_field, value
+    HAVING COUNT(DISTINCT user_id) >= min_users
+  )
+  UPDATE category_rules cr
+  SET scope = 'system', source = 'system', updated_at = now()
+  FROM consensus c
+  WHERE lower(cr.keyword) = c.k AND cr.target_field = c.f AND cr.value = c.v
+    AND cr.scope <> 'system';
+  GET DIAGNOSTICS promoted = ROW_COUNT;
+  RETURN promoted;
+END;
+$$;
+
 
 -- ===========================================
 -- 5. APP LOGS (Telemetry & Diagnostics)

@@ -9,6 +9,30 @@ import { TABLES } from '@/config/database';
 
 const MAPPING_STORAGE_KEY = 'trackspendz_mappings_v2';
 let ruleCache: LearningRule[] = [];
+// The signed-in user's id, captured during initializeRules(). Used so applyRules
+// can prefer a user's OWN rule over a shared system rule of equal specificity.
+let currentUserId: string | null = null;
+
+/**
+ * Normalizes a raw bank description into a privacy-safe, generalizable keyword.
+ *
+ * WHY: rule keywords are shared across users once promoted to 'system' (see the
+ * consensus mechanism in schema.sql). A raw description like
+ * "UPI/9876543210@okhdfc/REF8462713" carries PII (account/UPI/ref numbers) AND
+ * never matches a future transaction because the ref number changes every time.
+ * Stripping long digit runs removes the PII and makes the keyword actually reusable.
+ *
+ * Conservative on purpose: lowercase, trim, drop runs of 4+ digits (card/account/
+ * txn refs), and collapse whitespace. Separators and merchant words are preserved
+ * so substring matching in applyRules still works.
+ */
+export const normalizeKeyword = (raw: string): string => {
+  return (raw || '')
+    .toLowerCase()
+    .replace(/\d{4,}/g, ' ')   // strip account / card / txn-ref numbers (PII)
+    .replace(/\s+/g, ' ')
+    .trim();
+};
 
 // --- File Column Mappings ---
 
@@ -83,11 +107,13 @@ const promiseWithTimeout = <T>(promise: PromiseLike<T>, ms = 15000): Promise<T> 
  */
 export const initializeRules = async () => {
   ruleCache = [];
+  currentUserId = null;
   if (!supabase) return;
 
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+    currentUserId = session.user.id;
 
     const { data, error } = await promiseWithTimeout(
       supabase.from(TABLES.CATEGORY_RULES).select('*'),
@@ -124,8 +150,13 @@ export const saveRule = async (
     keyword: cleanKey,
     target_field: field,
     value,
-    source: status === 'active' ? 'user' : 'user',
+    // User-authored rules are always source/scope 'user'. They become shared
+    // ('system') only via the consensus trigger or an admin promotion (see
+    // schema.sql + promoteRule) — never at creation time.
+    source: 'user',
+    scope: 'user',
     status,
+    user_id: currentUserId ?? undefined,
   };
   ruleCache.push(newRule);
 
@@ -134,7 +165,7 @@ export const saveRule = async (
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         await supabase.from(TABLES.CATEGORY_RULES).upsert(
-          { user_id: session.user.id, keyword: cleanKey, target_field: field, value, source: newRule.source, status },
+          { user_id: session.user.id, keyword: cleanKey, target_field: field, value, source: 'user', scope: 'user', status },
           { onConflict: 'user_id,keyword,target_field' }
         );
         logEvent('rule_proposed', { keyword: cleanKey, field, value });
@@ -143,18 +174,28 @@ export const saveRule = async (
   }
 };
 
-/** Admin-only: flips a pending rule to `active` and re-hydrates the cache. */
+/**
+ * Admin-only: promote a rule to a SHARED system rule so every user benefits.
+ *
+ * Sets `scope='system'` (the field the RLS SELECT policy actually checks — see
+ * schema.sql) plus `source='system'` and `status='active'`. This is the single
+ * source of truth for "promote"; the admin UI delegates here so the two code
+ * paths can't drift apart again. Throws on error so callers can surface it.
+ */
 export const promoteRule = async (id: number): Promise<void> => {
   if (!supabase) return;
-  await supabase.from(TABLES.CATEGORY_RULES).update({ status: 'active', source: 'admin' }).eq('id', id);
-  await initializeRules();
+  const { error } = await supabase
+    .from(TABLES.CATEGORY_RULES)
+    .update({ scope: 'system', source: 'system', status: 'active' })
+    .eq('id', id);
+  if (error) throw error;
 };
 
-/** Admin-only: removes a rule entirely and re-hydrates the cache. */
+/** Admin-only: removes a rule entirely. Throws on error so callers can surface it. */
 export const deleteRule = async (id: number): Promise<void> => {
   if (!supabase) return;
-  await supabase.from(TABLES.CATEGORY_RULES).delete().eq('id', id);
-  await initializeRules();
+  const { error } = await supabase.from(TABLES.CATEGORY_RULES).delete().eq('id', id);
+  if (error) throw error;
 };
 
 /**
@@ -165,9 +206,17 @@ export const applyRules = (text: string, field: 'category' | 'type' | 'project' 
   if (!text) return null;
   const textLower = text.toLowerCase();
 
+  const isOwn = (r: LearningRule) => !!r.user_id && r.user_id === currentUserId;
+
   const candidates = ruleCache
     .filter(r => r.status === 'active' && r.target_field === field)
-    .sort((a, b) => b.keyword.length - a.keyword.length);
+    .sort((a, b) => {
+      // Most specific (longest keyword) wins first.
+      if (b.keyword.length !== a.keyword.length) return b.keyword.length - a.keyword.length;
+      // On a tie, the user's OWN rule beats a shared system rule — a personal
+      // correction must never be overridden by the crowd-sourced default.
+      return (isOwn(a) ? 0 : 1) - (isOwn(b) ? 0 : 1);
+    });
 
   for (const rule of candidates) {
     if (textLower.includes(rule.keyword)) return rule.value;
@@ -189,6 +238,8 @@ interface TransactionLike {
   original_description?: string;
   notes: string;
   merchant_name?: string;
+  type?: string;
+  subCategory?: string;
 }
 
 /**
@@ -203,8 +254,21 @@ export const createRuleFromEdit = async (
   field: 'category' | 'subCategory',
   newValue: string
 ): Promise<boolean> => {
-  // Determine the best keyword: prefer raw bank text, fall back to notes
-  const keyword = (transaction.original_description || transaction.notes || '').trim();
+  // Transfer / Refund / Inter-Account are STRUCTURAL classifications, not learnable
+  // merchant categories. Training a rule from one (e.g. a bank "refund" line) would
+  // wrongly re-categorize unrelated future transactions that share the description.
+  // Skip them regardless of which field is being edited.
+  if (
+    transaction.type === 'Transfer' ||
+    transaction.subCategory === 'Refund' ||
+    transaction.subCategory === 'Inter-Account'
+  ) {
+    return false;
+  }
+
+  // Determine the best keyword: prefer raw bank text, fall back to notes, then
+  // normalize away PII/ref numbers so the rule generalizes and is safe to share.
+  const keyword = normalizeKeyword(transaction.original_description || transaction.notes || '');
   if (keyword.length < 3) return false;
 
   // Don't create rules for meaningless values

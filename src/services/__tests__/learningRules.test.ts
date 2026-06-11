@@ -32,6 +32,7 @@ import {
   createRuleFromEdit,
   initializeRules,
   getAllRules,
+  normalizeKeyword,
 } from '../learningRules';
 
 describe('getFileSignature', () => {
@@ -159,5 +160,82 @@ describe('createRuleFromEdit', () => {
       'Unclassified',
     );
     expect(made).toBe(false);
+  });
+
+  // BUG 4 — Transfer/Refund/Inter-Account are structural, not learnable categories.
+  it('does NOT create a rule for a Transfer-type transaction', async () => {
+    const made = await createRuleFromEdit(
+      { notes: 'Self transfer to savings', original_description: 'NEFT SELF TRANSFER', type: 'Transfer' },
+      'category',
+      'Food',
+    );
+    expect(made).toBe(false);
+    // And nothing leaked into the rule cache for that description
+    expect(applyRules('neft self transfer', 'category')).toBe(null);
+  });
+
+  it('does NOT create a rule for a Refund sub-category', async () => {
+    const made = await createRuleFromEdit(
+      { notes: 'Amazon order refund', original_description: 'AMAZON REFUND REF999', subCategory: 'Refund' },
+      'category',
+      'Shopping',
+    );
+    expect(made).toBe(false);
+    expect(applyRules('amazon refund ref999', 'category')).toBe(null);
+  });
+
+  it('does NOT create a rule for an Inter-Account sub-category', async () => {
+    const made = await createRuleFromEdit(
+      { notes: 'Transfer between accounts', original_description: 'IMPS INTER ACCOUNT', subCategory: 'Inter-Account' },
+      'subCategory',
+      'Whatever',
+    );
+    expect(made).toBe(false);
+  });
+
+  it('still creates rules for ordinary expense transactions', async () => {
+    const made = await createRuleFromEdit(
+      { notes: 'Lunch at cafe', original_description: 'POS CAFE COFFEE DAY', type: 'Expense' },
+      'category',
+      'Food',
+    );
+    expect(made).toBe(true);
+    expect(applyRules('pos cafe coffee day', 'category')).toBe('Food');
+  });
+
+  it('strips PII (long digit runs) from the learned keyword, keeping it matchable', async () => {
+    const made = await createRuleFromEdit(
+      { notes: '', original_description: 'STARBUCKS COFFEE 1234567' },
+      'category',
+      'Food',
+    );
+    expect(made).toBe(true);
+    // Future transaction (same merchant) still matches the normalized keyword
+    expect(applyRules('starbucks coffee mumbai', 'category')).toBe('Food');
+    // The stored keyword carries no account/ref number
+    const rule = getAllRules().find(r => r.value === 'Food');
+    expect(rule?.keyword).toBe('starbucks coffee');
+    expect(rule?.keyword).not.toMatch(/\d{4,}/);
+  });
+});
+
+describe('normalizeKeyword (PII-safe, generalizable keyword)', () => {
+  it('strips runs of 4+ digits (account / card / txn-ref numbers)', () => {
+    expect(normalizeKeyword('UPI/9876543210@okhdfc/REF84627139')).not.toMatch(/\d{4,}/);
+    expect(normalizeKeyword('CARD 4111111111111111 GROCERY')).toBe('card grocery');
+  });
+
+  it('lowercases, trims, and collapses whitespace', () => {
+    expect(normalizeKeyword('  AMAZON   Marketplace  ')).toBe('amazon marketplace');
+  });
+
+  it('keeps short numbers and merchant words intact', () => {
+    expect(normalizeKeyword('Shop 24 Coffee')).toBe('shop 24 coffee');
+  });
+
+  it('is null/undefined safe', () => {
+    expect(normalizeKeyword('')).toBe('');
+    // @ts-expect-error testing defensive null handling
+    expect(normalizeKeyword(null)).toBe('');
   });
 });

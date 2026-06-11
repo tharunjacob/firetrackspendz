@@ -20,7 +20,9 @@ interface FileRow {
 }
 
 interface FileUploaderProps {
-  onStartAnalysis: (jobs: FileJob[]) => Promise<void>;
+  // Returns a Promise; the resolved value (if any) is ignored here — callers that
+  // need the import summary handle it on their side.
+  onStartAnalysis: (jobs: FileJob[]) => Promise<unknown>;
   isProcessing: boolean;
   progress: number;
 }

@@ -4,6 +4,7 @@ import { TABLES } from '@/config/database';
 import { Icon } from '@/components/common/Icons';
 import { logEvent, EVENTS } from '@/services/logger';
 import { logAdminAction } from '@/services/adminAudit';
+import { promoteRule as promoteRuleDb, deleteRule as deleteRuleDb } from '@/services/learningRules';
 import type { UserProfile, LearningRule, AppLog, AdminTab } from '@/types';
 
 import { OverviewTab } from './OverviewTab';
@@ -168,26 +169,36 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
   };
 
   const promoteRule = async (rule: LearningRule) => {
-    const { error } = await supabase.from(TABLES.CATEGORY_RULES).update({ scope: 'system' }).eq('id', rule.id);
-    if (!error) {
-      setRules(prev => prev.map(r => r.id === rule.id ? { ...r, scope: 'system' as any } : r));
-      logEvent(EVENTS.ADMIN_RULE_PROMOTED, { ruleId: rule.id, keyword: rule.keyword, value: rule.value });
-      logAdminAction(adminId, adminEmail, 'rule_promoted', 'category_rule', String(rule.id ?? ''), {
-        keyword: rule.keyword, value: rule.value,
-      });
+    if (rule.id == null) return;
+    // Delegate the DB write to the single shared definition in learningRules.ts
+    // so the admin path and the service path can't drift apart again.
+    try {
+      await promoteRuleDb(rule.id);
+    } catch (e) {
+      console.warn('[Admin] promoteRule failed', e);
+      return;
     }
+    setRules(prev => prev.map(r => r.id === rule.id ? { ...r, scope: 'system', source: 'system' } : r));
+    logEvent(EVENTS.ADMIN_RULE_PROMOTED, { ruleId: rule.id, keyword: rule.keyword, value: rule.value });
+    logAdminAction(adminId, adminEmail, 'rule_promoted', 'category_rule', String(rule.id ?? ''), {
+      keyword: rule.keyword, value: rule.value,
+    });
   };
 
   const deleteRule = async (rule: LearningRule) => {
+    if (rule.id == null) return;
     if (!confirm(`Delete rule "${rule.keyword} → ${rule.value}"?`)) return;
-    const { error } = await supabase.from(TABLES.CATEGORY_RULES).delete().eq('id', rule.id);
-    if (!error) {
-      setRules(prev => prev.filter(r => r.id !== rule.id));
-      logEvent(EVENTS.ADMIN_RULE_DELETED, { ruleId: rule.id, keyword: rule.keyword, value: rule.value });
-      logAdminAction(adminId, adminEmail, 'rule_deleted', 'category_rule', String(rule.id ?? ''), {
-        keyword: rule.keyword, value: rule.value,
-      });
+    try {
+      await deleteRuleDb(rule.id);
+    } catch (e) {
+      console.warn('[Admin] deleteRule failed', e);
+      return;
     }
+    setRules(prev => prev.filter(r => r.id !== rule.id));
+    logEvent(EVENTS.ADMIN_RULE_DELETED, { ruleId: rule.id, keyword: rule.keyword, value: rule.value });
+    logAdminAction(adminId, adminEmail, 'rule_deleted', 'category_rule', String(rule.id ?? ''), {
+      keyword: rule.keyword, value: rule.value,
+    });
   };
 
   const updateUserPlan = async (userId: string, plan: string) => {

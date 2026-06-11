@@ -34,6 +34,14 @@ import { LIMITS } from '@/config/storage';
 // CONSUMED BY: DashboardShell, PaywallBanner, DataView, all chart views
 // ============================================================
 
+/** Outcome summary returned by processFiles so callers can react to success/failure. */
+export interface ProcessFilesResult {
+  /** Number of files that parsed and produced at least one transaction. */
+  successCount: number;
+  /** Number of non-duplicate transactions added across all files. */
+  newTransactions: number;
+}
+
 interface DataState {
   transactions: Transaction[];
   allTransactionsCount: number;
@@ -52,7 +60,11 @@ interface DataState {
    * Null for PDF imports or when the cached (localStorage) mapping was used.
    */
   lastImportHeaders: string[] | null;
-  processFiles: (jobs: FileJob[], ownerOverride?: string) => Promise<void>;
+  /**
+   * Parses and merges uploaded files. Resolves with a summary the caller can use
+   * to react to the outcome (e.g. auto-collapse the uploader only on success).
+   */
+  processFiles: (jobs: FileJob[], ownerOverride?: string) => Promise<ProcessFilesResult>;
   cancelProcessing: () => void;
   updateTransactions: (updated: Transaction[]) => Promise<void>;
   deleteTransactions: (ids: string[]) => Promise<void>;
@@ -215,7 +227,11 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
     load();
   }, [userId, plan, isAuthReady, isMimicMode, showToast]);
 
-  const processFiles = useCallback(async (jobs: FileJob[], ownerOverride?: string) => {
+  const processFiles = useCallback(async (jobs: FileJob[], ownerOverride?: string): Promise<ProcessFilesResult> => {
+    // Hoisted out of the try block so they survive to the function's return value
+    // (used by callers to auto-collapse the uploader only on a successful import).
+    let successCount = 0;
+    let totalNewTransactions = 0;
     setIsProcessing(true);
     setProcessingProgress(5);
     const abortController = new AbortController();
@@ -245,9 +261,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       // for both anonymous and signed-in users, so this compares against everything.
       let fullDataset = [...allRawRef.current];
       let completed = 0;
-      let successCount = 0;
       let totalDuplicates = 0;
-      let totalNewTransactions = 0;
       // Track headers from the first file that returns non-cached headers (for confirmation prompt)
       let importHeaders: string[] | null = null;
 
@@ -377,6 +391,8 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
         setTimeout(() => setIsProcessing(false), 800);
       }
     }
+
+    return { successCount, newTransactions: totalNewTransactions };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, plan, isMimicMode, showToast]);
 

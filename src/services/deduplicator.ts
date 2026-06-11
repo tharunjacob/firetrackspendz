@@ -89,10 +89,24 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
 
   const hasTransferKeyword = (str: string) => TRANSFER_KEYWORDS.some(k => str.toLowerCase().includes(k));
   const getTokens = (str: string) => str.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(' ').filter(x => x.length > 2);
+
+  // Substantial token overlap — NOT a single incidental shared word. A lone common
+  // token (a city, "online", "payment") used to be enough to fuse two unrelated
+  // rows into a phantom transfer/refund, silently erasing real money from totals.
+  // We accept a match when either the shorter description's tokens are fully
+  // contained in the longer one (e.g. "Amazon" vs "Amazon Marketplace Order") or
+  // there are ≥2 shared tokens covering ≥50% of the shorter description.
+  const strongTokenOverlap = (d1: string, d2: string): boolean => {
+    const t1 = getTokens(d1), t2 = getTokens(d2);
+    if (!t1.length || !t2.length) return false;
+    const shared = t1.filter(token => t2.includes(token)).length;
+    const minLen = Math.min(t1.length, t2.length);
+    return shared === minLen || (shared >= 2 && shared / minLen >= 0.5);
+  };
+
   const areSimilar = (d1: string, d2: string) => {
     if (hasTransferKeyword(d1) && hasTransferKeyword(d2)) return true;
-    const t1 = getTokens(d1), t2 = getTokens(d2);
-    return t1.filter(token => t2.includes(token)).length > 0;
+    return strongTokenOverlap(d1, d2);
   };
 
   const groups = new Map<string, Transaction[]>();
@@ -138,19 +152,17 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
     const d1 = (inc.notes || inc.category || '').toLowerCase();
     const d2 = (exp.notes || exp.category || '').toLowerCase();
 
-    const isRefundKeyword = (s: string) => /\b(refund|reversal|rvsl|credited|rtn|return)\b/i.test(s);
+    // An explicit refund/reversal marker is strong evidence on its own — paired with
+    // the same owner, exact amount, and ≤10-day window the caller already enforces,
+    // this is a confident refund. ("credited" was removed: it's too generic — e.g.
+    // "Salary credited" / "Interest credited" would falsely reverse real income.)
+    const isRefundKeyword = (s: string) => /\b(refund|reversal|rvsl|rtn|return|chargeback|reversed)\b/i.test(s);
     if (isRefundKeyword(d1) || isRefundKeyword(d2)) return true;
 
-    const t1 = getTokens(d1);
-    const t2 = getTokens(d2);
-    if (t1.some(token => t2.includes(token))) return true;
-
-    if (d1 && d2 && (d1.includes(d2) || d2.includes(d1))) return true;
-
-    const isMovieTicket = (s: string) => /wasteland|movie|ticket|bookmyshow|cinema|entertainment/i.test(s);
-    if (isMovieTicket(d1) && isMovieTicket(d2)) return true;
-
-    return false;
+    // Otherwise require substantial merchant-name overlap. (Previously a single
+    // shared token — or a hardcoded movie-ticket regex overfit to one developer's
+    // own statement — was enough, which produced phantom refunds.)
+    return strongTokenOverlap(d1, d2);
   };
 
   // Refund matching — only look at transactions that weren't already tagged as Transfer

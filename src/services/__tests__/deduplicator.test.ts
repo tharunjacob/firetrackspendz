@@ -156,6 +156,30 @@ describe('Deduplication Engine', () => {
     expect(duplicateCount).toBe(0);
   });
 
+  it('overlapping statements: 200 existing, re-upload 100 dups + 50 new → exactly 50 pass', () => {
+    // Simulate an existing dataset of 200 transactions (Jan–Mar).
+    const existing: Transaction[] = [];
+    for (let i = 0; i < 200; i++) {
+      const month = String((i % 3) + 1).padStart(2, '0'); // 01, 02, 03
+      const day = String((i % 28) + 1).padStart(2, '0');
+      existing.push(createTx(`e-${i}`, 'Me', `2025-${month}-${day}`, 100 + i, `Merchant ${i}`));
+    }
+
+    // Re-upload: first 100 are identical to existing (different ids — like a fresh parse),
+    // plus 50 brand-new transactions.
+    const reupload: Transaction[] = [];
+    for (let i = 0; i < 100; i++) {
+      reupload.push(createTx(`r-${i}`, 'Me', existing[i].date, existing[i].amount, existing[i].notes));
+    }
+    for (let i = 0; i < 50; i++) {
+      reupload.push(createTx(`r-new-${i}`, 'Me', `2025-04-${String((i % 28) + 1).padStart(2, '0')}`, 9000 + i, `Fresh Merchant ${i}`));
+    }
+
+    const { unique, duplicateCount } = deduplicateTransactions(existing, reupload);
+    expect(unique).toHaveLength(50);
+    expect(duplicateCount).toBe(100);
+  });
+
   it('"bought coffee twice" with existing data — within-batch dups still kept', () => {
     // Existing has nothing on this day. New file has two identical rows.
     // Both must pass through; dedup is only against existing.
@@ -217,10 +241,10 @@ describe('Inter-Account Transfers Detection', () => {
 });
 
 describe('Refunds Detection', () => {
-  it('detects refunds within the same account', () => {
+  it('detects refunds within the same account (same merchant, refund keyword)', () => {
     const txns = [
-      createTx('1', 'CreditCard', '2026-05-02', 1622.82, 'Wasteland Entertainmen Gurgaon', 'Expense'),
-      createTx('2', 'CreditCard', '2026-05-07', 1622.82, 'District Movie Ticket Gurugram', 'Income'),
+      createTx('1', 'CreditCard', '2026-05-02', 1622.82, 'BookMyShow Movie Ticket', 'Expense'),
+      createTx('2', 'CreditCard', '2026-05-07', 1622.82, 'BookMyShow Ticket Refund', 'Income'),
     ];
 
     const { transactions, transferCount } = identifyInterAccountTransfers(txns);
@@ -236,6 +260,77 @@ describe('Refunds Detection', () => {
     expect(inc?.type).toBe('Transfer');
     expect(inc?.category).toBe('Transfer');
     expect(inc?.subCategory).toBe('Refund');
+  });
+
+  it('does NOT fuse unrelated transactions that merely share one incidental token', () => {
+    // Same owner, same amount, within 10 days, BUT the only thing in common is a
+    // single generic word ("payment"). Before the matcher was tightened this was
+    // silently tagged as a refund, erasing real income + expense from the totals.
+    const txns = [
+      createTx('1', 'HDFC', '2026-05-02', 1500, 'Online Payment Grocery Store', 'Expense'),
+      createTx('2', 'HDFC', '2026-05-05', 1500, 'Payment Received Freelance Work', 'Income'),
+    ];
+
+    const { transactions, transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(0);
+    expect(transactions.find(t => t.id === '1')?.type).toBe('Expense');
+    expect(transactions.find(t => t.id === '2')?.type).toBe('Income');
+  });
+
+  it('matches a refund when the shorter description is fully contained in the longer', () => {
+    const txns = [
+      createTx('1', 'Visa', '2026-06-01', 999, 'Amazon Marketplace Order Electronics', 'Expense'),
+      createTx('2', 'Visa', '2026-06-04', 999, 'Amazon Marketplace', 'Income'),
+    ];
+    const { transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(1);
+  });
+
+  it('tags BOTH sides of a same-account refund pair (income + expense) as Transfer/Refund', () => {
+    // Regression guard for BUG 1: previously only one side of a refund pair could
+    // end up tagged. A refund = an income that reverses an earlier expense on the
+    // SAME account (same owner, same amount, within 10 days, similar description).
+    const txns = [
+      createTx('exp', 'Me', '2026-03-05', 1299.0, 'Amazon Marketplace Order', 'Expense'),
+      createTx('inc', 'Me', '2026-03-10', 1299.0, 'Amazon Marketplace Order', 'Income'),
+    ];
+
+    const { transactions, transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(1);
+
+    const exp = transactions.find(t => t.id === 'exp');
+    const inc = transactions.find(t => t.id === 'inc');
+
+    // Expense side
+    expect(exp?.type).toBe('Transfer');
+    expect(exp?.subCategory).toBe('Refund');
+    // Income side — must ALSO be tagged, not left as 'Income'
+    expect(inc?.type).toBe('Transfer');
+    expect(inc?.subCategory).toBe('Refund');
+  });
+
+  it('does not leave a refund expense matchable after an inter-account transfer round', () => {
+    // An inter-account transfer (different owners) and an unrelated same-account
+    // refund coexist. The transfer must be tagged Inter-Account and the refund
+    // pair Refund — neither expense should be double-matched or left untagged.
+    const txns = [
+      // Inter-account transfer pair (different owners, same date+amount)
+      createTx('t-exp', 'Me', '2026-04-01', 5000, 'Self Transfer to Wife', 'Expense'),
+      createTx('t-inc', 'Wife', '2026-04-01', 5000, 'Transfer from Me', 'Income'),
+      // Same-account refund pair (same owner, within 10 days)
+      createTx('r-exp', 'Me', '2026-04-02', 750, 'Flipkart Order Refund', 'Expense'),
+      createTx('r-inc', 'Me', '2026-04-06', 750, 'Flipkart Order Refund', 'Income'),
+    ];
+
+    const { transactions, transferCount } = identifyInterAccountTransfers(txns);
+    expect(transferCount).toBe(2);
+
+    expect(transactions.find(t => t.id === 't-exp')?.subCategory).toBe('Inter-Account');
+    expect(transactions.find(t => t.id === 't-inc')?.subCategory).toBe('Inter-Account');
+    expect(transactions.find(t => t.id === 'r-exp')?.subCategory).toBe('Refund');
+    expect(transactions.find(t => t.id === 'r-inc')?.subCategory).toBe('Refund');
+    // Every one of the four ended up as a Transfer (none left as Income/Expense)
+    expect(transactions.every(t => t.type === 'Transfer')).toBe(true);
   });
 
   it('rejects refund if owner/account is different', () => {

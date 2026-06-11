@@ -191,10 +191,16 @@ export const DataView = () => {
 
   const handleStartAnalysis = useCallback(async (jobs: any[]) => {
     try {
-      await processFiles(jobs);
-      setShowUploader(false);
+      const result = await processFiles(jobs);
+      // Auto-collapse the uploader after a successful import so the user lands on
+      // their data table. Only collapse when at least one file imported (never on
+      // a failed/empty import — the panel stays open so the user can retry). A
+      // short delay lets the "success" state register before the panel hides.
+      if (result && result.successCount > 0) {
+        setTimeout(() => setShowUploader(false), 1000);
+      }
     } catch (e) {
-      // ignore
+      // Processing failed — keep the uploader open so the user can try again.
     }
   }, [processFiles]);
 
