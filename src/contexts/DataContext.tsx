@@ -274,8 +274,8 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
               console.info(`[processFiles] Skipped ${duplicateCount} duplicate transactions from ${job.file.name}`);
             }
             fullDataset = [...fullDataset, ...unique];
-            const { transactions: cleaned } = identifyInterAccountTransfers(fullDataset);
-            fullDataset = cleaned;
+            // NOTE: identifyInterAccountTransfers runs once after the loop, not per-file.
+            // This avoids O(N²×files) — we only need it done once on the full merged dataset.
 
             if (isAnon) {
               setAllTransactionsRaw(fullDataset);
@@ -311,6 +311,19 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
         }
         completed++;
         setProcessingProgress(Math.round((completed / jobs.length) * 100));
+      }
+
+      // Run transfer/refund detection ONCE on the fully merged dataset (after all files).
+      // This is much more efficient than running it per-file (was O(N²×numFiles)).
+      if (totalNewTransactions > 0) {
+        const { transactions: cleaned, transferCount } = identifyInterAccountTransfers(fullDataset);
+        fullDataset = cleaned;
+        if (transferCount > 0) {
+          console.info(`[processFiles] Identified ${transferCount} inter-account transfer/refund pair(s)`);
+        }
+        // Update React state with the final transfer-detected dataset
+        setTransactions(applyPlanCap(fullDataset, plan));
+        setAllTransactionsRaw(fullDataset);
       }
 
       // Single persist after all files processed.

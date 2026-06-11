@@ -153,13 +153,16 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
     return false;
   };
 
-  // Round 1: Exact matches first
+  // Refund matching — only look at transactions that weren't already tagged as Transfer
+  // (inter-account transfer section above may have tagged some)
+  // Round 1: Exact description matches first
   let remainingIncomes = transactions.filter(t => t.type === 'Income');
   let remainingExpenses = transactions.filter(t => t.type === 'Expense');
 
   remainingIncomes.forEach(inc => {
-    if (inc.type !== 'Income') return;
+    if (inc.type !== 'Income') return; // skip if already tagged by another round
     const matchIndex = remainingExpenses.findIndex(exp => {
+      if (exp.type !== 'Expense') return false; // skip if already tagged
       if (inc.owner !== exp.owner) return false;
       if (Math.abs(inc.amount - exp.amount) > 0.01) return false;
       if (getDateDiffInDays(inc.date, exp.date) > 10) return false;
@@ -179,10 +182,13 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
   });
 
   // Round 2: Fuzzy/Heuristic matches for the remainder
+  // Re-filter both lists to get only still-untagged transactions
   remainingIncomes = transactions.filter(t => t.type === 'Income');
+  remainingExpenses = transactions.filter(t => t.type === 'Expense'); // ← must refresh, inter-account may have tagged some
   remainingIncomes.forEach(inc => {
-    if (inc.type !== 'Income') return;
+    if (inc.type !== 'Income') return; // skip if already tagged
     const matchIndex = remainingExpenses.findIndex(exp => {
+      if (exp.type !== 'Expense') return false; // skip if already tagged
       if (inc.owner !== exp.owner) return false;
       if (Math.abs(inc.amount - exp.amount) > 0.01) return false;
       if (getDateDiffInDays(inc.date, exp.date) > 10) return false;
