@@ -625,7 +625,11 @@ export const transformData = async (
 
     if (signal?.aborted) throw new Error('CANCELED');
 
-    if (!rawData?.length) throw new Error('No transactions found in PDF. Try converting to CSV.');
+    if (!rawData?.length) {
+      throw new Error(
+        'No transactions found in PDF. If you removed this statement\'s password via "Print to PDF" or flattening, the text layer might have been stripped. Try uploading the original password-protected PDF, or convert to CSV/Excel.'
+      );
+    }
 
     if (rawData.length > MAX_ROWS) {
       throw new Error(`This file has over ${MAX_ROWS.toLocaleString()} rows. Please split it into smaller files.`);

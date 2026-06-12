@@ -422,6 +422,22 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
           )}
         </div>
 
+        {/* Security & PDF Disclaimer Note */}
+        <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 space-y-2.5">
+          <div className="flex items-start gap-2.5 text-xs text-slate-400 dark:text-slate-500">
+            <Icon name="shield" className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+            <span>
+              <strong>Privacy & Security:</strong> PDF passwords are processed locally in your browser. They are <strong>never sent to or stored on our servers</strong>.
+            </span>
+          </div>
+          <div className="flex items-start gap-2.5 text-xs text-slate-400 dark:text-slate-500">
+            <Icon name="warning" className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <span>
+              <strong>Note on Unlocked PDFs:</strong> Removing a password using "Print to PDF" or similar options often flattens the file into an image, destroying the text layer and causing AI extraction to fail. For best results, upload the original password-protected PDF or a <strong>CSV/Excel export</strong> from your bank.
+            </span>
+          </div>
+        </div>
+
         {/* Shared hidden file input */}
         <input
           ref={fileInputRef}
