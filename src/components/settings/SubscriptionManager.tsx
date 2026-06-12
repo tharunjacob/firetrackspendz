@@ -6,6 +6,7 @@ import {
   type SubscriptionDetails,
 } from '@/services/paymentProvider';
 import { getSupabase } from '@/services/supabase';
+import { LEGAL } from '@/config/legal';
 
 /**
  * In-app replacement for Stripe's customer portal.
@@ -88,9 +89,21 @@ export const SubscriptionManager = () => {
   }
 
   if (!details) {
-    // Plan is non-free but we can't find a Razorpay subscription — likely an
-    // admin-mocked upgrade or pre-Razorpay user. Hide the manager.
-    return null;
+    return (
+      <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-700 dark:text-amber-300">
+        <p className="font-medium mb-1">Couldn't load subscription details.</p>
+        <p>
+          To cancel, email{' '}
+          <a
+            href={`mailto:${LEGAL.supportEmail}?subject=Cancel%20my%20subscription`}
+            className="underline hover:text-amber-900 dark:hover:text-amber-100"
+          >
+            {LEGAL.supportEmail}
+          </a>{' '}
+          and we'll process it within 24 hours.
+        </p>
+      </div>
+    );
   }
 
   const periodLabel = profile?.subscription_period === 'yearly' ? 'Yearly' : 'Monthly';

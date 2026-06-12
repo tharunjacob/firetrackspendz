@@ -123,6 +123,11 @@ CREATE POLICY "Admins can read all profiles"
   ON user_profiles FOR SELECT
   USING (is_admin() OR auth.uid() = id);
 
+DROP POLICY IF EXISTS "Admins can update all profiles" ON user_profiles;
+CREATE POLICY "Admins can update all profiles"
+  ON user_profiles FOR UPDATE
+  USING (is_admin() OR auth.role() = 'service_role');
+
 -- Auto-create profile on sign-up
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
@@ -198,7 +203,7 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_razorpay_sub
 CREATE OR REPLACE FUNCTION protect_subscription_columns()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF auth.role() <> 'service_role' THEN
+  IF auth.role() <> 'service_role' AND NOT is_admin() THEN
     NEW.subscription_plan        := OLD.subscription_plan;
     NEW.subscription_status      := OLD.subscription_status;
     NEW.subscription_period      := OLD.subscription_period;
@@ -357,6 +362,21 @@ DROP POLICY IF EXISTS "Users can delete own rules" ON category_rules;
 CREATE POLICY "Users can delete own rules"
   ON category_rules FOR DELETE
   USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Admins can read all rules" ON category_rules;
+CREATE POLICY "Admins can read all rules"
+  ON category_rules FOR SELECT
+  USING (is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Admins can update all rules" ON category_rules;
+CREATE POLICY "Admins can update all rules"
+  ON category_rules FOR UPDATE
+  USING (is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Admins can delete all rules" ON category_rules;
+CREATE POLICY "Admins can delete all rules"
+  ON category_rules FOR DELETE
+  USING (is_admin() OR auth.role() = 'service_role');
 
 -- ---------------------------------------------------------------------------
 -- CROSS-USER LEARNING — Consensus promotion
@@ -652,6 +672,11 @@ DROP POLICY IF EXISTS "Users can read own feedback" ON feedback;
 CREATE POLICY "Users can read own feedback"
   ON feedback FOR SELECT
   USING (auth.uid() = user_id OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Admins can read all feedback" ON feedback;
+CREATE POLICY "Admins can read all feedback"
+  ON feedback FOR SELECT
+  USING (is_admin() OR auth.role() = 'service_role');
 
 -- Admins can update feedback status (e.g. mark resolved). Previously this allowed
 -- ANY authenticated user (auth.uid() IS NOT NULL) to update any feedback row —

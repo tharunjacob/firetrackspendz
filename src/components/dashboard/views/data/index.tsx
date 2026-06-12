@@ -3,7 +3,7 @@ import { useApp } from '@/contexts/AppContext';
 import { DEFAULT_CATEGORIES } from '@/utils/constants';
 import { Icon } from '@/components/common/Icons';
 import { FileUploader } from '@/components/upload/FileUploader';
-import { createRuleFromEdit } from '@/services/learningRules';
+import { createRuleFromEdit, normalizeKeyword } from '@/services/learningRules';
 import type { Transaction } from '@/types';
 import { ITEMS_PER_PAGE, type EditState } from './types';
 import { TransactionTable } from './TransactionTable';
@@ -34,6 +34,13 @@ export const DataView = () => {
     try { return localStorage.getItem('tsz_data_edit_hint_dismissed') !== '1'; }
     catch { return true; }
   });
+  const [pendingBulkUpdate, setPendingBulkUpdate] = useState<{
+    originalTransaction: Transaction;
+    newCategory: string;
+    field: 'category' | 'subCategory';
+    matchingIds: string[];
+    keyword: string;
+  } | null>(null);
   const dismissEditHint = useCallback(() => {
     setShowEditHint(false);
     try { localStorage.setItem('tsz_data_edit_hint_dismissed', '1'); } catch { /* ignore */ }
@@ -124,10 +131,30 @@ export const DataView = () => {
       return;
     }
     if (newCategory === t.category) return;
-    updateTransactions([{ ...t, category: newCategory }]);
-    const created = await createRuleFromEdit(t, 'category', newCategory);
-    if (created) showToast(`Learned: similar transactions → "${newCategory}"`);
-  }, [updateTransactions, showToast, startEdit]);
+
+    const keyword = normalizeKeyword(t.original_description || t.notes || '');
+    const similarTxns = keyword.length >= 3
+      ? transactions.filter(other =>
+          other.id !== t.id &&
+          (other.original_description || other.notes || '').toLowerCase().includes(keyword) &&
+          other.category !== newCategory
+        )
+      : [];
+
+    if (similarTxns.length > 0) {
+      setPendingBulkUpdate({
+        originalTransaction: { ...t, category: newCategory },
+        newCategory,
+        field: 'category',
+        matchingIds: similarTxns.map(s => s.id),
+        keyword,
+      });
+    } else {
+      updateTransactions([{ ...t, category: newCategory }]);
+      const created = await createRuleFromEdit(t, 'category', newCategory);
+      if (created) showToast(`Learned: similar transactions → "${newCategory}"`);
+    }
+  }, [transactions, updateTransactions, showToast, startEdit]);
 
   const handleBatchCategory = useCallback(async (newCategory: string) => {
     setBatchCategoryOpen(false);
@@ -156,7 +183,7 @@ export const DataView = () => {
     const parsedAmount = parseFloat(editData.amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) return;
 
-    updateTransactions([{
+    const updatedTx = {
       ...tx,
       category: finalCategory,
       notes: editData.notes,
@@ -165,7 +192,55 @@ export const DataView = () => {
       date: editData.date,
       subCategory: editData.subCategory,
       owner: editData.owner,
-    }]);
+    };
+
+    if (finalCategory !== tx.category) {
+      const keyword = normalizeKeyword(tx.original_description || tx.notes || '');
+      const similarTxns = keyword.length >= 3
+        ? transactions.filter(other =>
+            other.id !== tx.id &&
+            (other.original_description || other.notes || '').toLowerCase().includes(keyword) &&
+            other.category !== finalCategory
+          )
+        : [];
+
+      if (similarTxns.length > 0) {
+        setPendingBulkUpdate({
+          originalTransaction: updatedTx,
+          newCategory: finalCategory,
+          field: 'category',
+          matchingIds: similarTxns.map(s => s.id),
+          keyword,
+        });
+        setEditId(null);
+        setUseCustomCategory(false);
+        return;
+      }
+    } else if (editData.subCategory && editData.subCategory !== (tx.subCategory || '')) {
+      const keyword = normalizeKeyword(tx.original_description || tx.notes || '');
+      const similarTxns = keyword.length >= 3
+        ? transactions.filter(other =>
+            other.id !== tx.id &&
+            (other.original_description || other.notes || '').toLowerCase().includes(keyword) &&
+            (other.subCategory || '') !== editData.subCategory
+          )
+        : [];
+
+      if (similarTxns.length > 0) {
+        setPendingBulkUpdate({
+          originalTransaction: updatedTx,
+          newCategory: editData.subCategory,
+          field: 'subCategory',
+          matchingIds: similarTxns.map(s => s.id),
+          keyword,
+        });
+        setEditId(null);
+        setUseCustomCategory(false);
+        return;
+      }
+    }
+
+    updateTransactions([updatedTx]);
 
     if (finalCategory !== tx.category) {
       const created = await createRuleFromEdit(tx, 'category', finalCategory);
@@ -178,6 +253,42 @@ export const DataView = () => {
     setEditId(null);
     setUseCustomCategory(false);
   }, [editId, transactions, useCustomCategory, editData, updateTransactions, showToast]);
+
+  const handleConfirmBulkUpdate = useCallback(async (updateAll: boolean) => {
+    if (!pendingBulkUpdate) return;
+    const { originalTransaction, newCategory, field, matchingIds } = pendingBulkUpdate;
+    setPendingBulkUpdate(null);
+
+    const txnsToUpdate = [originalTransaction];
+
+    if (updateAll) {
+      matchingIds.forEach(id => {
+        const other = transactions.find(t => t.id === id);
+        if (other) {
+          txnsToUpdate.push({
+            ...other,
+            [field]: newCategory,
+          });
+        }
+      });
+    }
+
+    await updateTransactions(txnsToUpdate);
+
+    // Create the learning rule
+    const created = await createRuleFromEdit(originalTransaction, field, newCategory);
+
+    if (updateAll) {
+      showToast(`Updated ${txnsToUpdate.length} transactions and saved rule.`);
+    } else {
+      const msg = field === 'category' ? `categorized as "${newCategory}"` : `updated subcategory to "${newCategory}"`;
+      if (created) {
+        showToast(`Updated 1 transaction. Learned: similar future transactions will be ${msg}`);
+      } else {
+        showToast(`Updated 1 transaction.`);
+      }
+    }
+  }, [pendingBulkUpdate, transactions, updateTransactions, showToast]);
 
   const onSort = useCallback((field: 'date' | 'amount') => {
     setSortBy(field);
@@ -335,6 +446,52 @@ export const DataView = () => {
         />
         {paginationBar}
       </div>
+
+      {pendingBulkUpdate && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" onClick={() => setPendingBulkUpdate(null)}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 max-w-lg w-full p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/30 rounded-full flex items-center justify-center text-brand-600 dark:text-brand-400">
+                  <Icon name="ai" className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Apply rules to existing data?</h3>
+                  <p className="text-xs text-slate-500">We found similar transactions matching "{pendingBulkUpdate.keyword}"</p>
+                </div>
+              </div>
+              <button onClick={() => setPendingBulkUpdate(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <Icon name="close" className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-xl p-4 mb-4">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
+                We found <strong className="text-brand-600 dark:text-brand-400">{pendingBulkUpdate.matchingIds.length} other</strong> matching transactions currently categorized differently.
+              </p>
+              <p className="text-xs text-slate-500">
+                Do you want to update all of them to <strong className="text-slate-800 dark:text-slate-200">"{pendingBulkUpdate.newCategory}"</strong> or only update the one you just edited?
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 justify-end">
+              <button
+                onClick={() => handleConfirmBulkUpdate(false)}
+                className="px-4 py-2 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm font-medium"
+              >
+                Only this one
+              </button>
+              <button
+                onClick={() => handleConfirmBulkUpdate(true)}
+                className="px-4 py-2 bg-brand-600 hover:bg-brand-750 text-white rounded-xl transition-colors text-sm font-medium shadow-md shadow-brand-600/10 flex items-center justify-center gap-1.5"
+              >
+                <Icon name="check" className="w-4 h-4" />
+                Update all {pendingBulkUpdate.matchingIds.length + 1} transactions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
