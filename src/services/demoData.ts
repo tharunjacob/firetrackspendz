@@ -96,7 +96,7 @@ export const generateDemoTransactions = (): Transaction[] => {
           date: `${year}-${pad(month + 1)}-12`,
           time: null,
           amount: Math.round(800 + rng() * 900),
-          category: 'Income',
+          category: 'Other Income',
           subCategory: '',
           project: null,
           notes: 'Demo Freelance Project',

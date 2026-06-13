@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { logEvent, EVENTS } from '@/services/logger';
 import { useApp } from '@/contexts/AppContext';
-import { formatAmount, DEFAULT_CATEGORIES } from '@/utils/constants';
+import { formatAmount, TYPE_CATEGORIES } from '@/utils/constants';
 import { Icon } from '@/components/common/Icons';
 import type { Budget } from '@/types';
 import { getUserSetting, setUserSetting } from '@/services/userSettings';
@@ -96,7 +96,7 @@ export const BudgetsView = () => {
               className="input-field"
             >
               <option value="">Select category</option>
-              {DEFAULT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              {TYPE_CATEGORIES.Expense.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <input
               id="budget-limit"

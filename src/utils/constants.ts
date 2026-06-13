@@ -93,7 +93,7 @@ export const COLORS = {
 export const DEFAULT_CATEGORIES = [
   'Food', 'Groceries', 'Transport', 'Shopping', 'Utilities',
   'Entertainment', 'Health', 'Education', 'Investment', 'Salary',
-  'Housing', 'EMI', 'Bill Payment', 'Transfer', 'Cash',
+  'Housing', 'EMI', 'Bill Payment', 'Transfer', 'Self Transfer', 'Cash',
   'Travel', 'Insurance', 'Subscription', 'Other Income', 'Gift', 'Unclassified',
 ];
 
@@ -103,7 +103,7 @@ export const TYPE_CATEGORIES = {
     'Food', 'Groceries', 'Transport', 'Shopping', 'Utilities',
     'Entertainment', 'Health', 'Education', 'Housing', 'EMI',
     'Bill Payment', 'Travel', 'Insurance', 'Subscription', 'Cash',
-    'Transfer', 'Unclassified'
+    'Transfer', 'Investment', 'Gift', 'Unclassified'
   ],
-  Transfer: ['Transfer', 'Investment', 'Cash', 'Unclassified']
+  Transfer: ['Transfer', 'Investment', 'Self Transfer', 'Cash', 'Unclassified']
 };

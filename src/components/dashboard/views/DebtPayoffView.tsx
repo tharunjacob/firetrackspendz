@@ -28,7 +28,7 @@ const DEBT_TYPE_LABELS: Record<Debt['type'], string> = {
   other: 'Other',
 };
 
-const EXCLUDED_CATEGORIES = ['Rent', 'Mortgage', 'EMI', 'Loan', 'Transfer', 'Income'];
+const EXCLUDED_CATEGORIES = ['Rent', 'Mortgage', 'EMI', 'Loan', 'Transfer', 'Other Income', 'Gift'];
 
 const formatMonths = (n: number) =>
   n === 0 ? '—' : n < 12 ? `${n}mo` : `${Math.floor(n / 12)}yr ${n % 12}mo`.replace(' 0mo', '');

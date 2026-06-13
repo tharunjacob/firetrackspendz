@@ -229,7 +229,7 @@ const applyMapping = (dataRows: any[][], header: string[], mapping: FileMapping,
       // Only re-classify based on the description/notes — not the category.
       // Categories like "Credit Card" or "Credit Card Bills" legitimately contain
       // the word "credit" but are spending categories, not income signals.
-      if (type === 'Expense' && (hasKeyword(notes, CONFIG.keywords.income) || category === 'Salary' || category === 'Income')) type = 'Income';
+      if (type === 'Expense' && (hasKeyword(notes, CONFIG.keywords.income) || category === 'Salary' || category === 'Income' || category === 'Other Income' || category === 'Gift')) type = 'Income';
       if (category === 'Transfer' || category === 'Credit Card Payment') type = 'Transfer';
     }
 
