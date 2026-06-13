@@ -116,11 +116,21 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
   });
 
   // 1. Identify inter-account transfers (different owners, same date + amount, similar descriptions)
+  // We run this in three rounds:
+  // - Round 1: Match Income with Expense (standard transfer pairing)
+  // - Round 2: Match remaining Income with Transfer (where the Transfer is the debit leg)
+  // - Round 3: Match remaining Expense with Transfer (where the Transfer is the credit leg)
   groups.forEach(group => {
     if (group.length < 2) return;
-    const incomes = group.filter(t => t.type === 'Income');
-    const expenses = group.filter(t => t.type === 'Expense');
-    if (!incomes.length || !expenses.length) return;
+
+    const matchedIds = new Set<string>();
+
+    const getUnmatched = (type: 'Income' | 'Expense' | 'Transfer') =>
+      group.filter(t => t.type === type && !matchedIds.has(t.id));
+
+    // Round 1: Income with Expense
+    let incomes = getUnmatched('Income');
+    let expenses = getUnmatched('Expense');
 
     incomes.forEach(inc => {
       const matchIndex = expenses.findIndex(exp => {
@@ -133,8 +143,54 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
         const exp = expenses[matchIndex];
         inc.type = 'Transfer'; inc.category = 'Transfer'; inc.subCategory = 'Inter-Account';
         exp.type = 'Transfer'; exp.category = 'Transfer'; exp.subCategory = 'Inter-Account';
+        matchedIds.add(inc.id);
+        matchedIds.add(exp.id);
         transferCount++;
         expenses.splice(matchIndex, 1);
+      }
+    });
+
+    // Round 2: Remaining Income with existing Transfer
+    incomes = getUnmatched('Income');
+    let transfers = getUnmatched('Transfer');
+
+    incomes.forEach(inc => {
+      const matchIndex = transfers.findIndex(trf => {
+        if (Math.abs(Math.abs(inc.amount) - Math.abs(trf.amount)) > 0.01) return false;
+        if (inc.owner === trf.owner) return false;
+        return areSimilar(inc.notes || inc.category, trf.notes || trf.category);
+      });
+
+      if (matchIndex !== -1) {
+        const trf = transfers[matchIndex];
+        inc.type = 'Transfer'; inc.category = 'Transfer'; inc.subCategory = 'Inter-Account';
+        trf.category = 'Transfer'; trf.subCategory = 'Inter-Account';
+        matchedIds.add(inc.id);
+        matchedIds.add(trf.id);
+        transferCount++;
+        transfers.splice(matchIndex, 1);
+      }
+    });
+
+    // Round 3: Remaining Expense with existing Transfer
+    expenses = getUnmatched('Expense');
+    transfers = getUnmatched('Transfer');
+
+    expenses.forEach(exp => {
+      const matchIndex = transfers.findIndex(trf => {
+        if (Math.abs(Math.abs(exp.amount) - Math.abs(trf.amount)) > 0.01) return false;
+        if (exp.owner === trf.owner) return false;
+        return areSimilar(exp.notes || exp.category, trf.notes || trf.category);
+      });
+
+      if (matchIndex !== -1) {
+        const trf = transfers[matchIndex];
+        exp.type = 'Transfer'; exp.category = 'Transfer'; exp.subCategory = 'Inter-Account';
+        trf.category = 'Transfer'; trf.subCategory = 'Inter-Account';
+        matchedIds.add(exp.id);
+        matchedIds.add(trf.id);
+        transferCount++;
+        transfers.splice(matchIndex, 1);
       }
     });
   });
