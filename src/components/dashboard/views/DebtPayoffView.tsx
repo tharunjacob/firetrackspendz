@@ -113,7 +113,7 @@ const DebtForm = ({ initial, onSave, onCancel }: DebtFormProps) => {
 // ---- Main View ----
 
 export const DebtPayoffView = () => {
-  const { transactions, currency, isAuthReady, plan } = useApp();
+  const { transactions, currency, isAuthReady, plan, isDemoMode } = useApp();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const GRID_COLOR = isDark ? '#334155' : '#e2e8f0';
@@ -146,16 +146,49 @@ export const DebtPayoffView = () => {
     if (!isAuthReady) return;
     let cancelled = false;
     getUserSetting<Debt[]>(STORAGE_KEYS.DEBTS, []).then(loaded => {
-      if (!cancelled) { setDebts(loaded); setHydrated(true); }
+      if (!cancelled) {
+        if (loaded.length === 0 && isDemoMode) {
+          setDebts([
+            {
+              id: 'demo-d1',
+              name: 'Credit Card A',
+              balance: 4500,
+              interestRate: 18.9,
+              minimumPayment: 135,
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: 'demo-d2',
+              name: 'Car Loan',
+              balance: 14000,
+              interestRate: 4.5,
+              minimumPayment: 320,
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: 'demo-d3',
+              name: 'Student Loan',
+              balance: 28000,
+              interestRate: 6.8,
+              minimumPayment: 290,
+              createdAt: new Date().toISOString(),
+            }
+          ]);
+        } else {
+          setDebts(loaded);
+        }
+        setHydrated(true);
+      }
     });
     return () => { cancelled = true; };
-  }, [isAuthReady]);
+  }, [isAuthReady, isDemoMode]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (!hydrated) return;
+    if (isDemoMode) return; // Do not persist demo debts to user settings
     setUserSetting(STORAGE_KEYS.DEBTS, debts);
-  }, [debts, hydrated]);
+  }, [debts, hydrated, isDemoMode]);
 
   const extra = Math.max(0, parseFloat(extraPayment) || 0);
 

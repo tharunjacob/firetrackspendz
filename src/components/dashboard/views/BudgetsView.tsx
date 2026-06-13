@@ -10,7 +10,7 @@ import { canAccessFeature } from '@/config/plans';
 
 export const BudgetsView = () => {
   useEffect(() => { logEvent(EVENTS.FEATURE_BUDGETS_OPENED); }, []);
-  const { transactions, currency, isAuthReady, plan } = useApp();
+  const { transactions, currency, isAuthReady, plan, isDemoMode } = useApp();
 
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [hydrated, setHydrated] = useState(false);
@@ -22,17 +22,27 @@ export const BudgetsView = () => {
     let cancelled = false;
     getUserSetting<Budget[]>(STORAGE_KEYS.BUDGETS, []).then(loaded => {
       if (!cancelled) {
-        setBudgets(loaded);
+        if (loaded.length === 0 && isDemoMode) {
+          setBudgets([
+            { id: 'demo-b1', user_id: '', category: 'Housing', monthly_limit: 1800, currency, is_active: true },
+            { id: 'demo-b2', user_id: '', category: 'Groceries', monthly_limit: 500, currency, is_active: true },
+            { id: 'demo-b3', user_id: '', category: 'Transport', monthly_limit: 250, currency, is_active: true },
+            { id: 'demo-b4', user_id: '', category: 'Food', monthly_limit: 200, currency, is_active: true },
+          ]);
+        } else {
+          setBudgets(loaded);
+        }
         setHydrated(true);
       }
     });
     return () => { cancelled = true; };
-  }, [isAuthReady]);
+  }, [isAuthReady, isDemoMode, currency]);
 
   useEffect(() => {
     if (!hydrated) return;
+    if (isDemoMode) return; // Do not persist demo budgets to user settings
     setUserSetting(STORAGE_KEYS.BUDGETS, budgets);
-  }, [budgets, hydrated]);
+  }, [budgets, hydrated, isDemoMode]);
 
   const currentMonth = new Date().toISOString().substring(0, 7);
   const currentMonthExpenses = useMemo(() => {

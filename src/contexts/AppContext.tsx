@@ -90,7 +90,7 @@ export const useApp = (): AppState => {
     userId: auth.userId,
     userEmail: auth.userEmail,
     profile: auth.profile,
-    plan: auth.plan,
+    plan: data.isDemoMode ? 'enterprise' : auth.plan,
     isAuthOpen: auth.isAuthOpen,
     setIsAuthOpen: auth.setIsAuthOpen,
     user: auth.user,

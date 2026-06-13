@@ -20,7 +20,7 @@ const GOAL_COLORS = COLORS.categories;
 
 export const GoalsView = () => {
   useEffect(() => { logEvent(EVENTS.FEATURE_GOALS_OPENED); }, []);
-  const { transactions, currency, isAuthReady, plan } = useApp();
+  const { transactions, currency, isAuthReady, plan, isDemoMode } = useApp();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const GRID_COLOR = isDark ? '#334155' : '#e2e8f0';
@@ -46,17 +46,48 @@ export const GoalsView = () => {
     let cancelled = false;
     getUserSetting<SavingsGoal[]>(STORAGE_KEYS.SAVINGS_GOALS, []).then(loaded => {
       if (!cancelled) {
-        setGoals(loaded);
+        if (loaded.length === 0 && isDemoMode) {
+          const twoYearsFromNow = new Date();
+          twoYearsFromNow.setFullYear(twoYearsFromNow.getFullYear() + 2);
+          const deadlineStr = twoYearsFromNow.toISOString().split('T')[0];
+          setGoals([
+            {
+              id: 'demo-g1',
+              name: 'Emergency Fund',
+              targetAmount: 20000,
+              currentAmount: 12500,
+              deadline: deadlineStr,
+              icon: 'shield',
+              color: GOAL_COLORS[0],
+              monthlyContribution: 500,
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: 'demo-g2',
+              name: 'New Vehicle',
+              targetAmount: 35000,
+              currentAmount: 8000,
+              deadline: deadlineStr,
+              icon: 'target',
+              color: GOAL_COLORS[1],
+              monthlyContribution: 400,
+              createdAt: new Date().toISOString(),
+            }
+          ]);
+        } else {
+          setGoals(loaded);
+        }
         setHydrated(true);
       }
     });
     return () => { cancelled = true; };
-  }, [isAuthReady]);
+  }, [isAuthReady, isDemoMode]);
 
   useEffect(() => {
     if (!hydrated) return;
+    if (isDemoMode) return; // Do not persist demo goals to user settings
     setUserSetting(STORAGE_KEYS.SAVINGS_GOALS, goals);
-  }, [goals, hydrated]);
+  }, [goals, hydrated, isDemoMode]);
 
   // Monthly savings average
   const avgMonthlySavings = useMemo(() => {

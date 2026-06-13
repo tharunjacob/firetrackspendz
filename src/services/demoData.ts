@@ -57,15 +57,18 @@ export const generateDemoTransactions = (): Transaction[] => {
     const base = new Date(now.getFullYear(), now.getMonth() - m, 1);
     const year = base.getFullYear();
     const month = base.getMonth(); // 0-indexed
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Generate a full month's worth of transactions for all months, including the current month.
+    // This ensures that the charts, budgets, and dashboards always look fully populated and impressive,
+    // even if the user views the demo early in the calendar month.
+    const maxDay = new Date(year, month + 1, 0).getDate();
 
     for (const spec of SPECS) {
       for (let i = 0; i < spec.perMonth; i++) {
         const day = spec.recurring && spec.perMonth === 1
-          ? Math.min(2, daysInMonth)
-          : 1 + Math.floor(rng() * daysInMonth);
-        const d = new Date(year, month, day);
-        if (d > now) continue; // never produce future-dated rows
+          ? Math.min(2, maxDay)
+          : 1 + Math.floor(rng() * maxDay);
+        
         const amount = Math.round(spec.min + rng() * (spec.max - spec.min));
         txns.push({
           id: `demo-${idx++}`,
@@ -87,23 +90,21 @@ export const generateDemoTransactions = (): Transaction[] => {
 
     // Occasional freelance income to vary the income side.
     if (m % 3 === 0) {
-      const d = new Date(year, month, 12);
-      if (d <= now) {
-        txns.push({
-          id: `demo-${idx++}`,
-          owner: 'Sample Account',
-          type: 'Income',
-          date: `${year}-${pad(month + 1)}-12`,
-          time: null,
-          amount: Math.round(800 + rng() * 900),
-          category: 'Other Income',
-          subCategory: '',
-          project: null,
-          notes: 'Demo Freelance Project',
-          original_description: 'Demo Freelance Project',
-          merchant_name: 'Demo Freelance Project',
-        });
-      }
+      const day = 12;
+      txns.push({
+        id: `demo-${idx++}`,
+        owner: 'Sample Account',
+        type: 'Income',
+        date: `${year}-${pad(month + 1)}-${pad(day)}`,
+        time: null,
+        amount: Math.round(800 + rng() * 900),
+        category: 'Other Income',
+        subCategory: '',
+        project: null,
+        notes: 'Demo Freelance Project',
+        original_description: 'Demo Freelance Project',
+        merchant_name: 'Demo Freelance Project',
+      });
     }
   }
 
