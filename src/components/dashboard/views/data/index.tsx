@@ -30,6 +30,11 @@ export const DataView = () => {
   const [openCategoryId, setOpenCategoryId] = useState<string | null>(null);
   const [batchCategoryOpen, setBatchCategoryOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
   const [showEditHint, setShowEditHint] = useState(() => {
     try { return localStorage.getItem('tsz_data_edit_hint_dismissed') !== '1'; }
     catch { return true; }
@@ -67,12 +72,24 @@ export const DataView = () => {
     }
     if (typeFilter !== 'all') result = result.filter(t => t.type === typeFilter);
     if (ownerFilter !== 'all') result = result.filter(t => t.owner === ownerFilter);
+
+    if (startDate) result = result.filter(t => t.date >= startDate);
+    if (endDate) result = result.filter(t => t.date <= endDate);
+    if (minAmount) {
+      const min = parseFloat(minAmount);
+      if (!isNaN(min)) result = result.filter(t => t.amount >= min);
+    }
+    if (maxAmount) {
+      const max = parseFloat(maxAmount);
+      if (!isNaN(max)) result = result.filter(t => t.amount <= max);
+    }
+
     result.sort((a, b) => {
       const cmp = sortBy === 'date' ? a.date.localeCompare(b.date) : a.amount - b.amount;
       return sortDir === 'desc' ? -cmp : cmp;
     });
     return result;
-  }, [transactions, search, typeFilter, ownerFilter, sortBy, sortDir]);
+  }, [transactions, search, typeFilter, ownerFilter, startDate, endDate, minAmount, maxAmount, sortBy, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const paginated = useMemo(
@@ -80,7 +97,7 @@ export const DataView = () => {
     [filtered, page]
   );
 
-  useEffect(() => { setPage(1); }, [search, typeFilter, ownerFilter, sortBy, sortDir]);
+  useEffect(() => { setPage(1); }, [search, typeFilter, ownerFilter, startDate, endDate, minAmount, maxAmount, sortBy, sortDir]);
 
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds(prev => {
@@ -195,8 +212,6 @@ export const DataView = () => {
 
   const saveEdit = useCallback(async () => {
     if (!editId) return;
-    const tx = transactions.find(t => t.id === editId);
-    if (!tx) return;
 
     const finalCategory = useCustomCategory && editData.customCategory.trim()
       ? editData.customCategory.trim()
@@ -204,6 +219,30 @@ export const DataView = () => {
 
     const parsedAmount = parseFloat(editData.amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) return;
+
+    if (editId === 'new') {
+      const newTx: Transaction = {
+        id: `manual-${Date.now()}`,
+        date: editData.date,
+        time: null,
+        amount: parsedAmount,
+        type: editData.type,
+        owner: editData.owner || 'Manual Account',
+        category: finalCategory || 'Unclassified',
+        subCategory: editData.subCategory || '',
+        notes: editData.notes || 'Manually added',
+        project: null,
+      };
+
+      await updateTransactions([newTx]);
+      showToast('Transaction created manually');
+      setEditId(null);
+      setUseCustomCategory(false);
+      return;
+    }
+
+    const tx = transactions.find(t => t.id === editId);
+    if (!tx) return;
 
     const updatedTx = {
       ...tx,
@@ -361,6 +400,25 @@ export const DataView = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Transaction Data ({filtered.length})</h2>
         <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => {
+              setEditId('new');
+              setEditData({
+                category: 'Unclassified',
+                customCategory: '',
+                notes: '',
+                type: 'Expense',
+                amount: '',
+                date: new Date().toISOString().split('T')[0],
+                subCategory: '',
+                owner: owners[0] || 'Manual Account',
+              });
+              setUseCustomCategory(false);
+            }}
+            className="btn-secondary text-sm px-4 py-2 flex items-center gap-1"
+          >
+            <Icon name="plus" className="w-4 h-4" /> Add Transaction
+          </button>
           <button onClick={() => setShowUploader(!showUploader)} className="btn-primary text-sm px-4 py-2">
             <Icon name="upload" className="w-4 h-4 inline mr-1" /> Upload More
           </button>
@@ -382,6 +440,32 @@ export const DataView = () => {
         </div>
       )}
 
+      {editId === 'new' && (
+        <div className="card p-5 border border-brand-300 dark:border-brand-800 bg-brand-50/10 dark:bg-brand-950/5 animate-slide-up">
+          <div className="flex items-center justify-between mb-4 border-b border-brand-100 dark:border-brand-900 pb-2">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <Icon name="plus" className="w-4 h-4 text-brand-600" />
+              Add Manual Transaction
+            </h3>
+            <button
+              onClick={cancelEdit}
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            >
+              <Icon name="close" className="w-4 h-4" />
+            </button>
+          </div>
+          <TransactionEditPanel
+            editData={editData}
+            setEditData={setEditData}
+            useCustomCategory={useCustomCategory}
+            toggleCustomCategory={toggleCustomCategory}
+            allCategories={allCategories}
+            onSave={saveEdit}
+            onCancel={cancelEdit}
+          />
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Icon name="search" className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -397,7 +481,52 @@ export const DataView = () => {
           <option value="all">All Accounts</option>
           {owners.map(o => <option key={o} value={o}>{o}</option>)}
         </select>
+        <button
+          onClick={() => setShowFilters(v => !v)}
+          className={`btn-secondary text-sm px-4 py-2 flex items-center gap-1.5 ${showFilters ? 'bg-slate-200 dark:bg-slate-700' : ''}`}
+          title="Toggle Date & Amount Filters"
+        >
+          <Icon name="filter" className="w-4 h-4" />
+          Filters
+          {(startDate || endDate || minAmount || maxAmount) && (
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
+          )}
+        </button>
       </div>
+
+      {showFilters && (
+        <div className="card p-4 bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-end animate-slide-up">
+          <div>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">Start Date</label>
+            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="input-field text-xs py-1.5 w-full" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">End Date</label>
+            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="input-field text-xs py-1.5 w-full" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">Min Amount</label>
+            <input type="number" placeholder="Min" value={minAmount} onChange={e => setMinAmount(e.target.value)} className="input-field text-xs py-1.5 w-full" min="0" step="1" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">Max Amount</label>
+            <input type="number" placeholder="Max" value={maxAmount} onChange={e => setMaxAmount(e.target.value)} className="input-field text-xs py-1.5 w-full" min="0" step="1" />
+          </div>
+          <div>
+            <button
+              onClick={() => {
+                setStartDate('');
+                setEndDate('');
+                setMinAmount('');
+                setMaxAmount('');
+              }}
+              className="btn-secondary text-xs w-full py-1.5 px-3"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="text-xs text-slate-500 flex items-center gap-2">
         <Icon name="pencil" className="w-3.5 h-3.5" />
