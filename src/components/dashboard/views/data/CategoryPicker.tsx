@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import type { Transaction } from '@/types';
+import { TYPE_CATEGORIES, DEFAULT_CATEGORIES } from '@/utils/constants';
 
 interface Props {
   transaction: Transaction;
@@ -10,6 +12,20 @@ interface Props {
 }
 
 export const CategoryPicker = ({ transaction, allCategories, isOpen, onOpen, onClose, onChange }: Props) => {
+  const filteredCategories = useMemo(() => {
+    const type = transaction.type;
+    const defaults = TYPE_CATEGORIES[type as keyof typeof TYPE_CATEGORIES] || DEFAULT_CATEGORIES;
+    const isDefaultCategory = (cat: string) => DEFAULT_CATEGORIES.includes(cat);
+
+    return allCategories.filter(cat => {
+      if (cat === transaction.category) return true;
+      if (isDefaultCategory(cat)) {
+        return defaults.includes(cat);
+      }
+      return true;
+    });
+  }, [allCategories, transaction.type, transaction.category]);
+
   if (isOpen) {
     return (
       <select
@@ -19,7 +35,7 @@ export const CategoryPicker = ({ transaction, allCategories, isOpen, onOpen, onC
         onBlur={onClose}
         className="text-xs border border-brand-300 dark:border-brand-700 rounded px-1 py-0.5 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none max-w-[160px]"
       >
-        {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
+        {filteredCategories.map(c => <option key={c} value={c}>{c}</option>)}
         <option value="__custom__">+ Custom...</option>
       </select>
     );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from '@/components/common/Icons';
 import { formatAmount } from '@/utils/constants';
 import type { Transaction, Currency } from '@/types';
@@ -26,6 +26,7 @@ interface Props {
   onOpenCategory: (id: string) => void;
   onCloseCategory: () => void;
   onInlineCategoryChange: (t: Transaction, newCategory: string) => void;
+  onInlineTypeChange: (t: Transaction, newType: 'Income' | 'Expense' | 'Transfer') => void;
   onStartEdit: (t: Transaction) => void;
   onCancelEdit: () => void;
   onSaveEdit: () => void;
@@ -36,9 +37,12 @@ export const TransactionTable = ({
   editId, editData, setEditData, useCustomCategory, toggleCustomCategory,
   openCategoryId, allCategories,
   onToggleSelect, onToggleAll, onSort, onOpenCategory, onCloseCategory,
-  onInlineCategoryChange, onStartEdit, onCancelEdit, onSaveEdit,
-}: Props) => (
-  <div className="overflow-x-auto">
+  onInlineCategoryChange, onInlineTypeChange, onStartEdit, onCancelEdit, onSaveEdit,
+}: Props) => {
+  const [editingTypeRowId, setEditingTypeRowId] = useState<string | null>(null);
+
+  return (
+    <div className="overflow-x-auto">
     <table className="w-full text-sm">
       <thead className="bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
         <tr>
@@ -93,10 +97,31 @@ export const TransactionTable = ({
               <td className="px-3 py-2.5">
                 <span className="text-xs text-slate-500">{t.subCategory && t.subCategory !== 'General' ? t.subCategory : '—'}</span>
               </td>
-              <td className="px-3 py-2.5">
-                <span className={`text-xs font-medium ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
-                  {t.type}
-                </span>
+              <td
+                className="px-3 py-2.5 cursor-pointer select-none"
+                onDoubleClick={() => setEditingTypeRowId(t.id)}
+                title="Double click to edit type"
+              >
+                {editingTypeRowId === t.id ? (
+                  <select
+                    autoFocus
+                    value={t.type}
+                    onChange={e => {
+                      onInlineTypeChange(t, e.target.value as 'Income' | 'Expense' | 'Transfer');
+                      setEditingTypeRowId(null);
+                    }}
+                    onBlur={() => setEditingTypeRowId(null)}
+                    className="text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-brand-500 w-24 text-slate-700 dark:text-slate-200"
+                  >
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Transfer">Transfer</option>
+                  </select>
+                ) : (
+                  <span className={`text-xs font-medium ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
+                    {t.type}
+                  </span>
+                )}
               </td>
               <td className={`px-3 py-2.5 text-right font-semibold ${t.type === 'Income' ? 'text-green-600' : t.type === 'Expense' ? 'text-red-500' : 'text-brand-500'}`}>
                 {formatAmount(t.amount, currency)}
@@ -134,4 +159,5 @@ export const TransactionTable = ({
       </tbody>
     </table>
   </div>
-);
+  );
+};

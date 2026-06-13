@@ -94,5 +94,16 @@ export const DEFAULT_CATEGORIES = [
   'Food', 'Groceries', 'Transport', 'Shopping', 'Utilities',
   'Entertainment', 'Health', 'Education', 'Investment', 'Salary',
   'Housing', 'EMI', 'Bill Payment', 'Transfer', 'Cash',
-  'Travel', 'Insurance', 'Subscription', 'Income', 'Unclassified',
+  'Travel', 'Insurance', 'Subscription', 'Other Income', 'Gift', 'Unclassified',
 ];
+
+export const TYPE_CATEGORIES = {
+  Income: ['Salary', 'Investment', 'Gift', 'Transfer', 'Other Income', 'Unclassified'],
+  Expense: [
+    'Food', 'Groceries', 'Transport', 'Shopping', 'Utilities',
+    'Entertainment', 'Health', 'Education', 'Housing', 'EMI',
+    'Bill Payment', 'Travel', 'Insurance', 'Subscription', 'Cash',
+    'Transfer', 'Unclassified'
+  ],
+  Transfer: ['Transfer', 'Investment', 'Cash', 'Unclassified']
+};

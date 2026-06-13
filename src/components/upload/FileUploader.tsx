@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Icon } from '@/components/common/Icons';
-import { isPdfEncrypted, validatePdfPassword } from '@/services/transformer';
+import { isPdfEncrypted, validatePdfPassword, isExcelEncrypted } from '@/services/transformer';
 import type { FileJob } from '@/types';
 import { logEvent, EVENTS } from '@/services/logger';
 import { LIMITS } from '@/config/storage';
@@ -18,6 +18,44 @@ interface FileRow {
   status: 'idle' | 'checking' | 'ready' | 'error';
   error?: string;
 }
+
+interface PasswordPromptProps {
+  row: FileRow;
+  onPasswordChange: (rowId: string, password: string) => void;
+}
+
+const PasswordPrompt = ({ row, onPasswordChange }: PasswordPromptProps) => {
+  if (!row.needsPassword) return null;
+  return (
+    <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg px-3 py-2 w-full">
+      <Icon name="lock" className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+      <div className="flex flex-col gap-1 flex-1">
+        <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">This PDF is password-protected</span>
+        <input
+          type="password"
+          placeholder="Enter PDF password"
+          value={row.password}
+          onChange={e => onPasswordChange(row.id, e.target.value)}
+          className="text-sm bg-white dark:bg-slate-700 border border-amber-300 dark:border-amber-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent w-full dark:text-slate-100"
+          autoFocus
+        />
+      </div>
+      {row.password && row.status === 'ready' && (
+        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shrink-0">
+          <Icon name="check" className="w-3 h-3 text-white" />
+        </div>
+      )}
+      {row.password && row.status === 'checking' && (
+        <div className="w-5 h-5 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin shrink-0" />
+      )}
+      {row.status === 'error' && row.error && (
+        <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shrink-0" title={row.error}>
+          <Icon name="close" className="w-3 h-3 text-white" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface FileUploaderProps {
   // Returns a Promise; the resolved value (if any) is ignored here — callers that
@@ -38,6 +76,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [showExcelPasswordModal, setShowExcelPasswordModal] = useState(false);
 
   const filesRef = useRef<{ [rowId: string]: File }>({});
   const validationTimeouts = useRef<{ [rowId: string]: number }>({});
@@ -91,6 +130,21 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
       try {
         const encrypted = await isPdfEncrypted(file);
         updateRow(rowId, { needsPassword: encrypted, status: encrypted ? 'idle' : 'ready' });
+      } catch {
+        updateRow(rowId, { status: 'ready' });
+      }
+    } else if (file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls')) {
+      try {
+        const encrypted = await isExcelEncrypted(file);
+        if (encrypted) {
+          updateRow(rowId, {
+            status: 'error',
+            error: 'This Excel file is password-protected and cannot be read.',
+          });
+          setShowExcelPasswordModal(true);
+          return;
+        }
+        updateRow(rowId, { status: 'ready' });
       } catch {
         updateRow(rowId, { status: 'ready' });
       }
@@ -164,36 +218,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
 
   const readyCount = rows.filter(r => r.file && r.owner.trim() && r.status === 'ready').length;
 
-  // ── Encrypted PDF password block (shared between layouts) ──
-  const PasswordPrompt = ({ row }: { row: FileRow }) => row.needsPassword ? (
-    <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg px-3 py-2 w-full">
-      <Icon name="lock" className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-      <div className="flex flex-col gap-1 flex-1">
-        <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">This PDF is password-protected</span>
-        <input
-          type="password"
-          placeholder="Enter PDF password"
-          value={row.password}
-          onChange={e => handlePasswordChange(row.id, e.target.value)}
-          className="text-sm bg-white dark:bg-slate-700 border border-amber-300 dark:border-amber-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent w-full dark:text-slate-100"
-          autoFocus
-        />
-      </div>
-      {row.password && row.status === 'ready' && (
-        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shrink-0">
-          <Icon name="check" className="w-3 h-3 text-white" />
-        </div>
-      )}
-      {row.password && row.status === 'checking' && (
-        <div className="w-5 h-5 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin shrink-0" />
-      )}
-      {row.status === 'error' && row.error && (
-        <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shrink-0" title={row.error}>
-          <Icon name="close" className="w-3 h-3 text-white" />
-        </div>
-      )}
-    </div>
-  ) : null;
+
 
 
   return (
@@ -267,7 +292,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
               {/* Password for encrypted PDFs */}
               {row.needsPassword && (
                 <div className="px-4 pb-4">
-                  <PasswordPrompt row={row} />
+                  <PasswordPrompt row={row} onPasswordChange={handlePasswordChange} />
                 </div>
               )}
 
@@ -360,7 +385,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
                   {/* Password prompt for encrypted PDF */}
                   {row.needsPassword && (
                     <div className="sm:w-auto w-full">
-                      <PasswordPrompt row={row} />
+                      <PasswordPrompt row={row} onPasswordChange={handlePasswordChange} />
                     </div>
                   )}
 
@@ -450,6 +475,53 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
             e.target.value = '';
           }}
         />
+
+        {showExcelPasswordModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-scale-up">
+              <div className="flex items-start gap-3.5 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center shrink-0">
+                  <Icon name="lock" className="w-5 h-5 text-red-600 dark:text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                    Password-Protected Excel File
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Excel decryption is not supported in-browser.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300 mb-6 bg-slate-50 dark:bg-slate-900/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">
+                  How to unlock your file:
+                </p>
+                <ol className="list-decimal list-inside space-y-2 text-xs leading-relaxed">
+                  <li>Open the file in <strong className="text-slate-700 dark:text-slate-200">Microsoft Excel</strong> or <strong className="text-slate-700 dark:text-slate-200">Google Sheets</strong>.</li>
+                  <li>Enter the password to decrypt and view the file.</li>
+                  <li>
+                    <strong className="text-slate-700 dark:text-slate-200">In Excel</strong>: Go to <span className="italic">File &gt; Info &gt; Protect Workbook &gt; Encrypt with Password</span>. Clear the password field and click OK.
+                  </li>
+                  <li>
+                    <strong className="text-slate-700 dark:text-slate-200">In Google Sheets</strong>: Go to <span className="italic">File &gt; Download &gt; Microsoft Excel (.xlsx)</span> to export a clean copy.
+                  </li>
+                  <li>Upload the new unprotected file here.</li>
+                </ol>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowExcelPasswordModal(false)}
+                  className="btn-primary w-full sm:w-auto px-5 py-2 text-xs rounded-xl"
+                >
+                  Got it, thanks!
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -509,6 +509,23 @@ export const validatePdfPassword = async (file: File, password?: string): Promis
   }
 };
 
+export const isExcelEncrypted = async (file: File): Promise<boolean> => {
+  const name = file.name.toLowerCase();
+  if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) return false;
+  try {
+    const XLSX = await import('xlsx');
+    const arrayBuffer = await file.arrayBuffer();
+    XLSX.read(arrayBuffer, { type: 'array' });
+    return false;
+  } catch (err: any) {
+    const errMsg = err.message?.toLowerCase() || '';
+    if (errMsg.includes('password') || errMsg.includes('decrypt') || errMsg.includes('encrypt') || errMsg.includes('protected')) {
+      return true;
+    }
+    return false;
+  }
+};
+
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {

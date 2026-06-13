@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { DEFAULT_CATEGORIES } from '@/utils/constants';
+import { DEFAULT_CATEGORIES, TYPE_CATEGORIES } from '@/utils/constants';
 import { Icon } from '@/components/common/Icons';
 import { FileUploader } from '@/components/upload/FileUploader';
 import { createRuleFromEdit, normalizeKeyword } from '@/services/learningRules';
@@ -155,6 +155,28 @@ export const DataView = () => {
       if (created) showToast(`Learned: similar transactions → "${newCategory}"`);
     }
   }, [transactions, updateTransactions, showToast, startEdit]);
+
+  const handleInlineTypeChange = useCallback(async (t: Transaction, newType: 'Income' | 'Expense' | 'Transfer') => {
+    if (newType === t.type) return;
+    let newCategory = t.category;
+
+    const defaults = TYPE_CATEGORIES[newType as keyof typeof TYPE_CATEGORIES] || DEFAULT_CATEGORIES;
+    const isDefaultCategory = (cat: string) => DEFAULT_CATEGORIES.includes(cat);
+
+    if (isDefaultCategory(t.category) && !defaults.includes(t.category)) {
+      if (newType === 'Income') newCategory = 'Other Income';
+      else if (newType === 'Expense') newCategory = 'Unclassified';
+      else if (newType === 'Transfer') newCategory = 'Transfer';
+    }
+
+    updateTransactions([{ ...t, type: newType, category: newCategory }]);
+    
+    if (newCategory !== t.category) {
+      showToast(`Updated transaction to ${newType} and category auto-corrected to "${newCategory}"`);
+    } else {
+      showToast(`Updated transaction type to ${newType}`);
+    }
+  }, [updateTransactions, showToast]);
 
   const handleBatchCategory = useCallback(async (newCategory: string) => {
     setBatchCategoryOpen(false);
@@ -440,6 +462,7 @@ export const DataView = () => {
           onOpenCategory={onOpenCategory}
           onCloseCategory={onCloseCategory}
           onInlineCategoryChange={handleInlineCategoryChange}
+          onInlineTypeChange={handleInlineTypeChange}
           onStartEdit={startEdit}
           onCancelEdit={cancelEdit}
           onSaveEdit={saveEdit}
