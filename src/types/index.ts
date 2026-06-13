@@ -487,7 +487,8 @@ export type AdminTab =
   | 'analytics'
   | 'flags'
   | 'audit'
-  | 'formats';
+  | 'formats'
+  | 'abandoned';
 
 // Tab definitions
 export const DASHBOARD_TABS = [

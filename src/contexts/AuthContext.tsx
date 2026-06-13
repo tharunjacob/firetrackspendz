@@ -87,7 +87,22 @@ export const AuthProvider = ({ children, onSignIn, onSignOut }: AuthProviderProp
   const user = devPlan
     ? { id: 'dev-user-001', email: 'dev@trackspendz.local' }
     : (userId && userEmail ? { id: userId, email: userEmail } : null);
-  const plan: SubscriptionPlan = devPlan || profile?.subscription_plan || 'free';
+  const rawPlan = profile?.subscription_plan || 'free';
+  const plan: SubscriptionPlan = useMemo(() => {
+    if (devPlan) return devPlan;
+    if (rawPlan === 'free') return 'free';
+
+    // Failsafe: if billing date is in the past by > 48 hours and status is not active, treat as free
+    if (profile?.next_billing_date) {
+      const expiry = new Date(profile.next_billing_date).getTime();
+      const gracePeriod = 48 * 60 * 60 * 1000; // 48-hour grace period
+      if (Date.now() > (expiry + gracePeriod) && profile.subscription_status !== 'active') {
+        return 'free';
+      }
+    }
+
+    return rawPlan;
+  }, [devPlan, rawPlan, profile]);
   const effectiveUserId = devPlan ? 'dev-user-001' : userId;
   const effectiveEmail = devPlan ? 'dev@trackspendz.local' : userEmail;
 

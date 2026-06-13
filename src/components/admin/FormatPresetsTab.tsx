@@ -28,18 +28,52 @@ export const FormatPresetsTab = () => {
   const [presets, setPresets] = useState<FormatPreset[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'verified' | 'rejected'>('all');
+  const [fileStats, setFileStats] = useState({ pdf: 0, excel: 0, csv: 0, total: 0 });
 
   const loadPresets = useCallback(async () => {
     setLoading(true);
     const supabase = getSupabase();
-    const query = supabase
+    
+    const presetsQuery = supabase
       .from(TABLES.FORMAT_PRESETS)
       .select('*')
       .order('created_at', { ascending: false })
       .limit(500);
 
-    const { data } = await query;
-    setPresets((data as FormatPreset[]) || []);
+    const filesQuery = supabase
+      .from('user_files')
+      .select('file_name, file_type');
+
+    const [presetsRes, filesRes] = await Promise.all([presetsQuery, filesQuery]);
+
+    setPresets((presetsRes.data as FormatPreset[]) || []);
+
+    if (filesRes.data) {
+      let pdfCount = 0;
+      let csvCount = 0;
+      let excelCount = 0;
+      
+      filesRes.data.forEach((file: any) => {
+        const name = (file.file_name || '').toLowerCase();
+        const type = (file.file_type || '').toLowerCase();
+        
+        if (name.endsWith('.pdf') || type.includes('pdf')) {
+          pdfCount++;
+        } else if (name.endsWith('.csv') || type.includes('csv')) {
+          csvCount++;
+        } else if (name.endsWith('.xls') || name.endsWith('.xlsx') || type.includes('excel') || type.includes('spreadsheet') || type.includes('officedocument')) {
+          excelCount++;
+        }
+      });
+      
+      setFileStats({
+        pdf: pdfCount,
+        excel: excelCount,
+        csv: csvCount,
+        total: filesRes.data.length,
+      });
+    }
+
     setLoading(false);
   }, []);
 
@@ -90,6 +124,26 @@ export const FormatPresetsTab = () => {
         >
           {loading ? 'Loading…' : 'Refresh'}
         </button>
+      </div>
+
+      {/* File Upload Statistics Dashboard */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2 mb-4">
+        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Uploads</p>
+          <p className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">{fileStats.total} file{fileStats.total !== 1 ? 's' : ''}</p>
+        </div>
+        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">PDFs (AI Reader)</p>
+          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{fileStats.pdf}</p>
+        </div>
+        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Excel Files (Mapped)</p>
+          <p className="text-xl font-bold text-blue-600 dark:text-blue-400 mt-1">{fileStats.excel}</p>
+        </div>
+        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">CSV Files (Mapped)</p>
+          <p className="text-xl font-bold text-purple-600 dark:text-purple-400 mt-1">{fileStats.csv}</p>
+        </div>
       </div>
 
       {/* Filter tabs */}

@@ -433,7 +433,7 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
           <div className="flex items-start gap-2.5 text-xs text-slate-400 dark:text-slate-500">
             <Icon name="warning" className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
             <span>
-              <strong>Note on Unlocked PDFs:</strong> Removing a password using "Print to PDF" or similar options often flattens the file into an image, destroying the text layer and causing AI extraction to fail. For best results, upload the original password-protected PDF or a <strong>CSV/Excel export</strong> from your bank.
+              <strong>Note on Unlocked PDFs:</strong> Removing a password (e.g., via "Print to PDF") can cause the file to be processed incorrectly. For best results, upload the original PDF as-is.
             </span>
           </div>
         </div>

@@ -19,6 +19,7 @@ import { AnalyticsTab } from './AnalyticsTab';
 import { FeatureFlagsTab } from './FeatureFlagsTab';
 import { AuditLogTab } from './AuditLogTab';
 import { FormatPresetsTab } from './FormatPresetsTab';
+import { AbandonedTab } from './AbandonedTab';
 
 // ============================================================
 // Shared interfaces (used across multiple tabs)
@@ -57,6 +58,7 @@ const TABS: { key: AdminTab; label: string; icon: string }[] = [
   { key: 'flags',      label: 'Flags',      icon: 'cog' },
   { key: 'audit',      label: 'Audit',      icon: 'shield' },
   { key: 'formats',    label: 'Formats',    icon: 'chart' },
+  { key: 'abandoned',  label: 'Abandoned',  icon: 'warning' },
 ];
 
 export const AdminLayout = ({ adminEmail, adminId }: Props) => {
@@ -247,6 +249,7 @@ export const AdminLayout = ({ adminEmail, adminId }: Props) => {
       case 'flags':        return <FeatureFlagsTab adminId={adminId} adminEmail={adminEmail} />;
       case 'audit':        return <AuditLogTab />;
       case 'formats':      return <FormatPresetsTab />;
+      case 'abandoned':    return <AbandonedTab loadUserDetail={loadUserDetail} />;
       default:             return null;
     }
   };

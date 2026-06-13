@@ -149,6 +149,9 @@ serve(async (req: Request) => {
     },
     'subscription.halted': {
       subscription_status: 'halted',
+      subscription_plan: 'free',
+      next_billing_date: null,
+      cancel_at_period_end: false,
     },
     'subscription.cancelled': {
       // Razorpay sends this both for immediate cancels (status goes to 'cancelled'
