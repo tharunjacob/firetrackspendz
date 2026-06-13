@@ -155,6 +155,7 @@ export const DebtPayoffView = () => {
               balance: 4500,
               interestRate: 18.9,
               minimumPayment: 135,
+              type: 'credit_card',
               createdAt: new Date().toISOString(),
             },
             {
@@ -163,6 +164,7 @@ export const DebtPayoffView = () => {
               balance: 14000,
               interestRate: 4.5,
               minimumPayment: 320,
+              type: 'car_loan',
               createdAt: new Date().toISOString(),
             },
             {
@@ -171,6 +173,7 @@ export const DebtPayoffView = () => {
               balance: 28000,
               interestRate: 6.8,
               minimumPayment: 290,
+              type: 'student_loan',
               createdAt: new Date().toISOString(),
             }
           ]);
