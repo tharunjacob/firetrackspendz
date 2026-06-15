@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Icon } from '@/components/common/Icons';
 import type { TransactionType } from '@/types';
 import type { EditState } from './types';
 import { TYPE_CATEGORIES, DEFAULT_CATEGORIES } from '@/utils/constants';
+import { CategoryPicker } from './CategoryPicker';
 
 interface Props {
   editData: EditState;
@@ -19,20 +20,6 @@ export const TransactionEditPanel = ({
   editData, setEditData, useCustomCategory, toggleCustomCategory,
   allCategories, onSave, onCancel, hint,
 }: Props) => {
-  const filteredCategories = useMemo(() => {
-    const type = editData.type;
-    const defaults = TYPE_CATEGORIES[type as keyof typeof TYPE_CATEGORIES] || DEFAULT_CATEGORIES;
-    const isDefaultCategory = (cat: string) => DEFAULT_CATEGORIES.includes(cat);
-
-    return allCategories.filter(cat => {
-      if (cat === editData.category) return true;
-      if (isDefaultCategory(cat)) {
-        return defaults.includes(cat);
-      }
-      return true;
-    });
-  }, [allCategories, editData.type, editData.category]);
-
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -84,9 +71,13 @@ export const TransactionEditPanel = ({
           {useCustomCategory ? (
             <input type="text" value={editData.customCategory} onChange={e => setEditData(p => ({ ...p, customCategory: e.target.value }))} placeholder="Enter custom category" className="input-field text-xs py-1.5 w-full" autoFocus />
           ) : (
-            <select value={editData.category} onChange={e => setEditData(p => ({ ...p, category: e.target.value }))} className="input-field text-xs py-1.5 w-full">
-              {filteredCategories.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <CategoryPicker
+              value={editData.category}
+              onChange={(newCategory: string) => setEditData(p => ({ ...p, category: newCategory }))}
+              type={editData.type}
+              allCategories={allCategories}
+              variant="field"
+            />
           )}
         </div>
       <div>
