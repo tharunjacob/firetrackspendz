@@ -111,7 +111,7 @@ const applyMapping = (dataRows: any[][], header: string[], mapping: FileMapping,
   // browser locale if neither yields a hint.
   const dateColIdx = mapping.dateColumn ? header.indexOf(mapping.dateColumn) : -1;
   const sampledDates = dateColIdx !== -1
-    ? dataRows.slice(0, 50).map(r => r[dateColIdx]).filter(v => v != null && v !== '')
+    ? dataRows.map(r => r[dateColIdx]).filter(v => v != null && v !== '')
     : [];
   const dateHint: DateFormatHint | undefined =
     normalizeDateHint(mapping.dateFormat) || detectDateFormat(sampledDates) || undefined;
@@ -668,7 +668,13 @@ export const transformData = async (
       try {
         const data = e.target?.result;
         const XLSX = await import('xlsx');
-        const workbook = XLSX.read(data, { type: 'array', cellDates: true, dateNF: 'yyyy-mm-dd' });
+        const isCsv = file.name.toLowerCase().endsWith('.csv');
+        const workbook = XLSX.read(data, {
+          type: 'array',
+          raw: isCsv,
+          cellDates: !isCsv,
+          dateNF: 'yyyy-mm-dd',
+        });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows: any[][] = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
 
