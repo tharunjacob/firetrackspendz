@@ -80,7 +80,7 @@ const MarkdownText = ({ text }: { text: string }) => {
 
 export const AIAdvisorView = () => {
   useEffect(() => { logEvent(EVENTS.FEATURE_AI_ADVISOR_OPENED); }, []);
-  const { transactions, currency, plan } = useApp();
+  const { transactions, currency, plan, isDemoMode } = useApp();
 
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     try {
@@ -148,6 +148,17 @@ export const AIAdvisorView = () => {
         <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-2">AI Advisor Unavailable</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400">Please configure your Gemini API key in the environment variables to enable AI features.</p>
         <p className="text-xs text-slate-500 mt-2">Set VITE_GEMINI_API_KEY in your .env file</p>
+      </div>
+    );
+  }
+
+  if (isDemoMode) {
+    return (
+      <div className="card p-8 text-center animate-fade-in">
+        <Icon name="ai" className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-2">AI Advisor Unavailable</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400">AI Advisor features are disabled in Demo Mode.</p>
+        <p className="text-xs text-slate-500 mt-2">Exit Demo Mode and upload your own statements to interact with the AI Advisor.</p>
       </div>
     );
   }

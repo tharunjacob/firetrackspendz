@@ -22,14 +22,11 @@ CREATE OR REPLACE FUNCTION is_admin()
 RETURNS BOOLEAN
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
-DECLARE
-  user_email TEXT;
 BEGIN
-  SELECT email INTO user_email FROM auth.users WHERE id = auth.uid();
-  -- Admin allow-list — these emails get the admin panel + read-all access.
-  -- This function is the SINGLE source of truth for admin checks across all RLS
-  -- policies below. To add/remove an admin, edit this array and re-run the file.
-  RETURN user_email = ANY(ARRAY['tharun@krexo.in', 'tharunjacob@gmail.com', 'silkaminni777@gmail.com']);
+  RETURN EXISTS (
+    SELECT 1 FROM public.user_profiles 
+    WHERE id = auth.uid() AND is_admin = true
+  );
 END;
 $$;
 
@@ -46,6 +43,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   gender        TEXT,
   dob           DATE,
   retirement_year INT,
+  is_admin      BOOLEAN NOT NULL DEFAULT false,
 
   -- Subscription (provider-agnostic core)
   subscription_plan     TEXT NOT NULL DEFAULT 'free' CHECK (subscription_plan IN ('free', 'pro', 'enterprise')),
@@ -212,6 +210,7 @@ BEGIN
     NEW.razorpay_customer_id     := OLD.razorpay_customer_id;
     NEW.next_billing_date        := OLD.next_billing_date;
     NEW.cancel_at_period_end     := OLD.cancel_at_period_end;
+    NEW.is_admin                 := OLD.is_admin;
   END IF;
   RETURN NEW;
 END;
@@ -1245,7 +1244,18 @@ CREATE POLICY "Users can CRUD own settings"
 --   AFTER INSERT ON public.user_profiles
 --   FOR EACH ROW EXECUTE FUNCTION notify_welcome_email();
 -- ===========================================
+-- 11. AI Usage Logs (Rate Limiting)
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.ai_usage_logs (
+  id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id   UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
+ALTER TABLE public.ai_usage_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can view all logs" ON public.ai_usage_logs
+  FOR SELECT USING (is_admin());
 
 -- ===========================================
 -- DONE! Schema created successfully.

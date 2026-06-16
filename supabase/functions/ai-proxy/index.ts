@@ -14,10 +14,11 @@ serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY') ?? '';
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('[ai-proxy] Error: SUPABASE_URL or SUPABASE_ANON_KEY is missing in Deno environment.');
+    if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
+      console.error('[ai-proxy] Error: SUPABASE_URL, SUPABASE_ANON_KEY, or SUPABASE_SERVICE_ROLE_KEY is missing in Deno environment.');
       return new Response(JSON.stringify({ error: 'Supabase URL/Key config is missing in Edge Function environment.' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -38,18 +39,98 @@ serve(async (req: Request) => {
       supabaseAnonKey,
       { global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } } }
     );
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
-      console.warn('[ai-proxy] Auth verification failed:', error?.message ?? 'No user returned');
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.warn('[ai-proxy] Auth verification failed:', authError?.message ?? 'No user returned');
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
+    // Initialize service client to query profile and write usage logs bypassing RLS
+    const serviceClient = createClient(supabaseUrl, serviceRoleKey);
+
+    // Fetch user profile (subscription tier and admin status)
+    const { data: profile, error: profileError } = await serviceClient
+      .from('user_profiles')
+      .select('subscription_plan, is_admin')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      console.error('[ai-proxy] Error fetching user profile:', profileError?.message);
+      return new Response(JSON.stringify({ error: 'Failed to verify user profile.' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { subscription_plan, is_admin } = profile;
+
+    // Enforcement: check daily/lifetime usage limits (Admins bypass all limits)
+    if (!is_admin) {
+      // 1. Fetch lifetime usage count
+      const { count: lifetimeCount, error: lifetimeError } = await serviceClient
+        .from('ai_usage_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (lifetimeError) {
+        console.error('[ai-proxy] Error checking lifetime logs:', lifetimeError.message);
+        return new Response(JSON.stringify({ error: 'Database error checking usage logs.' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      if (subscription_plan === 'free') {
+        if (lifetimeCount && lifetimeCount >= 5) {
+          return new Response(JSON.stringify({ error: 'You have reached your limit of 5 lifetime trial prompts. Upgrade to Pro for unlimited access.' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      } else {
+        // 2. Pro/Enterprise: check daily limit (Pro = 50, Enterprise = 150)
+        const dailyLimit = subscription_plan === 'enterprise' ? 150 : 50;
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+        const { count: dailyCount, error: dailyError } = await serviceClient
+          .from('ai_usage_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('timestamp', oneDayAgo);
+
+        if (dailyError) {
+          console.error('[ai-proxy] Error checking daily logs:', dailyError.message);
+          return new Response(JSON.stringify({ error: 'Database error checking daily usage logs.' }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (dailyCount && dailyCount >= dailyLimit) {
+          return new Response(JSON.stringify({ error: `You have reached your daily limit of ${dailyLimit} prompts. Please try again tomorrow.` }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      }
+    }
+
+    // Log the request to the usage log
+    const { error: logError } = await serviceClient
+      .from('ai_usage_logs')
+      .insert({ user_id: user.id });
+
+    if (logError) {
+      console.warn('[ai-proxy] Failed to log AI request (proceeding anyway):', logError.message);
+    }
+
     // Parse the request from the client
     const { action, payload } = await req.json() as { action: string; payload: any };
-    console.log(`[ai-proxy] action=${action} user=${user.email} jsonMode=${!!payload.jsonMode}`);
+    console.log(`[ai-proxy] action=${action} user=${user.email} plan=${subscription_plan} admin=${is_admin} jsonMode=${!!payload.jsonMode}`);
 
     // Route to the correct Gemini endpoint
     // gemini-2.5-flash has thinking enabled by default which causes 75-94s response
