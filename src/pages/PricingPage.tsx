@@ -228,6 +228,10 @@ const PricingPage = () => {
           ))}
         </div>
 
+        <p className="mt-8 text-xs text-slate-400 dark:text-slate-500 max-w-lg mx-auto leading-relaxed">
+          🔒 Payments are securely processed via Razorpay. Your bank statement or card transaction descriptor will show charges under the name <strong>"Krexo LLP"</strong> (the parent entity behind TrackSpendZ).
+        </p>
+
       </section>
 
       {/* FAQ */}

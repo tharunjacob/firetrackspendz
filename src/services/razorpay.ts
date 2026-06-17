@@ -313,8 +313,8 @@ export async function startUpgrade(args: UpgradeArgs): Promise<UpgradeResult> {
     const rzp = new window.Razorpay!({
       key: session.keyId,
       subscription_id: session.subscriptionId,
-      name: 'TrackSpendZ',
-      description: `${args.tier === 'pro' ? 'Pro' : 'Enterprise'} — billed ${args.period}`,
+      name: 'TrackSpendZ (Krexo LLP)',
+      description: `${args.tier === 'pro' ? 'Pro' : 'Enterprise'} — billed ${args.period} (charged as Krexo LLP)`,
       prefill: {
         email: args.user.email,
         name: args.user.name,
