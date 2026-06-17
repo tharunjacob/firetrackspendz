@@ -47,6 +47,13 @@ Disallow: /settings
 Disallow: /family
 Disallow: /auth/callback
 
+User-agent: CCBot
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
 User-agent: *
 Allow: /
 Disallow: /assets
