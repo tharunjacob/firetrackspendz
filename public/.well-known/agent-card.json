@@ -1,0 +1,10 @@
+{
+  "name": "TrackSpendZ Agent",
+  "description": "Financial planning and early retirement tracking assistant",
+  "abilities": [
+    "expense tracking",
+    "net worth forecasting",
+    "monte carlo retirement planning"
+  ],
+  "contact": "support@krexo.in"
+}

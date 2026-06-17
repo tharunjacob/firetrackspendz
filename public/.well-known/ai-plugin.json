@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "TrackSpendZ",
+  "name_for_model": "trackspendz",
+  "description_for_human": "Track expenses, forecast net worth, and plan early retirement.",
+  "description_for_model": "Track expenses, forecast net worth, and plan early retirement using AI statement categorization and Monte Carlo simulations.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://trackspendz.com/.well-known/openapi.json"
+  },
+  "logo_url": "https://trackspendz.com/icons/icon-512.png",
+  "contact_email": "support@krexo.in",
+  "legal_info_url": "https://trackspendz.com/terms"
+}

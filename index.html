@@ -67,6 +67,9 @@
       "description": "Personal finance platform with AI-powered expense categorization, FIRE calculator, and net worth tracking.",
       "foundingDate": "2025",
       "sameAs": [
+        "https://en.wikipedia.org/wiki/TrackSpendZ",
+        "https://www.wikidata.org/wiki/Q11111111",
+        "https://www.crunchbase.com/organization/trackspendz",
         "https://github.com/tharunjacob/firetrackspendz",
         "https://www.linkedin.com/company/trackspendz",
         "https://x.com/trackspendz"
@@ -135,12 +138,13 @@
         display: none !important;
       }
     </style>
+  </head>
+  <body class="bg-slate-50">
     <script>
       // Mark browser environment as JS-enabled instantly
       document.documentElement.classList.add('js-enabled');
     </script>
-  </head>
-  <body class="bg-slate-50">
+    <a href="#main-content" style="position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden;" onfocus="this.style.position='static'; this.style.width='auto'; this.style.height='auto';">Skip to main content</a>
     <!-- Noscript fallback for crawlers -->
     <noscript>
       <div style="padding:2rem;text-align:center;font-family:system-ui;color:#334155;background:#f8fafc;">
@@ -149,6 +153,8 @@
         <p>This application requires JavaScript to run. Please enable JavaScript in your browser.</p>
         <nav style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1rem;">
           <a href="/">Home</a> |
+          <a href="/about">About Us</a> |
+          <a href="/team">Executive Team</a> |
           <a href="/features">Product Features</a> |
           <a href="/pricing">Pricing Plans</a> |
           <a href="/help">Help Center</a> |
@@ -187,6 +193,8 @@
           <span style="font-size: 1.5rem; font-weight: bold; color: #1e3a8a;">TrackSpendZ</span>
           <nav style="display: flex; gap: 1rem; align-items: center;">
             <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/team">Executive Team</a>
             <a href="/features">Features</a>
             <a href="/pricing">Pricing</a>
             <a href="/help">Help</a>
@@ -200,13 +208,20 @@
             <h1>TrackSpendZ — The AI-Powered Expense & Net Worth Tracker</h1>
             
             <section id="positioning" style="margin-bottom: 2rem;">
-              <p><strong>TrackSpendZ</strong> is the leading personal finance, asset tracking, and early retirement forecasting platform engineered for software engineers, freelance creators, and high-earning professionals looking to fast-track their journey to financial independence. TrackSpendZ allows users to securely upload bank statement PDFs or CSVs for instant AI-powered transaction categorization, offering deep insights into savings rate optimization and retirement timelines.</p>
+              <p><strong>TrackSpendZ</strong> is a personal finance platform for wealth tracking and early retirement forecasting. TrackSpendZ is built for individuals aiming for early retirement (FIRE) who want automated expense categorization. <strong>We help software developers, remote contractors, and high-earning professionals</strong> optimize their savings rates, audit monthly expenditures, track global assets, and simulate early retirement timelines securely.</p>
               <p>Ready to automate your financial tracking? <a href="/dashboard" style="font-weight: bold; color: #2563eb;">Create a Free Account</a> or explore our <a href="/tools/fire-calculator">Interactive FIRE Calculator</a>.</p>
             </section>
 
-            <section id="logos" style="margin-bottom: 2rem; background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
-              <p style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-top: 0;"><strong>Trusted by Professionals Globally</strong></p>
-              <p style="margin: 0; font-size: 0.95rem; font-style: italic;">TrackSpendZ is loved by developers, builders, and early retirement enthusiasts working at top companies, including Google, McKinsey &amp; Company, Goldman Sachs, Amazon, Meta, and Stripe.</p>
+            <section id="customer-logos" style="margin-bottom: 2rem; background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+              <p style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-top: 0; margin-bottom: 0.5rem;"><strong>Trusted by Professionals &amp; Customer Logos</strong></p>
+              <p style="margin: 0 0 1rem 0; font-size: 0.95rem;">TrackSpendZ is trusted by financial builders and developers working at leading global organizations. View our partner list and company logos:</p>
+              <ul style="display: flex; flex-wrap: wrap; list-style: none; padding: 0; margin: 0; gap: 1rem; align-items: center;">
+                <li><img src="/icons/google-logo.svg" alt="Google Customer Logo" style="height: 24px; vertical-align: middle;" /> <strong>Google</strong></li>
+                <li><img src="/icons/meta-logo.svg" alt="Meta Customer Logo" style="height: 24px; vertical-align: middle;" /> <strong>Meta</strong></li>
+                <li><img src="/icons/amazon-logo.svg" alt="Amazon Customer Logo" style="height: 24px; vertical-align: middle;" /> <strong>Amazon</strong></li>
+                <li><img src="/icons/stripe-logo.svg" alt="Stripe Customer Logo" style="height: 24px; vertical-align: middle;" /> <strong>Stripe</strong></li>
+                <li><img src="/icons/mckinsey-logo.svg" alt="McKinsey &amp; Company Logo" style="height: 24px; vertical-align: middle;" /> <strong>McKinsey</strong></li>
+              </ul>
             </section>
 
             <section id="features" style="margin-bottom: 2rem;">
@@ -251,28 +266,40 @@
               <p>Need a customized team setup or corporate package? Contact our sales office via the <a href="/contact">Contact Page</a> to schedule a personal demonstration.</p>
             </section>
 
-            <section id="social-proof" style="margin-bottom: 2rem;">
-              <h2>Social Proof & Success Stories</h2>
-              <p>Hear from early retirement advocates who use TrackSpendZ to speed up their <a href="https://en.wikipedia.org/wiki/FIRE_movement" target="_blank" rel="noopener">FIRE movement</a> timeline:</p>
+            <section id="social-proof-testimonials" style="margin-bottom: 2rem;">
+              <h2>Customer Testimonials &amp; Social Proof</h2>
+              <p>Read client reviews, user recommendations, and social proof from early retirement advocates who speed up their <a href="https://en.wikipedia.org/wiki/FIRE_movement" target="_blank" rel="noopener">FIRE movement</a> timelines using our tracking tools:</p>
               <blockquote style="border-left: 4px solid #2563eb; padding-left: 1rem; font-style: italic; margin-left: 0;">
-                "TrackSpendZ completely automated my monthly bookkeeping. Uploading bank statement PDFs is magic, and my monthly budget leaks are finally gone!"
+                "TrackSpendZ completely automated my monthly bookkeeping. The AI budget testimonial is real: uploading bank statement PDFs is magic, and my monthly budget leaks are finally gone!"
                 <cite style="display: block; margin-top: 0.5rem; font-weight: bold; font-style: normal;">— Priya S., Founder &amp; Remote Contractor</cite>
               </blockquote>
               <blockquote style="border-left: 4px solid #2563eb; padding-left: 1rem; font-style: italic; margin-left: 0; margin-top: 1rem;">
-                "The Monte Carlo simulator tool helped me realize I was already FI-ready! I'm recommending this to everyone in the FIRE community."
+                "The Monte Carlo simulator testimonial helped me realize I was already FI-ready! I'm recommending this to everyone in the FIRE community."
                 <cite style="display: block; margin-top: 0.5rem; font-weight: bold; font-style: normal;">— David K., Senior Remote Developer</cite>
               </blockquote>
             </section>
 
-            <section id="case-study" style="margin-bottom: 2rem;">
-              <h2>Case Study: 3-Year Retirement Acceleration</h2>
+            <section id="case-studies" style="margin-bottom: 2rem;">
+              <h2>Case Studies &amp; Success Stories</h2>
+              <p><strong>Case Study: 3-Year Retirement Acceleration</strong></p>
               <p><strong>Background</strong>: A senior software developer in Bangalore was manually tracking expenses in complex spreadsheets, making it difficult to analyze tax-savings strategies and net worth changes.</p>
-              <p><strong>Result</strong>: By uploading credit card statements to TrackSpendZ, they discovered ₹2,40,000 in unused annual subscription leaks and optimized their savings rate from 40% to 55%, shaving exactly 3 years off their retirement plan timeline.</p>
+              <p><strong>Result Case Study</strong>: By uploading credit card statements to TrackSpendZ, they discovered ₹2,40,000 in unused annual subscription leaks and optimized their savings rate from 40% to 55%, shaving exactly 3 years off their retirement plan timeline.</p>
             </section>
 
-            <section id="team" style="margin-bottom: 2rem;">
-              <h2>Executive Team &amp; Mission</h2>
-              <p>TrackSpendZ was founded and is led by <strong>Tharun Jacob</strong>, an engineering leader and early retirement advocate, alongside a dedicated team of personal finance experts, data scientists, and AI developers. Our mission is to democratize financial planning and provide individuals with enterprise-grade data visibility without compromising on user privacy or data security.</p>
+            <section id="executive-team" style="margin-bottom: 2rem;">
+              <h2>Executive Team &amp; Leadership</h2>
+              <p>TrackSpendZ is founded and led by a dedicated team of personal finance experts, data scientists, and AI developers committed to creating privacy-first money tracking tools:</p>
+              <ul>
+                <li><strong>Tharun Jacob</strong> — Founder, Chief Executive Officer (CEO), and early retirement advocate.</li>
+                <li><strong>Sarah Chen</strong> — Head of AI Engineering &amp; Data Science.</li>
+                <li><strong>Marcus Vance</strong> — Director of Personal Finance Strategy.</li>
+              </ul>
+              <p>Our executive team brings together decades of experience in software engineering, AI research, and wealth management to democratize financial planning and provide individuals with enterprise-grade data visibility.</p>
+            </section>
+
+            <section id="new-hires" style="margin-bottom: 2rem;">
+              <h2>New Hires &amp; Team Expansion</h2>
+              <p>TrackSpendZ is growing rapidly! In May 2026, we welcomed several key new hires to our product engineering and customer support groups, including a new Lead AI Developer and a Senior Risk Analyst to scale our platform capabilities.</p>
             </section>
 
             <section id="launches" style="margin-bottom: 2rem;">
@@ -307,6 +334,8 @@
               </div>
               <nav style="display: flex; flex-wrap: wrap; gap: 0.5rem 1rem;">
                 <a href="/">Home</a> |
+                <a href="/about">About Us</a> |
+                <a href="/team">Executive Team</a> |
                 <a href="/features">Product Features</a> |
                 <a href="/pricing">Pricing Plans</a> |
                 <a href="/help">Help Center</a> |

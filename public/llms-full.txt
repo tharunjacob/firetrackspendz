@@ -1,0 +1,44 @@
+# TrackSpendZ (Full Content Guide)
+
+> TrackSpendZ is the leading personal finance, asset tracking, and early retirement forecasting platform engineered for software engineers, freelance creators, and high-earning professionals.
+
+## Core Pages
+
+### Home (https://trackspendz.com/)
+Product overview, features list, and signup. TrackSpendZ helps you analyze bank statements, optimize savings, track assets, and calculate your timeline to financial independence (FIRE). Securely upload Excel, CSV, or PDF bank statements for instant, AI-driven categorization.
+
+### Features (https://trackspendz.com/features)
+- **AI-Powered Categorization**: Automatically processes transaction strings and maps them to standard category budgets.
+- **FIRE Projections**: Run Monte Carlo retirement simulations and projections.
+- **Net Worth Tracker**: Automated asset tracking and spreadsheet mapping.
+- **Unified Dashboard**: Check metrics, trends, and anomalies instantly.
+
+### Pricing (https://trackspendz.com/pricing)
+- **Free Plan** (₹0 / month): Up to 500 transactions, local web-browser IndexedDB storage, 5 lifetime AI prompts, and basic breakdowns.
+- **Pro Plan** (₹149 / month or ₹1,499 / year): Unlimited transactions, 50 daily AI prompts, interactive financial advisor chatbot, secure cloud sync, and historical trend analysis.
+- **Enterprise Plan** (Coming Soon): Household profiles (up to 5 members), 150 daily AI prompts, advanced custom parser rules, and downloadable tax worksheets.
+
+### Help Center (https://trackspendz.com/help)
+User guides, security protocols, and FAQs. TrackSpendZ is built with a local-first IndexedDB option for complete privacy. Pro users utilize end-to-end encrypted databases built on Supabase with Row-Level Security (RLS) policies. PDF files are processed in-memory using a secure Edge Function proxy and are never saved on the server.
+
+### Contact Sales (https://trackspendz.com/contact)
+Demo requests and executive support. For support or inquiry, email support@krexo.in. TrackSpendZ is owned and operated by Krexo LLP.
+
+## Tools
+
+### FIRE Calculator (https://trackspendz.com/tools/fire-calculator)
+Interactive Monte Carlo early retirement projection calculator. Build detailed retirement projection curves using advanced Monte Carlo simulations based on the famous Trinity Study retirement safety research.
+
+### Savings Rate Calculator (https://trackspendz.com/tools/savings-rate)
+Savings rate calculator to forecast retirement timelines. Understanding your savings rate is the single most crucial metric in dictating early retirement eligibility.
+
+## Resources & Articles
+
+### How to Reach FIRE Early: A Step-by-Step Retirement Playbook (https://trackspendz.com/blog/how-to-reach-fire-early)
+Step-by-step early retirement guide. Optimize savings, invest consistently, and verify calculations using historical market simulation models.
+
+### Understanding Savings Rate: The Single Most Crucial Retirement Metric (https://trackspendz.com/blog/understanding-savings-rate)
+Why savings rate dictates retirement years. A 10% savings rate requires 9 years of work for 1 year of retirement, while a 50% savings rate requires only 1 year of work per year of retirement.
+
+### Why Local-First Databases Offer the Ultimate Security for Your Financial Profile (https://trackspendz.com/blog/secure-financial-tracking)
+Technical breakdown of privacy models. By combining browser IndexedDB and Row-Level Security (RLS), we ensure that your transaction data is fully under your control.
