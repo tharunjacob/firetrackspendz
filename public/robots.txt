@@ -1,3 +1,52 @@
+User-agent: GPTBot
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /assets
+Disallow: /settings
+Disallow: /family
+Disallow: /auth/callback
+
 User-agent: *
 Allow: /
 Disallow: /assets

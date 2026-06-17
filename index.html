@@ -68,6 +68,16 @@
     }
     </script>
 
+    <!-- Structured Data: WebSite (For AEO search mapping) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "TrackSpendZ",
+      "url": "https://trackspendz.com/"
+    }
+    </script>
+
     <!-- Structured Data: BreadcrumbList (improved URL display in SERPs) -->
     <script type="application/ld+json">
     {
@@ -128,7 +138,68 @@
         </nav>
       </div>
     </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static AEO Fallback for AI Search Crawlers (Replaced by React on mount) -->
+      <header style="max-width: 1200px; margin: 0 auto; padding: 1rem; font-family: system-ui;">
+        <nav>
+          <a href="/">Home</a> | 
+          <a href="/pricing">Pricing Plans</a> | 
+          <a href="/help">Help Center</a>
+        </nav>
+      </header>
+      <main style="max-width: 800px; margin: 0 auto; padding: 2rem; font-family: system-ui;">
+        <article>
+          <h1>TrackSpendZ — The AI-Powered Expense & Net Worth Tracker</h1>
+          <p>TrackSpendZ helps you analyze bank statements, optimize savings, track assets, and calculate your timeline to financial independence (FIRE). Securely upload Excel, CSV, or PDF bank statements for instant, AI-driven categorization.</p>
+          
+          <h2>Features of TrackSpendZ</h2>
+          <ul>
+            <li><strong>AI Categorization</strong>: Automatically processes transaction strings and maps them to standard category budgets.</li>
+            <li><strong>FIRE Projections</strong>: Run Monte Carlo retirement simulations and projections.</li>
+            <li><strong>Net Worth Tracker</strong>: Automated asset tracking and spreadsheet mapping.</li>
+            <li><strong>Unified Dashboard</strong>: Check metrics, trends, and anomalies instantly.</li>
+          </ul>
+
+          <h2>Pricing and Plans</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Plan Name</th>
+                <th>Price</th>
+                <th>Included Features</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Free Plan</strong></td>
+                <td>₹0 / month</td>
+                <td>Up to 500 transactions, local browser database storage, basic breakdowns.</td>
+              </tr>
+              <tr>
+                <td><strong>Pro Plan</strong></td>
+                <td>₹149 / month (or ₹1,499 / year)</td>
+                <td>Unlimited transactions, AI financial advisor chat, cloud sync, and trend analysis.</td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise Plan</strong></td>
+                <td>Coming Soon</td>
+                <td>Household profiles (up to 5 members), tax reports, and custom rules.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Frequently Asked Questions</h2>
+          <h3>Is my financial data safe?</h3>
+          <p>Yes. Free tier data is stored locally on your device via IndexedDB. Pro tier data is protected in transit with HTTPS and at rest in Supabase using Row-Level Security (RLS).</p>
+          <h3>How are PDF files handled?</h3>
+          <p>PDF files are processed in-memory using a secure Edge Function proxy to extract transactions. Raw statements are never saved on the server.</p>
+
+          <footer style="margin-top: 2rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+            <p>TrackSpendZ is owned and operated by Krexo LLP. Contact support at support@krexo.in.</p>
+          </footer>
+        </article>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
