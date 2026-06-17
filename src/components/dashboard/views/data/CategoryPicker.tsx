@@ -19,6 +19,7 @@ interface Props {
   allCategories: string[];
   variant?: 'inline' | 'field';
   onChange: any; // (t: Transaction, cat: string) => void OR (cat: string) => void
+  openUp?: boolean;
 }
 
 export const CategoryPicker = ({
@@ -32,6 +33,7 @@ export const CategoryPicker = ({
   allCategories,
   variant = 'inline',
   onChange,
+  openUp = false,
 }: Props) => {
   // Determine variant dynamically if not explicitly specified
   const activeVariant = transaction ? 'inline' : variant;
@@ -204,7 +206,11 @@ export const CategoryPicker = ({
     return (
       <div className="relative inline-block text-left" ref={containerRef}>
         {isOpen ? (
-          <div className="absolute left-0 top-full mt-1 z-50 min-w-[220px] bg-white dark:bg-slate-800 border border-brand-300 dark:border-brand-700 rounded-lg shadow-xl p-1.5 animate-fade-in">
+          <div
+            onMouseDown={e => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
+            className={`absolute left-0 z-50 min-w-[220px] bg-white dark:bg-slate-800 border border-brand-300 dark:border-brand-700 rounded-lg shadow-xl p-1.5 animate-fade-in ${openUp ? 'bottom-full mb-1' : 'top-full mt-1'}`}
+          >
             <div className="relative flex items-center mb-1.5 border-b border-slate-100 dark:border-slate-700 pb-1.5">
               <Icon name="search" className="w-3.5 h-3.5 text-slate-400 absolute left-2" />
               <input
@@ -341,7 +347,11 @@ export const CategoryPicker = ({
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-1 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl p-1.5 animate-slide-up max-h-60 overflow-y-auto scrollbar-thin">
+        <div
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
+          className="absolute left-0 right-0 mt-1 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl p-1.5 animate-slide-up max-h-60 overflow-y-auto scrollbar-thin"
+        >
           {filteredRecommended.length > 0 && (
             <div>
               <div className="px-2 py-1 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Recommended Categories</div>

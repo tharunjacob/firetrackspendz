@@ -7,6 +7,7 @@ import { getMonthlyBreakdown, getDeepInsights, calculateFireMetrics, getMonthlyS
 import { MetricCard, type Tone } from '@/components/dashboard/MetricCard';
 import { FIRE_MULTIPLIER } from './fire/shared';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from 'recharts';
+import { Icon } from '@/components/common/Icons';
 
 // ─── Helpers ────────────────────────────────────────────────
 const formatPercent = (v: number) =>
@@ -145,6 +146,31 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
   const GRID_COLOR = isDark ? '#334155' : '#e2e8f0';
   const txns = data ?? transactions;
 
+  // Banner dismiss state
+  const [bannerDismissed, setBannerDismissed] = useState(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem('tsz_unclassified_banner_dismissed') === 'true';
+    }
+    return false;
+  });
+
+  const handleDismissBanner = () => {
+    setBannerDismissed(true);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('tsz_unclassified_banner_dismissed', 'true');
+    }
+  };
+
+  const { showUnclassifiedBanner, unclassifiedCount } = useMemo(() => {
+    if (!txns || txns.length === 0) return { showUnclassifiedBanner: false, unclassifiedCount: 0 };
+    const count = txns.filter(t => t.category === 'Unclassified').length;
+    const ratio = count / txns.length;
+    return {
+      showUnclassifiedBanner: ratio > 0.5,
+      unclassifiedCount: count
+    };
+  }, [txns]);
+
   const categoryData = useMemo(() => {
     const incomeMap = new Map<string, number>();
     const expenseMap = new Map<string, number>();
@@ -170,6 +196,38 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {showUnclassifiedBanner && !bannerDismissed && (
+        <div className="relative overflow-hidden bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-800/80 border border-amber-200 dark:border-slate-700 rounded-2xl p-4 sm:p-5 flex gap-4 items-start shadow-sm pr-12 animate-fade-in">
+          <div className="p-2 bg-amber-100 dark:bg-slate-700 text-amber-700 dark:text-amber-400 rounded-xl shrink-0">
+            <Icon name="warning" className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-sm font-bold text-amber-900 dark:text-slate-100 mb-1">
+              Unclassified Transactions Detected
+            </h4>
+            <p className="text-xs sm:text-sm text-amber-800 dark:text-slate-300 leading-relaxed">
+              We noticed that {unclassifiedCount} of your transactions are unclassified. <strong>Review Unclassified Transactions in the Data tab once</strong>, and we will automatically categorize all future uploads for you!
+            </p>
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => setActiveTab('Data')}
+                className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 dark:bg-brand-600 dark:hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition"
+              >
+                Review Unclassified Transactions
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDismissBanner}
+            className="absolute top-4 right-4 p-1 rounded-lg hover:bg-amber-100 dark:hover:bg-slate-700 text-amber-600 dark:text-slate-400 hover:text-amber-800 dark:hover:text-slate-200 transition"
+            aria-label="Dismiss banner"
+          >
+            <Icon name="close" className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       {/* Donut Charts – matches live version */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <DonutChartCard title="Income Sources" data={categoryData.income} colors={COLORS.categories} formatCurrency={fmtCurrency} />

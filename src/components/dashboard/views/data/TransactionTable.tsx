@@ -70,7 +70,7 @@ export const TransactionTable = ({
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
-        {paginated.map(t => (
+        {paginated.map((t, idx) => (
           <React.Fragment key={t.id}>
             <tr className={`hover:bg-slate-50 dark:hover:bg-slate-700 ${selectedIds.has(t.id) ? 'bg-brand-50 dark:bg-brand-950/30' : ''} ${editId === t.id ? 'bg-brand-50/50 dark:bg-brand-900/20' : ''}`}>
               <td className="px-3 py-2.5">
@@ -92,6 +92,7 @@ export const TransactionTable = ({
                   onOpen={() => onOpenCategory(t.id)}
                   onClose={onCloseCategory}
                   onChange={onInlineCategoryChange}
+                  openUp={paginated.length > 2 && idx >= paginated.length - 2}
                 />
               </td>
               <td className="px-3 py-2.5">

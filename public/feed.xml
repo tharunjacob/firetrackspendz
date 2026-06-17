@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>TrackSpendZ Blog</title>
+  <link>https://trackspendz.com/</link>
+  <description>Latest personal finance, budget tracking, and FIRE calculation updates from TrackSpendZ.</description>
+  <language>en-us</language>
+  <pubDate>Thu, 18 Jun 2026 00:00:00 +0530</pubDate>
+  <lastBuildDate>Thu, 18 Jun 2026 00:00:00 +0530</lastBuildDate>
+  <atom:link href="https://trackspendz.com/feed.xml" rel="self" type="application/rss+xml" />
+  <item>
+    <title>How to Reach FIRE Early: A Step-by-Step Retirement Playbook</title>
+    <link>https://trackspendz.com/blog/how-to-reach-fire-early</link>
+    <guid>https://trackspendz.com/blog/how-to-reach-fire-early</guid>
+    <pubDate>Thu, 18 Jun 2026 00:00:00 +0530</pubDate>
+    <description>Learn the step-by-step framework to planning your path to financial independence and early retirement (FIRE).</description>
+  </item>
+  <item>
+    <title>Understanding Savings Rate: The Single Most Crucial Retirement Metric</title>
+    <link>https://trackspendz.com/blog/understanding-savings-rate</link>
+    <guid>https://trackspendz.com/blog/understanding-savings-rate</guid>
+    <pubDate>Mon, 15 Jun 2026 00:00:00 +0530</pubDate>
+    <description>Your savings rate determines how quickly you can retire. Discover how to calculate and optimize it.</description>
+  </item>
+  <item>
+    <title>Why Local-First Databases Offer the Ultimate Security for Your Financial Profile</title>
+    <link>https://trackspendz.com/blog/secure-financial-tracking</link>
+    <guid>https://trackspendz.com/blog/secure-financial-tracking</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 +0530</pubDate>
+    <description>Explore the benefits of keeping your sensitive financial data stored locally inside your browser using IndexedDB.</description>
+  </item>
+</channel>
+</rss>
