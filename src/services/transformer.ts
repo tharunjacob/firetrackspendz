@@ -471,8 +471,8 @@ const getPdfJs = async () => {
   try {
     const pdfjsModule = await import('pdfjs-dist');
     const pdfjs = pdfjsModule.default || pdfjsModule;
-    if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+    if (pdfjs.GlobalWorkerOptions.workerSrc === undefined) {
+      pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js`;
     }
     return pdfjs;
   } catch (e) {
@@ -537,7 +537,7 @@ export const validatePdfPassword = async (file: File, password?: string): Promis
     await pdfjs.getDocument({ data: arrayBuffer, password, disableFontFace: true }).promise;
     return true;
   } catch (err: any) {
-    console.error('[validatePdfPassword] error during validation:', err);
+    console.error('[validatePdfPassword] failed:', err);
     const errMsg = (err?.message || String(err || '')).toLowerCase();
     const errName = err?.name || '';
     const errCode = err?.code || 0;
@@ -545,13 +545,11 @@ export const validatePdfPassword = async (file: File, password?: string): Promis
     // Explicit password exceptions
     const isPasswordError = errName === 'PasswordException' || errCode === 1 || errMsg.includes('password');
     if (isPasswordError) {
-      return false; // Genuinely incorrect password
+      return false; // Wrong password
     }
 
-    // Unrelated error (e.g. worker failed to fetch, font loading issues).
-    // Let the validation pass so the user is not blocked from trying to analyze the document.
-    console.warn('[validatePdfPassword] Non-password error during validation, allowing submit:', err);
-    return true;
+    // Engine error (like worker load failed). Re-throw so the UI can display it
+    throw err;
   }
 };
 

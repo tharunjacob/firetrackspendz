@@ -202,8 +202,9 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
         } else {
           updateRow(rowId, { status: 'error', error: 'Incorrect PDF password' });
         }
-      } catch (err) {
-        updateRow(rowId, { status: 'error', error: 'Failed to validate password' });
+      } catch (err: any) {
+        console.error('[FileUploader] Password validation engine failed:', err);
+        updateRow(rowId, { status: 'error', error: err?.message || 'Failed to validate password' });
       }
     }, 400);
   };
