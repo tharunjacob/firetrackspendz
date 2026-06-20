@@ -41,6 +41,7 @@ export const useLocalPricing = () => {
       price: t.label,
       period: t.period,
       amount: t.amount,
+      originalPrice: t.originalLabel || null,
       sub: period === 'yearly' ? getMonthlyEquivalent(tier, billingCurrency) : null,
     };
   };
@@ -53,6 +54,7 @@ export const useLocalPricing = () => {
       yearly: get('pro', 'yearly'),
       // Back-compat shape — defaults to the format the old PricingPage used.
       price: isIndia ? PLAN_PRICING.pro.inr.monthly.label : PLAN_PRICING.pro.usd.yearly.label,
+      originalPrice: isIndia ? null : PLAN_PRICING.pro.usd.yearly.originalLabel,
       period: isIndia ? PLAN_PRICING.pro.inr.monthly.period : PLAN_PRICING.pro.usd.yearly.period,
       sub: isIndia ? null : getMonthlyEquivalent('pro', 'USD'),
     },
@@ -60,6 +62,7 @@ export const useLocalPricing = () => {
       monthly: get('enterprise', 'monthly'),
       yearly: get('enterprise', 'yearly'),
       price: isIndia ? PLAN_PRICING.enterprise.inr.monthly.label : PLAN_PRICING.enterprise.usd.yearly.label,
+      originalPrice: isIndia ? null : PLAN_PRICING.enterprise.usd.yearly.originalLabel,
       period: isIndia ? PLAN_PRICING.enterprise.inr.monthly.period : PLAN_PRICING.enterprise.usd.yearly.period,
       sub: isIndia ? null : getMonthlyEquivalent('enterprise', 'USD'),
     },

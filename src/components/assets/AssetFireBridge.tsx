@@ -19,7 +19,7 @@ export const AssetFireBridge: React.FC<Props> = ({ snapshots, config: _config, c
   const monthly = useMemo(() => computeMonthlyNetWorth(snapshots), [snapshots]);
   const latest = monthly[monthly.length - 1];
   const multiplier = FIRE_MULTIPLIER[currency] || 25;
-  const fire = useMemo(() => calculateFireMetrics(transactions, multiplier), [transactions, multiplier]);
+  const fire = useMemo(() => calculateFireMetrics(transactions, multiplier, currency), [transactions, multiplier, currency]);
 
   const fmt = (n: number) => formatAmount(n, currency);
   const pct = (n: number) => (n * 100).toFixed(1) + '%';

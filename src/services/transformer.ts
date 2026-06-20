@@ -482,18 +482,37 @@ const getPdfJs = async () => {
 
 export const isPdfEncrypted = async (file: File): Promise<boolean> => {
   if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') return false;
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfjs = await getPdfJs();
-    await pdfjs.getDocument({ data: arrayBuffer, disableFontFace: true }).promise;
-    return false;
-  } catch (err: any) {
-    if (err.name === 'PasswordException' || err.code === 1 || err.message?.toLowerCase().includes('password')) return true;
+
+  // Helper: scan raw PDF bytes for /Encrypt dictionary (catches encryption that pdfjs misses)
+  const hasEncryptDictionary = async (): Promise<boolean> => {
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
       const text = new TextDecoder('iso-8859-1').decode(bytes.subarray(0, Math.min(bytes.length, 50000)));
       return text.includes('/Encrypt') && !text.includes('/Encrypt null');
     } catch { return false; }
+  };
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfjs = await getPdfJs();
+    const pdf = await pdfjs.getDocument({ data: arrayBuffer, disableFontFace: true }).promise;
+
+    // Some owner-password-encrypted PDFs open without PasswordException but expose
+    // 0 pages (content is locked). A real bank statement always has ≥1 page, so
+    // treat 0-page PDFs as encrypted and fall back to the raw-bytes /Encrypt check.
+    if (pdf.numPages === 0) {
+      return await hasEncryptDictionary();
+    }
+
+    // Opened and has pages → genuinely unencrypted
+    return false;
+  } catch (err: any) {
+    // Explicit password errors
+    if (err.name === 'PasswordException' || err.code === 1 || err.message?.toLowerCase().includes('password')) return true;
+    // pdfjs sometimes surfaces "no pages" or "Invalid PDF structure" for encrypted files
+    if (err.message?.toLowerCase().includes('no pages')) return await hasEncryptDictionary();
+    // Fallback: raw byte scan for any other pdfjs failure
+    return await hasEncryptDictionary();
   }
 };
 
@@ -563,6 +582,12 @@ const extractTextFromEncryptedPDF = async (arrayBuffer: ArrayBuffer, password?: 
     try {
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer, password, disableFontFace: true });
       const pdf = await loadingTask.promise;
+
+      // Owner-password-encrypted PDFs can open but expose 0 pages without the user password
+      if (pdf.numPages === 0) {
+        throw new Error(password ? 'Incorrect Password. Please try again.' : 'PASSWORD_REQUIRED');
+      }
+
       let fullText = '';
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
@@ -571,7 +596,8 @@ const extractTextFromEncryptedPDF = async (arrayBuffer: ArrayBuffer, password?: 
       }
       return fullText;
     } catch (error: any) {
-      if (error.name === 'PasswordException' || error.message?.includes('Password') || error.code === 1) {
+      if (error.name === 'PasswordException' || error.message?.includes('Password') || error.code === 1
+          || error.message?.toLowerCase().includes('no pages')) {
         throw new Error(password ? 'Incorrect Password. Please try again.' : 'PASSWORD_REQUIRED');
       }
       throw error;

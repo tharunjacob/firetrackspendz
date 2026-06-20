@@ -390,8 +390,23 @@ const LandingPage = () => {
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
                 Most popular
               </div>
-              <p className="text-xs font-bold text-brand-500 uppercase tracking-widest mb-3">Pro</p>
-              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.pro.price}<span className="text-base font-normal text-slate-500">{pricing.pro.period}</span></div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-bold text-brand-500 uppercase tracking-widest">Pro</p>
+                {pricing.pro.originalPrice && (
+                  <span className="bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse whitespace-nowrap">
+                    50% Off
+                  </span>
+                )}
+              </div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+                {pricing.pro.originalPrice && (
+                  <span className="text-xl text-slate-400 dark:text-slate-500 line-through mr-2 font-medium">
+                    {pricing.pro.originalPrice}
+                  </span>
+                )}
+                {pricing.pro.price}
+                <span className="text-base font-normal text-slate-500">{pricing.pro.period}</span>
+              </div>
               <p className="text-xs text-slate-500 mb-5">{pricing.isIndia ? 'Billed monthly' : 'Billed annually'}</p>
               <ul className="space-y-2 mb-6">
                 {[

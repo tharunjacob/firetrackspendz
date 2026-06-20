@@ -19,7 +19,7 @@ export const FireView = ({ data }: FireViewProps = {}) => {
   const transactions = data ?? allTransactions;
   const { userId } = useAuth();
   const multiplier = FIRE_MULTIPLIER[currency] || 25;
-  const fire = useMemo(() => calculateFireMetrics(transactions, multiplier), [transactions, multiplier]);
+  const fire = useMemo(() => calculateFireMetrics(transactions, multiplier, currency), [transactions, multiplier, currency]);
   const recurring = useMemo(() => detectRecurring(transactions), [transactions]);
 
   const [activeFireTab, setActiveFireTab] = useState<FireTab>('my-fire');

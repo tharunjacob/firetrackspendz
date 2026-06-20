@@ -19,7 +19,7 @@
 // - Changing pricing? Update PLAN_PRICING.
 // ============================================================
 
-import type { SubscriptionPlan } from '@/types';
+import type { SubscriptionPlan, Currency } from '@/types';
 
 export const PLAN_NAMES: Record<string, SubscriptionPlan> = {
   FREE: 'free',
@@ -37,6 +37,8 @@ interface PriceTier {
   label: string;
   /** Period suffix shown after the price — e.g. "/mo", "/yr". */
   period: string;
+  /** Original label before discount — e.g. "$9.99". */
+  originalLabel?: string;
 }
 
 interface PlanPricing {
@@ -66,8 +68,8 @@ export const PLAN_PRICING: Record<Exclude<SubscriptionPlan, 'free'>, PlanPricing
       yearly:  { amount: 1499, label: '₹1,499', period: '/yr' },
     },
     usd: {
-      monthly: { amount: 4.99, label: '$4.99', period: '/mo' },
-      yearly:  { amount: 49.99, label: '$49.99', period: '/yr' },
+      monthly: { amount: 4.99, label: '$4.99', period: '/mo', originalLabel: '$9.99' },
+      yearly:  { amount: 49.99, label: '$49.99', period: '/yr', originalLabel: '$99.99' },
     },
   },
   enterprise: {
@@ -80,6 +82,17 @@ export const PLAN_PRICING: Record<Exclude<SubscriptionPlan, 'free'>, PlanPricing
       yearly:  { amount: 149,   label: '$149',   period: '/yr' },
     },
   },
+};
+
+export const DEFAULT_INFLATION: Record<Currency, number> = {
+  INR: 0.06,   // 6.0% for India
+  USD: 0.025,  // 2.5% for USA
+  EUR: 0.02,   // 2.0% for Eurozone
+  GBP: 0.02,   // 2.0% for UK
+  AUD: 0.025,  // 2.5% for Australia
+  CAD: 0.02,   // 2.0% for Canada
+  SGD: 0.02,   // 2.0% for Singapore
+  AED: 0.025,  // 2.5% for UAE
 };
 
 /**

@@ -180,14 +180,14 @@ export const NetWorthView = () => {
   const netWorth = totalAssets - totalLiabilities;
 
   const personalInflation = useMemo(
-    () => calculatePersonalInflation(transactions),
-    [transactions],
+    () => calculatePersonalInflation(transactions, currency),
+    [transactions, currency],
   );
 
   const multiplier = FIRE_MULTIPLIER[currency] || 25;
   const fireNumber = useMemo(
-    () => calculateFireMetrics(transactions, multiplier).fireNumberCurrent,
-    [transactions, multiplier],
+    () => calculateFireMetrics(transactions, multiplier, currency).fireNumberCurrent,
+    [transactions, multiplier, currency],
   );
 
   const fireProgress = fireNumber > 0 ? Math.max(0, Math.min(netWorth / fireNumber, 1)) : 0;

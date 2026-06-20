@@ -75,6 +75,7 @@ const PricingPage = () => {
       key: 'free' as const,
       name: 'Free',
       price: pricing.isIndia ? '₹0' : '$0',
+      originalPrice: null,
       period: 'forever',
       sub: null,
       desc: 'Perfect for getting started with expense tracking.',
@@ -87,11 +88,12 @@ const PricingPage = () => {
       ],
       cta: 'Start Free',
       popular: false,
-    },
-    {
+     },
+     {
       key: 'pro' as const,
       name: 'Pro',
       price: proTier.price,
+      originalPrice: proTier.originalPrice,
       period: proTier.period,
       sub: proTier.sub,
       desc: 'For individuals serious about financial independence.',
@@ -108,11 +110,12 @@ const PricingPage = () => {
       ],
       cta: 'Get Pro',
       popular: true,
-    },
-    {
+     },
+     {
       key: 'enterprise' as const,
       name: 'Enterprise',
       price: 'Coming Soon',
+      originalPrice: null,
       period: '',
       sub: null,
       desc: 'For families and power users.',
@@ -182,8 +185,20 @@ const PricingPage = () => {
                   Coming Soon
                 </div>
               )}
-              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">{plan.name}</h3>
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center justify-between">
+                <span>{plan.name}</span>
+                {plan.originalPrice && (
+                  <span className="bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse whitespace-nowrap">
+                    50% Off Launch Special
+                  </span>
+                )}
+              </h3>
               <div className="mb-1">
+                {plan.originalPrice && (
+                  <span className="text-xl text-slate-400 dark:text-slate-500 line-through mr-2 font-medium">
+                    {plan.originalPrice}
+                  </span>
+                )}
                 <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{plan.price}</span>
                 {plan.period && <span className="text-slate-500 dark:text-slate-400 text-sm">{plan.period}</span>}
               </div>

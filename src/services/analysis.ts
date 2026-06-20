@@ -1,4 +1,5 @@
 import type { Transaction, FireMetrics, RecurringTransaction, Anomaly, DeepInsight, Currency } from '@/types';
+import { DEFAULT_INFLATION } from '@/config/plans';
 
 // ============================================================
 // Analysis Engine - FIRE, Insights, Recurring, Anomalies
@@ -26,9 +27,10 @@ export const FIRE_MULTIPLIER: Record<Currency, number> = {
 //   3. For each year, average spending over only those same reference months (apples-to-apples).
 //   4. Compute CAGR across all qualified years rather than a single year-over-year jump.
 //   5. Allow negative values — spending CAN go down. Fallback to 0.06 only when data is insufficient.
-export const calculatePersonalInflation = (data: Transaction[]): number => {
+export const calculatePersonalInflation = (data: Transaction[], currency: Currency = 'INR'): number => {
   const expenses = data.filter(t => t.type === 'Expense');
-  if (expenses.length === 0) return 0.06;
+  const fallback = DEFAULT_INFLATION[currency] ?? 0.06;
+  if (expenses.length === 0) return fallback;
 
   const currentYear = new Date().getFullYear();
 
@@ -51,7 +53,7 @@ export const calculatePersonalInflation = (data: Transaction[]): number => {
     })
     .sort((a, b) => a - b);
 
-  if (qualifiedYears.length < 2) return 0.06;
+  if (qualifiedYears.length < 2) return fallback;
 
   // Use the latest year's months as the reference set for all comparisons
   // so a partial current year doesn't inflate/deflate the rate vs. prior full years
@@ -72,13 +74,13 @@ export const calculatePersonalInflation = (data: Transaction[]): number => {
     if (avg !== null && avg > 0) yearlyAvgs.push([yr, avg]);
   }
 
-  if (yearlyAvgs.length < 2) return 0.06;
+  if (yearlyAvgs.length < 2) return fallback;
 
   // CAGR: (lastAvg / firstAvg)^(1/numYears) - 1
   const [firstYear, firstAvg] = yearlyAvgs[0];
   const [lastYear2, lastAvg] = yearlyAvgs[yearlyAvgs.length - 1];
   const numYears = lastYear2 - firstYear;
-  if (numYears === 0 || firstAvg === 0) return 0.06;
+  if (numYears === 0 || firstAvg === 0) return fallback;
 
   const cagr = Math.pow(lastAvg / firstAvg, 1 / numYears) - 1;
   return Math.max(Math.min(cagr, 0.5), -0.15); // clamp to -15% … +50%
@@ -102,11 +104,16 @@ const calculateIncomeGrowth = (data: Transaction[]): number => {
  * forward by the user's personal inflation rate. Also computes savings rate and runway.
  * Returns zeros when there are no expenses yet.
  */
-export const calculateFireMetrics = (data: Transaction[], multiplier = DEFAULT_FIRE_MULTIPLIER): FireMetrics => {
+export const calculateFireMetrics = (
+  data: Transaction[],
+  multiplier = DEFAULT_FIRE_MULTIPLIER,
+  currency: Currency = 'INR'
+): FireMetrics => {
   const expenses = data.filter(t => t.type === 'Expense');
   const incomes = data.filter(t => t.type === 'Income');
+  const fallback = DEFAULT_INFLATION[currency] ?? 0.06;
   if (expenses.length === 0) {
-    return { currentAnnualExpense: 0, avgMonthlyExpense: 0, personalInflation: 0.06, yearsToFreedom: {}, fireNumberCurrent: 0 };
+    return { currentAnnualExpense: 0, avgMonthlyExpense: 0, personalInflation: fallback, yearsToFreedom: {}, fireNumberCurrent: 0 };
   }
 
   const sorted = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -117,7 +124,7 @@ export const calculateFireMetrics = (data: Transaction[], multiplier = DEFAULT_F
   const months = new Set(recent.map(t => t.date.substring(0, 7))).size || 1;
   const avgMonthly = totalRecent / months;
   const currentAnnual = avgMonthly * 12;
-  const inflation = calculatePersonalInflation(data);
+  const inflation = calculatePersonalInflation(data, currency);
   const fireNumberCurrent = currentAnnual * multiplier;
 
   const yearsToProject = [1, 3, 5, 7, 10, 15, 20];
@@ -611,7 +618,7 @@ export const generateSummaryText = (data: Transaction[], currency: string): stri
 
   // Same multiplier policy the dashboard uses, so the AI's FIRE number matches.
   const multiplier = FIRE_MULTIPLIER[currency as Currency] ?? DEFAULT_FIRE_MULTIPLIER;
-  const fire = calculateFireMetrics(data, multiplier);
+  const fire = calculateFireMetrics(data, multiplier, currency as Currency);
   const recurring = detectRecurring(data);
   const anomalies = detectAnomalies(data);
 

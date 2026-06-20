@@ -189,7 +189,7 @@ export const SummaryView = ({ data }: { data?: Transaction[] }) => {
 
   const insights = useMemo(() => getDeepInsights(txns), [txns]);
   const multiplier = FIRE_MULTIPLIER[currency] || 25;
-  const fire = useMemo(() => calculateFireMetrics(txns, multiplier), [txns, multiplier]);
+  const fire = useMemo(() => calculateFireMetrics(txns, multiplier, currency), [txns, multiplier, currency]);
   const last6Months = monthly.slice(-6);
 
   const fmtCurrency = (v: number) => formatAmount(v, currency);
