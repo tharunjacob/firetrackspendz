@@ -537,7 +537,21 @@ export const validatePdfPassword = async (file: File, password?: string): Promis
     await pdfjs.getDocument({ data: arrayBuffer, password, disableFontFace: true }).promise;
     return true;
   } catch (err: any) {
-    return false;
+    console.error('[validatePdfPassword] error during validation:', err);
+    const errMsg = (err?.message || String(err || '')).toLowerCase();
+    const errName = err?.name || '';
+    const errCode = err?.code || 0;
+
+    // Explicit password exceptions
+    const isPasswordError = errName === 'PasswordException' || errCode === 1 || errMsg.includes('password');
+    if (isPasswordError) {
+      return false; // Genuinely incorrect password
+    }
+
+    // Unrelated error (e.g. worker failed to fetch, font loading issues).
+    // Let the validation pass so the user is not blocked from trying to analyze the document.
+    console.warn('[validatePdfPassword] Non-password error during validation, allowing submit:', err);
+    return true;
   }
 };
 
