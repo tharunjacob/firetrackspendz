@@ -471,7 +471,7 @@ const getPdfJs = async () => {
   try {
     const pdfjsModule = await import('pdfjs-dist');
     const pdfjs = pdfjsModule.default || pdfjsModule;
-    if (pdfjs.GlobalWorkerOptions.workerSrc === undefined) {
+    if (!pdfjs.GlobalWorkerOptions.workerSrc) {
       pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js`;
     }
     return pdfjs;
