@@ -487,8 +487,17 @@ export const isPdfEncrypted = async (file: File): Promise<boolean> => {
   const hasEncryptDictionary = async (): Promise<boolean> => {
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
-      const text = new TextDecoder('iso-8859-1').decode(bytes.subarray(0, Math.min(bytes.length, 50000)));
-      return text.includes('/Encrypt') && !text.includes('/Encrypt null');
+      const len = bytes.length;
+      const decoder = new TextDecoder('iso-8859-1');
+      // Scan first 50KB (in case it is a linearized PDF)
+      const startText = decoder.decode(bytes.subarray(0, Math.min(len, 50000)));
+      if (startText.includes('/Encrypt') && !startText.includes('/Encrypt null')) return true;
+      // Scan last 50KB (trailer/cross-reference dictionary is usually at the very end of the file)
+      if (len > 50000) {
+        const endText = decoder.decode(bytes.subarray(len - 50000));
+        if (endText.includes('/Encrypt') && !endText.includes('/Encrypt null')) return true;
+      }
+      return false;
     } catch { return false; }
   };
 
@@ -507,10 +516,14 @@ export const isPdfEncrypted = async (file: File): Promise<boolean> => {
     // Opened and has pages → genuinely unencrypted
     return false;
   } catch (err: any) {
+    const errMsg = (err?.message || String(err || '')).toLowerCase();
+    const errName = err?.name || '';
+    const errCode = err?.code || 0;
+
     // Explicit password errors
-    if (err.name === 'PasswordException' || err.code === 1 || err.message?.toLowerCase().includes('password')) return true;
+    if (errName === 'PasswordException' || errCode === 1 || errMsg.includes('password')) return true;
     // pdfjs sometimes surfaces "no pages" or "Invalid PDF structure" for encrypted files
-    if (err.message?.toLowerCase().includes('no pages')) return await hasEncryptDictionary();
+    if (errMsg.includes('no pages') || errMsg.includes('invalid pdf structure')) return await hasEncryptDictionary();
     // Fallback: raw byte scan for any other pdfjs failure
     return await hasEncryptDictionary();
   }

@@ -130,8 +130,22 @@ export const FileUploader = ({ onStartAnalysis, isProcessing, progress }: FileUp
       try {
         const encrypted = await isPdfEncrypted(file);
         updateRow(rowId, { needsPassword: encrypted, status: encrypted ? 'idle' : 'ready' });
-      } catch {
-        updateRow(rowId, { status: 'ready' });
+      } catch (err) {
+        console.error('[FileUploader] PDF encryption check failed:', err);
+        // Fallback byte scan if pdfjs failed to run/load
+        let encrypted = false;
+        try {
+          const bytes = new Uint8Array(await file.arrayBuffer());
+          const len = bytes.length;
+          const decoder = new TextDecoder('iso-8859-1');
+          const startText = decoder.decode(bytes.subarray(0, Math.min(len, 50000)));
+          encrypted = startText.includes('/Encrypt') && !startText.includes('/Encrypt null');
+          if (!encrypted && len > 50000) {
+            const endText = decoder.decode(bytes.subarray(len - 50000));
+            encrypted = endText.includes('/Encrypt') && !endText.includes('/Encrypt null');
+          }
+        } catch {}
+        updateRow(rowId, { needsPassword: encrypted, status: encrypted ? 'idle' : 'ready' });
       }
     } else if (file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls')) {
       try {
