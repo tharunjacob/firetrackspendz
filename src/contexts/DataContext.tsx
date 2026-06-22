@@ -260,6 +260,11 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       // the hidden transactions into storage. allRawRef holds the complete set
       // for both anonymous and signed-in users, so this compares against everything.
       let fullDataset = [...allRawRef.current];
+      // Rows that existed before this upload. Transfer/refund detection must not
+      // re-classify them — the user may have manually corrected a category, and
+      // re-tagging would silently revert that edit. Only rows new to this upload
+      // get auto-tagged.
+      const preUploadIds = new Set(allRawRef.current.map(t => t.id));
       let completed = 0;
       let totalDuplicates = 0;
       // Track headers from the first file that returns non-cached headers (for confirmation prompt)
@@ -330,7 +335,7 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
       // Run transfer/refund detection ONCE on the fully merged dataset (after all files).
       // This is much more efficient than running it per-file (was O(N²×numFiles)).
       if (totalNewTransactions > 0) {
-        const { transactions: cleaned, transferCount } = identifyInterAccountTransfers(fullDataset);
+        const { transactions: cleaned, transferCount } = identifyInterAccountTransfers(fullDataset, preUploadIds);
         fullDataset = cleaned;
         if (transferCount > 0) {
           console.info(`[processFiles] Identified ${transferCount} inter-account transfer/refund pair(s)`);
@@ -485,7 +490,9 @@ export const DataProvider = ({ children, userId, plan, isMimicMode, isAuthReady,
   //
   // SIGN-UP SEQUENCE TRACE (anon uploads 50 txns → signs up):
   //   1. Anon upload → processFiles (isAnon) sets allTransactionsRaw=50,
-  //      isAnonymousPreview=true. Nothing is persisted anywhere yet.
+  //      isAnonymousPreview=true, and persists the rows to IndexedDB via
+  //      saveToStorage (so an anon reload restores them). The CLOUD copy is
+  //      not written until this promotion runs on sign-in.
   //   2. User signs up → Supabase fires SIGNED_IN → AuthContext sets userId
   //      and (after profile load) calls onSignIn → promoteRef.current() → here.
   //   3. React also re-runs the load effect because userId changed. Whichever

@@ -42,14 +42,11 @@ serve(async (req: Request) => {
 
     const rzpKeyId = Deno.env.get('RAZORPAY_KEY_ID') ?? '';
     const rzpKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET') ?? '';
-    console.log('[razorpay-create-subscription] Debug credentials:', {
-      hasKeyId: !!rzpKeyId,
-      keyIdLength: rzpKeyId.length,
-      keyIdStart: rzpKeyId.substring(0, 12),
-      hasSecret: !!rzpKeySecret,
-      secretLength: rzpKeySecret.length,
-      secretStart: rzpKeySecret.substring(0, 4),
-    });
+    // Never log key material (not even prefixes/lengths) — these end up in
+    // function logs. Log only presence for diagnostics.
+    if (!rzpKeyId || !rzpKeySecret) {
+      console.error('[razorpay-create-subscription] Razorpay credentials not configured');
+    }
 
     const body = await req.json().catch(() => ({})) as {
       tier?: 'pro' | 'enterprise';

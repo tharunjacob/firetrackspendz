@@ -132,11 +132,12 @@ export const deleteFromStorage = async (ids: string[]): Promise<void> => {
  *
  * Called on sign-in from AuthContext. No-op if the user is not signed in.
  *
- * NOTE — anon→signup data path: anonymous uploads currently live only in
- * DataContext's `allTransactionsRaw` state (memory). They are not written
- * to IndexedDB by `processFiles`, so this function will not see them on
- * sign-in. The DataContext-level promotion of `allTransactionsRaw` is
- * separate from this function.
+ * NOTE — anon→signup data path: the canonical anon→cloud promotion is done by
+ * DataContext's `promoteAnonymousData` (from the in-memory `allTransactionsRaw`),
+ * NOT by this function. `processFiles` also persists anon uploads to IndexedDB
+ * via `saveToStorage`, so a later sign-in/reload CAN find them here — but in the
+ * normal funnel `promoteAnonymousData` runs first and `localReset()`s that copy,
+ * leaving this a no-op. It remains as a backstop for that local copy.
  */
 export const syncLocalToCloud = async (): Promise<void> => {
   if (!(await isUserLoggedIn())) return;

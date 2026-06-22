@@ -37,6 +37,16 @@ export const CompareView = ({ data }: { data?: Transaction[] }) => {
   const [period1, setPeriod1] = useState<string>(options.length > 1 ? options[1] : '');
   const [period2, setPeriod2] = useState<string>(options.length > 0 ? options[0] : '');
 
+  // For signed-in users, transactions load asynchronously after mount, so `options`
+  // starts empty and the useState initializers above leave period1/period2 blank,
+  // which renders an empty comparison. Re-sync once options arrive — using functional
+  // updates so a selection the user already made is never overwritten.
+  useEffect(() => {
+    if (options.length === 0) return;
+    setPeriod1(prev => prev || (options.length > 1 ? options[1] : options[0] || ''));
+    setPeriod2(prev => prev || (options.length > 0 ? options[0] : ''));
+  }, [options.join('|')]);
+
   // Build comparison data
   type CategoryData = { total: number; subCategories: Record<string, number> };
   const comparisonData = useMemo(() => {

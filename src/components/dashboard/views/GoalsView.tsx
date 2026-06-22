@@ -107,11 +107,12 @@ export const GoalsView = () => {
   };
 
   const handleSave = () => {
-    if (!name.trim() || !target) return;
+    const parsedTarget = parseFloat(target);
+    if (!name.trim() || isNaN(parsedTarget) || parsedTarget <= 0) return;
     const goal: SavingsGoal = {
       id: editingId || crypto.randomUUID?.() || Date.now().toString(),
       name: name.trim(),
-      targetAmount: parseFloat(target),
+      targetAmount: parsedTarget,
       currentAmount: parseFloat(current) || 0,
       deadline: deadline || undefined,
       icon,

@@ -119,29 +119,13 @@ export const DebtPayoffView = () => {
   const GRID_COLOR = isDark ? '#334155' : '#e2e8f0';
   const TICK_COLOR = isDark ? '#94a3b8' : '#64748b';
 
-  if (!canAccessFeature(plan, 'debt_payoff')) {
-    return (
-      <UpgradePrompt
-        feature="Debt Payoff Planner"
-        description="Track all your debts, pick Snowball or Avalanche payoff, and see exactly when you'll be debt-free — available on the Pro plan."
-      />
-    );
-  }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [debts, setDebts] = useState<Debt[]>([]);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [hydrated, setHydrated] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isAdding, setIsAdding] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [editingId, setEditingId] = useState<string | null>(null);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [extraPayment, setExtraPayment] = useState('0');
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [method, setMethod] = useState<DebtPayoffMethod>('avalanche');
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (!isAuthReady) return;
     let cancelled = false;
@@ -186,7 +170,6 @@ export const DebtPayoffView = () => {
     return () => { cancelled = true; };
   }, [isAuthReady, isDemoMode]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (!hydrated) return;
     if (isDemoMode) return; // Do not persist demo debts to user settings
@@ -195,14 +178,11 @@ export const DebtPayoffView = () => {
 
   const extra = Math.max(0, parseFloat(extraPayment) || 0);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const snowballResult = useMemo(() => calculateDebtPayoff(debts, extra, 'snowball'), [debts, extra]);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const avalancheResult = useMemo(() => calculateDebtPayoff(debts, extra, 'avalanche'), [debts, extra]);
   const activeResult = method === 'snowball' ? snowballResult : avalancheResult;
 
   // Last month's top spending categories for the insight box
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const spendingInsight = useMemo(() => {
     const now = new Date();
     const lastMonthStr = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -231,7 +211,6 @@ export const DebtPayoffView = () => {
   }, [transactions]);
 
   // Months saved if we redirect the suggested amount
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const insightSavings = useMemo(() => {
     if (!spendingInsight || debts.length === 0) return null;
     const boosted = calculateDebtPayoff(debts, extra + spendingInsight.suggested, method);
@@ -241,7 +220,6 @@ export const DebtPayoffView = () => {
   }, [spendingInsight, debts, extra, method, activeResult]);
 
   // Chart data — downsample to ≤20 points
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const chartData = useMemo(() => {
     const sched = activeResult.schedule;
     if (sched.length === 0) return [];
@@ -256,6 +234,18 @@ export const DebtPayoffView = () => {
       return obj;
     });
   }, [activeResult.schedule]);
+
+  // Plan gate — placed AFTER all hooks so the hook order stays stable when
+  // `plan` changes (e.g. Free→Pro upgrade) while this tab is mounted. Returning
+  // before the hooks would change the hook count between renders and crash React.
+  if (!canAccessFeature(plan, 'debt_payoff')) {
+    return (
+      <UpgradePrompt
+        feature="Debt Payoff Planner"
+        description="Track all your debts, pick Snowball or Avalanche payoff, and see exactly when you'll be debt-free — available on the Pro plan."
+      />
+    );
+  }
 
   // Handlers
   const handleAdd = (fields: Omit<Debt, 'id' | 'createdAt'>) => {

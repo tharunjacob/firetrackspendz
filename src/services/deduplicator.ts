@@ -83,8 +83,17 @@ export const deduplicateTransactions = (
   return { unique, duplicateCount };
 };
 
-export const identifyInterAccountTransfers = (transactions: Transaction[]): { transactions: Transaction[]; transferCount: number } => {
+export const identifyInterAccountTransfers = (
+  transactions: Transaction[],
+  // IDs of rows that already existed BEFORE the current upload. Detection never
+  // re-classifies these: they have been processed once already and the user may
+  // have manually corrected them, so re-tagging would silently revert that edit
+  // (and change their totals). Only NEW rows get auto-tagged. Omitted = protect
+  // nothing, preserving the original behavior for existing callers and tests.
+  protectedIds?: Set<string>,
+): { transactions: Transaction[]; transferCount: number } => {
   let transferCount = 0;
+  const isProtected = (t: Transaction) => protectedIds?.has(t.id) ?? false;
   const TRANSFER_KEYWORDS = ['transfer', 'upi', 'neft', 'imps', 'rtgs', 'payment', 'trf', 'self', 'zelle', 'venmo', 'wire', 'sepa'];
 
   const hasTransferKeyword = (str: string) => TRANSFER_KEYWORDS.some(k => str.toLowerCase().includes(k));
@@ -133,7 +142,9 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
     let expenses = getUnmatched('Expense');
 
     incomes.forEach(inc => {
+      if (isProtected(inc)) return;
       const matchIndex = expenses.findIndex(exp => {
+        if (isProtected(exp)) return false;
         if (Math.abs(Math.abs(inc.amount) - Math.abs(exp.amount)) > 0.01) return false;
         if (inc.owner === exp.owner) return false;
         return areSimilar(inc.notes || inc.category, exp.notes || exp.category);
@@ -155,7 +166,9 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
     let transfers = getUnmatched('Transfer');
 
     incomes.forEach(inc => {
+      if (isProtected(inc)) return;
       const matchIndex = transfers.findIndex(trf => {
+        if (isProtected(trf)) return false;
         if (Math.abs(Math.abs(inc.amount) - Math.abs(trf.amount)) > 0.01) return false;
         if (inc.owner === trf.owner) return false;
         return areSimilar(inc.notes || inc.category, trf.notes || trf.category);
@@ -177,7 +190,9 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
     transfers = getUnmatched('Transfer');
 
     expenses.forEach(exp => {
+      if (isProtected(exp)) return;
       const matchIndex = transfers.findIndex(trf => {
+        if (isProtected(trf)) return false;
         if (Math.abs(Math.abs(exp.amount) - Math.abs(trf.amount)) > 0.01) return false;
         if (exp.owner === trf.owner) return false;
         return areSimilar(exp.notes || exp.category, trf.notes || trf.category);
@@ -229,8 +244,10 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
 
   remainingIncomes.forEach(inc => {
     if (inc.type !== 'Income') return; // skip if already tagged by another round
+    if (isProtected(inc)) return;
     const matchIndex = remainingExpenses.findIndex(exp => {
       if (exp.type !== 'Expense') return false; // skip if already tagged
+      if (isProtected(exp)) return false;
       if (inc.owner !== exp.owner) return false;
       if (Math.abs(inc.amount - exp.amount) > 0.01) return false;
       if (getDateDiffInDays(inc.date, exp.date) > 10) return false;
@@ -255,8 +272,10 @@ export const identifyInterAccountTransfers = (transactions: Transaction[]): { tr
   remainingExpenses = transactions.filter(t => t.type === 'Expense'); // ← must refresh, inter-account may have tagged some
   remainingIncomes.forEach(inc => {
     if (inc.type !== 'Income') return; // skip if already tagged
+    if (isProtected(inc)) return;
     const matchIndex = remainingExpenses.findIndex(exp => {
       if (exp.type !== 'Expense') return false; // skip if already tagged
+      if (isProtected(exp)) return false;
       if (inc.owner !== exp.owner) return false;
       if (Math.abs(inc.amount - exp.amount) > 0.01) return false;
       if (getDateDiffInDays(inc.date, exp.date) > 10) return false;

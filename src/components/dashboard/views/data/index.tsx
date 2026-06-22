@@ -231,6 +231,10 @@ export const DataView = () => {
         category: finalCategory || 'Unclassified',
         subCategory: editData.subCategory || '',
         notes: editData.notes || 'Manually added',
+        // Keep original_description consistent with imported rows so the learning
+        // engine keys on the user's real text (empty when none was typed), not the
+        // "Manually added" placeholder.
+        original_description: editData.notes || '',
         project: null,
       };
 

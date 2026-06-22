@@ -238,6 +238,41 @@ describe('Inter-Account Transfers Detection', () => {
     const { transferCount } = identifyInterAccountTransfers(txns);
     expect(transferCount).toBe(0);
   });
+
+  // Regression guard: re-running detection on a later upload must NOT silently
+  // revert a category the user manually corrected on a previously-saved row.
+  it('does not re-classify pre-existing (protected) rows', () => {
+    const txns = [
+      createTx('old-1', 'Me', '2025-01-01', 500, 'Self Transfer to HDFC', 'Expense'),
+      createTx('old-2', 'Wife', '2025-01-01', 500, 'Transfer from ICICI', 'Income'),
+    ];
+    const protectedIds = new Set(['old-1', 'old-2']);
+
+    const { transactions, transferCount } = identifyInterAccountTransfers(txns, protectedIds);
+    expect(transferCount).toBe(0);
+    expect(transactions.find(t => t.id === 'old-1')?.type).toBe('Expense');
+    expect(transactions.find(t => t.id === 'old-2')?.type).toBe('Income');
+  });
+
+  it('still detects transfers among rows new to this upload', () => {
+    const txns = [
+      createTx('new-1', 'Me', '2025-01-01', 500, 'Self Transfer to HDFC', 'Expense'),
+      createTx('new-2', 'Wife', '2025-01-01', 500, 'Transfer from ICICI', 'Income'),
+    ];
+    // Nothing protected (empty pre-upload set) → full detection, as before.
+    const { transferCount } = identifyInterAccountTransfers(txns, new Set());
+    expect(transferCount).toBe(1);
+  });
+
+  it('does not merge a new row with a protected existing row (conservative, non-destructive)', () => {
+    const txns = [
+      createTx('old-1', 'Me', '2025-01-01', 500, 'Self Transfer to HDFC', 'Expense'), // protected
+      createTx('new-2', 'Wife', '2025-01-01', 500, 'Transfer from ICICI', 'Income'),  // new
+    ];
+    const { transactions, transferCount } = identifyInterAccountTransfers(txns, new Set(['old-1']));
+    expect(transferCount).toBe(0);
+    expect(transactions.find(t => t.id === 'old-1')?.type).toBe('Expense');
+  });
 });
 
 describe('Refunds Detection', () => {

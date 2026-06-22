@@ -191,10 +191,12 @@ serve(async (req: Request) => {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  // Auth: accept the service role key as Bearer token
+  // Auth: accept the service role key as Bearer token.
+  // Fail CLOSED: if the key is missing/unset, reject every request rather than
+  // letting the `&&` short-circuit allow unauthenticated callers through.
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const authHeader = req.headers.get("Authorization");
-  if (serviceRoleKey && authHeader !== `Bearer ${serviceRoleKey}`) {
+  if (!serviceRoleKey || authHeader !== `Bearer ${serviceRoleKey}`) {
     return new Response("Unauthorized", { status: 401 });
   }
 

@@ -378,12 +378,12 @@ Interpret Type from the account holder’s point of view:
 
 Category — use ONLY these values (pick the single best match):
   Food | Groceries | Transport | Shopping | Utilities | Entertainment |
-  Health | Education | Investment | Salary | Income | Housing | EMI |
+  Health | Education | Investment | Salary | Other Income | Housing | EMI |
   Transfer | Cash | Unclassified
 
 Guidelines:
   - Salary / regular monthly pay: Category = Salary, Type = Income.
-  - Other inflows (interest, cashback, tax refund, generic credits): Category = Income, Type = Income.
+  - Other inflows (interest, cashback, tax refund, generic credits): Category = Other Income, Type = Income.
   - Mutual fund, stock, FD/RD, brokerage funding: Category = Investment.
     * If it’s a move to your own investment account, Type = Transfer.
   - Wallet loads and internal transfers: Category = Transfer, Type = Transfer.
@@ -413,7 +413,7 @@ SPECIAL NOTES FOR CREDIT CARD STATEMENTS
   - Treat purchases, fees, cash advances, interest charges as Expense.
   - Treat payments made to the card, credits, refunds, reversals, cashbacks as Income (if it is truly money gained) or Transfer (typical for card bill payments from your bank account).
     * Example: “NEFT PAYMENT RECEIVED” or “AutoPay from HDFC Bank” → Type = Transfer, Category = Transfer.
-    * “AMAZON REFUND” → Type = Income, Category = Income or Shopping (choose best).
+    * “AMAZON REFUND” → Type = Income, Category = Other Income or Shopping (choose best).
 
 EXAMPLES (format only)
 2025-03-15|Swiggy|450.00|Expense|Food
@@ -422,7 +422,7 @@ EXAMPLES (format only)
 2025-03-18|Netflix|649.00|Expense|Entertainment
 2025-03-19|Transfer to Savings|10000.00|Transfer|Transfer
 2025-03-20|HDFC Credit Card Payment|15000.00|Transfer|Transfer
-2025-03-21|Income Tax Refund|12500.00|Income|Income
+2025-03-21|Income Tax Refund|12500.00|Income|Other Income
 2025-03-22|Zerodha MF Purchase|5000.00|Transfer|Investment
 
 Remember:

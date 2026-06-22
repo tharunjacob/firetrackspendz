@@ -53,10 +53,11 @@ export const BudgetsView = () => {
   }, [transactions, currentMonth]);
 
   const addBudget = () => {
-    if (!newBudget.category || !newBudget.limit) return;
+    const parsedLimit = parseFloat(newBudget.limit);
+    if (!newBudget.category || isNaN(parsedLimit) || parsedLimit <= 0) return;
     setBudgets(prev => [...prev, {
       id: Date.now().toString(), user_id: '', category: newBudget.category,
-      monthly_limit: parseFloat(newBudget.limit), currency, is_active: true,
+      monthly_limit: parsedLimit, currency, is_active: true,
     }]);
     setNewBudget({ category: '', limit: '' });
     setShowAdd(false);
