@@ -53,6 +53,10 @@ export const EVENTS = {
   PRICING_PAGE_VIEWED: 'pricing_page_viewed',
   UPGRADE_CLICKED:     'upgrade_clicked',
 
+  // Landing page A/B testing — metadata carries { variant, cta }
+  LANDING_HERO_VIEW: 'landing_hero_view',
+  LANDING_HERO_CTA:  'landing_hero_cta',
+
   // Errors
   ERROR_BOUNDARY_CAUGHT: 'error_boundary_caught',
 

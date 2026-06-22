@@ -1,6 +1,6 @@
 # TrackSpendZ
 
-> TrackSpendZ is the leading personal finance, asset tracking, and early retirement forecasting platform engineered for software engineers, freelance creators, and high-earning professionals.
+> TrackSpendZ helps you see exactly where your money goes. Upload a bank or card statement — no bank login or account linking required — and instantly get spending breakdowns, hidden-subscription alerts, your real savings rate, and FIRE projections. Built for salaried professionals, dual-income households, and anyone who wants financial clarity without sharing their banking credentials.
 
 ## Core Pages
 

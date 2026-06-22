@@ -1,17 +1,40 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Logo, Icon } from '@/components/common/Icons';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { useLocalPricing } from '@/hooks/useLocalPricing';
+import { logEvent, EVENTS } from '@/services/logger';
+
+// ── A/B hero test ──────────────────────────────────────────────
+// Two headline framings. The visitor is bucketed once and the choice
+// is sticky (localStorage), so impressions and clicks are comparable.
+// Results surface in the admin Control Room → "A/B Tests" tab, which
+// aggregates the `landing_hero_view` / `landing_hero_cta` events.
+type HeroVariant = 'A' | 'B';
+
+const AB_STORAGE_KEY = 'tsz_ab_hero_variant';
+
+const getHeroVariant = (): HeroVariant => {
+  try {
+    const stored = localStorage.getItem(AB_STORAGE_KEY);
+    if (stored === 'A' || stored === 'B') return stored;
+    const assigned: HeroVariant = Math.random() < 0.5 ? 'A' : 'B';
+    localStorage.setItem(AB_STORAGE_KEY, assigned);
+    return assigned;
+  } catch {
+    return 'A';
+  }
+};
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const pricing = useLocalPricing();
+  const [variant] = useState<HeroVariant>(getHeroVariant);
 
   usePageMeta({
     title: 'TrackSpendZ — See Exactly Where Your Money Goes',
-    description: 'Upload your bank statement and get instant spending insights, auto-categorization, FIRE planning, and AI-powered advice. No signup needed. Works with any bank.',
+    description: 'Upload your bank statement and instantly see where your money goes — spending breakdowns, hidden subscriptions, savings rate, and FIRE planning. No bank login. No account linking. Works with any bank.',
     canonical: '/',
   });
 
@@ -19,6 +42,17 @@ const LandingPage = () => {
     const ref = searchParams.get('ref');
     if (ref) localStorage.setItem('tsz_referral_code', ref);
   }, [searchParams]);
+
+  // Log the hero impression once per page load (deduped by session in admin).
+  useEffect(() => {
+    logEvent(EVENTS.LANDING_HERO_VIEW, { variant });
+  }, [variant]);
+
+  // Fire a tracked CTA event, then run the navigation.
+  const heroCta = (cta: 'upload' | 'demo', go: () => void) => {
+    logEvent(EVENTS.LANDING_HERO_CTA, { variant, cta });
+    go();
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900">
@@ -32,34 +66,41 @@ const LandingPage = () => {
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-300 px-4 py-1.5 rounded-full text-sm font-medium mb-6 border border-brand-100 dark:border-brand-800">
                 <span className="w-2 h-2 bg-brand-500 rounded-full animate-pulse" />
-                No signup required · Free to start
+                No bank login · No signup to start · Free
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-slate-900 dark:text-slate-100 leading-[1.1] mb-5">
-                Understand your money<br />
-                <span className="text-gradient">without connecting your bank</span>
-              </h1>
+              {variant === 'A' ? (
+                <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-slate-900 dark:text-slate-100 leading-[1.1] mb-5">
+                  Where did your money<br />
+                  <span className="text-gradient">actually go last month?</span>
+                </h1>
+              ) : (
+                <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-slate-900 dark:text-slate-100 leading-[1.1] mb-5">
+                  See where your money goes<br />
+                  <span className="text-gradient">without connecting your bank</span>
+                </h1>
+              )}
 
               <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
-                Upload bank or credit card statements to instantly analyze spending, track net worth, and monitor your progress toward financial independence.
+                Upload a bank or card statement and TrackSpendZ instantly breaks down every transaction — what you spent, the subscriptions quietly draining you, and how much you could really be saving. No bank login. No credentials. Just answers.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-8">
                 <button
-                  onClick={() => navigate('/dashboard?demo=true')}
+                  onClick={() => heroCta('upload', () => navigate('/dashboard'))}
                   className="btn-primary text-base px-8 py-3.5 shadow-md shadow-brand-200/60 w-full sm:w-auto"
                 >
-                  Explore Live Demo
+                  Upload a Statement — Free
                 </button>
                 <button
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => heroCta('demo', () => navigate('/dashboard?demo=true'))}
                   className="btn-secondary text-base px-8 py-3.5 w-full sm:w-auto border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
                 >
-                  Upload Statement — Free
+                  See a live demo
                 </button>
               </div>
 
-              {/* Trust bullets */}
+              {/* Trust bullets — every claim verified against the codebase */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto lg:mx-0">
                 <span className="flex items-center gap-1.5">
                   <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
@@ -67,15 +108,15 @@ const LandingPage = () => {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
-                  Upload only files you choose
+                  Free to start, no card
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
-                  Account numbers never stored
+                  Free data stays in your browser
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Icon name="check" className="w-4 h-4 text-green-500 shrink-0" />
-                  Delete your data anytime
+                  Delete everything anytime
                 </span>
               </div>
             </div>
@@ -171,11 +212,45 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
+      {/* ── THE PROBLEM ──────────────────────────────────────────────── */}
       <section className="bg-white dark:bg-slate-900 py-20 border-t border-slate-100 dark:border-slate-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">
+              You earn well. So why doesn't it feel like it?
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+              You're not bad with money. You just can't <em>see</em> it clearly — it's
+              scattered across accounts and cards, buried in statements nobody can read.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            {[
+              { q: '“Where did my paycheck go?”', a: "It's the 28th and you're honestly not sure how." },
+              { q: '“What am I still paying for?”', a: 'Subscriptions you forgot about, renewing quietly every month.' },
+              { q: '“Why am I not saving more?”', a: 'On paper you should be. In reality, somehow you’re not.' },
+              { q: '“I have 4 accounts and 3 cards.”', a: 'No single place shows you the whole picture at once.' },
+            ].map(item => (
+              <div key={item.q} className="card p-5 flex flex-col">
+                <p className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1.5">{item.q}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{item.a}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+            Most apps “fix” this by asking for your bank login. We don't think you should
+            have to hand over your banking credentials just to read your own statements.
+          </p>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
+      <section className="bg-slate-50 dark:bg-slate-800 py-20 border-t border-slate-100 dark:border-slate-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">Up and running in 60 seconds</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-14">No account. No setup. Just results.</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">From messy statement to clear answers</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-14">No account linking. No setup. No bank connection.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             {/* Connector line (desktop only) */}
@@ -186,24 +261,24 @@ const LandingPage = () => {
                 icon: 'upload',
                 step: '01',
                 title: 'Upload your statement',
-                desc: 'Drop any file from any bank — Excel, CSV, or PDF. Major domestic and international banks all work.',
+                desc: 'Drag in a CSV or Excel file from any bank — no signup needed. (PDF statements need a free account.)',
               },
               {
-                icon: 'ai',
+                icon: 'sparkles',
                 step: '02',
-                title: 'AI categorizes everything',
-                desc: '150+ merchants recognized automatically. Corrections you make teach it your personal patterns.',
+                title: 'Watch it organize itself',
+                desc: 'Most transactions are auto-sorted using 150+ built-in patterns. Fix anything it’s unsure of once, and it remembers your choice next time.',
               },
               {
                 icon: 'chart',
                 step: '03',
-                title: 'Explore your insights',
-                desc: 'Spending breakdowns, trends, budgets, FIRE number — 15 dashboards ready instantly.',
+                title: 'See where it all goes',
+                desc: 'Spending breakdowns, hidden subscriptions, your real savings rate — laid out the moment the upload finishes.',
               },
             ].map(s => (
               <div key={s.step} className="relative flex flex-col items-center">
                 <div className="relative z-10 w-16 h-16 bg-brand-600 text-white rounded-2xl flex items-center justify-center mb-5 shadow-md shadow-brand-200/50">
-                  <Icon name={s.icon} className="w-7 h-7" />
+                  <Icon name={s.icon as any} className="w-7 h-7" />
                 </div>
                 <div className="text-xs font-bold text-brand-400 mb-1 tracking-widest">{s.step}</div>
                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-2">{s.title}</h3>
@@ -221,52 +296,52 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ── FEATURE HIGHLIGHTS ───────────────────────────────────────── */}
-      <section className="bg-slate-50 dark:bg-slate-800 py-20 border-t border-slate-100 dark:border-slate-700">
+      {/* ── THE PAYOFF (outcome-first) ───────────────────────────────── */}
+      <section className="bg-white dark:bg-slate-900 py-20 border-t border-slate-100 dark:border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">Built for serious money management</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">Everything becomes obvious</h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-              Not just pie charts. TrackSpendZ gives you the full picture — across months, accounts, and life goals.
+              The questions you couldn't answer in a spreadsheet — answered the second your statement lands.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
               {
-                icon: 'ai',
+                icon: 'chart',
                 color: 'bg-brand-50 dark:bg-brand-950 text-brand-600',
-                title: 'Smart categorization that learns',
-                desc: 'Correct a category once and TrackSpendZ remembers it forever. Over time it becomes tuned to your exact spending habits.',
-              },
-              {
-                icon: 'fire',
-                color: 'bg-orange-50 dark:bg-orange-900/20 text-orange-500',
-                title: 'FIRE calculator with Monte Carlo',
-                desc: 'Input your savings rate and investments. Get a probabilistic range of retirement dates — not just one optimistic number.',
+                title: 'Here’s where it actually goes',
+                desc: 'Every transaction sorted into a clear category breakdown. Correct one and TrackSpendZ remembers it for good.',
               },
               {
                 icon: 'wallet',
                 color: 'bg-green-50 dark:bg-green-900/20 text-green-600',
-                title: 'Works with any bank',
-                desc: 'Chase, Bank of America, HSBC, or any international bank — upload any CSV, Excel, or PDF statement and columns are auto-detected.',
-              },
-              {
-                icon: 'chart',
-                color: 'bg-brand-50 dark:bg-brand-900/20 text-brand-600',
-                title: 'Multiple accounts, one view',
-                desc: 'Merge statements from all your banks and cards. See your complete financial picture in a single dashboard.',
+                title: 'Here’s what’s quietly draining you',
+                desc: 'Recurring charges and forgotten subscriptions surfaced automatically, with confidence scores.',
               },
               {
                 icon: 'flash',
                 color: 'bg-amber-50 dark:bg-amber-900/20 text-amber-600',
-                title: 'AI financial advisor',
-                desc: 'Chat with Gemini about your actual transactions. Ask "where can I cut spending?" and get answers grounded in your data.',
+                title: 'Here’s your real savings rate',
+                desc: 'Not what you assume — what your statements actually show, month over month.',
+              },
+              {
+                icon: 'chart',
+                color: 'bg-brand-50 dark:bg-brand-900/20 text-brand-600',
+                title: 'All your accounts, one picture',
+                desc: 'Merge statements from every bank and card into a single dashboard — auto-detected columns, no manual mapping.',
+              },
+              {
+                icon: 'sparkles',
+                color: 'bg-brand-50 dark:bg-brand-950 text-brand-600',
+                title: 'Ask anything about your spending',
+                desc: 'An AI advisor that answers from your own transactions — “where can I cut back?” — not generic tips.',
               },
             ].map(f => (
               <div key={f.title} className="card p-6 hover:shadow-md transition-shadow">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${f.color}`}>
-                  <Icon name={f.icon} className="w-5 h-5" />
+                  <Icon name={f.icon as any} className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-2">{f.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
@@ -276,9 +351,9 @@ const LandingPage = () => {
             {/* CTA card */}
             <div className="card p-6 bg-brand-600 text-white flex flex-col justify-between">
               <div>
-                <p className="text-sm font-semibold text-brand-200 mb-2">And much more</p>
-                <p className="text-base font-bold mb-2">15 dashboards total</p>
-                <p className="text-sm text-brand-100">Net worth, goals, budgets, recurring charges, year-in-review, and more.</p>
+                <p className="text-sm font-semibold text-brand-200 mb-2">And 10 more</p>
+                <p className="text-base font-bold mb-2">15 dashboards in total</p>
+                <p className="text-sm text-brand-100">Budgets, goals, trends, net worth, debt payoff, year-in-review, and more.</p>
               </div>
               <Link to="/features" className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-white underline underline-offset-2">
                 See all features →
@@ -288,92 +363,96 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ── VS CHATGPT ───────────────────────────────────────────────── */}
-      <section className="bg-white dark:bg-slate-900 py-20 border-t border-slate-100 dark:border-slate-800">
+      {/* ── PRIVACY DEEP-DIVE ────────────────────────────────────────── */}
+      <section className="bg-slate-50 dark:bg-slate-800 py-20 border-t border-slate-100 dark:border-slate-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">
-              Built for your finances, not a blank chat box
+              Why we'll never ask for your bank login
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
-              AI chat is great for quick questions. TrackSpendZ remembers every
-              statement and turns it into a system you can act on.
+            <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+              Apps that link to your bank need your credentials and keep a live connection to your accounts.
+              We took the opposite approach.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-5 mb-10">
-            {/* TrackSpendZ side — lead with what we do */}
-            <div className="rounded-2xl border-2 border-brand-500 p-6 relative">
-              <div className="absolute -top-3 left-6 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                Built for this
-              </div>
-              <div className="flex items-center gap-3 mb-5">
-                <Logo size="sm" />
-              </div>
-              <ul className="space-y-3">
-                {[
-                  'Upload once — all history is always there',
-                  'Learns your patterns over months',
-                  '15 dashboards with interactive charts',
-                  'Advice grounded in your actual transactions',
-                  'Gets smarter with every correction you make',
-                ].map(item => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200">
-                    <Icon name="check" className="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Generic AI chat side */}
-            <div className="rounded-2xl border-2 border-slate-200 dark:border-slate-700 p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
-                  <Icon name="ai" className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {[
+              {
+                icon: 'lock',
+                title: 'No credentials, ever',
+                desc: 'No bank login, no open banking, no third-party linking. There’s simply nothing for us to leak.',
+              },
+              {
+                icon: 'eye',
+                title: 'You stay in control',
+                desc: 'You choose exactly which statements to upload. Nothing is ever pulled from your accounts automatically.',
+              },
+              {
+                icon: 'trash',
+                title: 'Your data, on your terms',
+                desc: 'On the free plan your data stays in your browser. We don’t extract or index account numbers — and you can delete everything in one click.',
+              },
+            ].map(p => (
+              <div key={p.title} className="card p-6">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-brand-50 dark:bg-brand-950 text-brand-600">
+                  <Icon name={p.icon as any} className="w-5 h-5" />
                 </div>
-                <span className="font-bold text-slate-700 dark:text-slate-200">A generic AI chat</span>
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-2">{p.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{p.desc}</p>
               </div>
-              <ul className="space-y-3">
-                {[
-                  'Paste your data manually every single time',
-                  "No memory of last month's conversation",
-                  'No charts, no visual breakdowns',
-                  'Generic advice, not based on your patterns',
-                  'Starts from zero each session',
-                ].map(item => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-500 dark:text-slate-400">
-                    <Icon name="close" className="w-4 h-4 text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            ))}
           </div>
 
-          <p className="text-center text-slate-600 dark:text-slate-400 font-medium text-lg">
-            Free AI models give you a snapshot.{' '}
-            <span className="text-gradient font-bold">TrackSpendZ gives you a system.</span>
+          <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6 max-w-2xl mx-auto">
+            Optional AI features send only anonymized spending summaries — never your account numbers or full transaction history.
+            See our <Link to="/privacy" className="underline hover:text-slate-600 dark:hover:text-slate-300">privacy policy</Link> for details.
           </p>
+        </div>
+      </section>
+
+      {/* ── THE FIRE REVEAL ──────────────────────────────────────────── */}
+      <section className="bg-white dark:bg-slate-900 py-20 border-t border-slate-100 dark:border-slate-800">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/20 text-orange-500 mb-5">
+            <Icon name="fire" className="w-7 h-7" />
+          </div>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">Clarity today. Freedom sooner.</h2>
+          <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+            Once you can see where your money goes, a bigger question opens up: <em>how soon could you stop
+            needing a paycheck?</em> TrackSpendZ turns your real savings rate into a FIRE projection — with a
+            Monte&nbsp;Carlo range of realistic dates, not one optimistic guess.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="btn-secondary text-base px-8 py-3 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+          >
+            Start with your spending — it’s free
+          </button>
         </div>
       </section>
 
       {/* ── PRICING PREVIEW ──────────────────────────────────────────── */}
       <section className="bg-slate-50 dark:bg-slate-800 py-20 border-t border-slate-100 dark:border-slate-700">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">Start free, upgrade when you're ready</h2>
-            <p className="text-slate-500 dark:text-slate-400">No credit card needed to get started.</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">Start free. Upgrade only if it earns it.</h2>
+            <p className="text-slate-500 dark:text-slate-400">No credit card to start. Cancel anytime.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
             {/* Free */}
             <div className="card p-6">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Free</p>
               <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{pricing.isIndia ? '₹0' : '$0'}</div>
               <p className="text-xs text-slate-500 mb-5">Forever free</p>
               <ul className="space-y-2 mb-6">
-                {['Up to 500 transactions', 'Unlimited file uploads', 'Core dashboards (5 views)', 'Local storage only'].map(f => (
+                {[
+                  'Up to 500 transactions',
+                  'Unlimited Excel & CSV uploads',
+                  'Spending breakdown & monthly analysis',
+                  'Private local storage',
+                ].map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                     <Icon name="check" className="w-4 h-4 text-green-500 flex-shrink-0" />
                     {f}
@@ -411,11 +490,11 @@ const LandingPage = () => {
               <ul className="space-y-2 mb-6">
                 {[
                   'Unlimited transactions',
-                  'Unlimited file uploads',
+                  'PDF statement uploads',
                   'AI financial advisor',
                   'FIRE calculator',
+                  'Budgets, goals & debt payoff',
                   'Cloud sync across devices',
-                  'Budget tracking',
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                     <Icon name="check" className="w-4 h-4 text-brand-500 flex-shrink-0" />
@@ -427,40 +506,63 @@ const LandingPage = () => {
                 View Pro plan
               </Link>
             </div>
-
-            {/* Enterprise */}
-            <div className="card p-6 border border-dashed border-slate-300 dark:border-slate-700 opacity-90 relative overflow-hidden">
-              <div className="absolute top-2 right-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded">
-                Coming Soon
-              </div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Enterprise</p>
-              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">Coming Soon</div>
-              <p className="text-xs text-slate-500 mb-5">Household & family profiles</p>
-              <ul className="space-y-2 mb-6">
-                {[
-                  'Everything in Pro',
-                  'Household tracking (5 profiles)',
-                  'Consolidated dashboard',
-                  'Custom category rules',
-                  'Priority support',
-                ].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                    <Icon name="check" className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button disabled className="w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-sm py-2.5 rounded-lg font-semibold cursor-not-allowed">
-                Coming Soon
-              </button>
-            </div>
           </div>
 
           <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-            Full details on the{' '}
-            <Link to="/pricing" className="text-brand-600 font-medium hover:underline">pricing page</Link>
-            . Cancel any time.
+            Cancel anytime — you keep Pro until your billing cycle ends, with a 7-day refund if it's not for you.
+            Need household accounts for the family? <span className="font-medium text-slate-600 dark:text-slate-300">Enterprise is coming soon.</span>
           </p>
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">
+            Full details on the{' '}
+            <Link to="/pricing" className="text-brand-600 font-medium hover:underline">pricing page</Link>.
+          </p>
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <section className="bg-white dark:bg-slate-900 py-20 border-t border-slate-100 dark:border-slate-800">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-10 text-center">Questions, answered</h2>
+          <div className="space-y-3">
+            {[
+              {
+                q: 'Do I have to connect my bank?',
+                a: 'Never. There’s no bank login, no Plaid, no open banking. You simply upload statement files you download yourself.',
+              },
+              {
+                q: 'Do I need to sign up?',
+                a: 'You can analyze Excel and CSV statements with no signup at all. PDF statements need a free account (no card) because they take extra processing on our side.',
+              },
+              {
+                q: 'Is my financial data private?',
+                a: 'On the free plan your data stays in your browser and never touches our servers. We don’t extract or index your account numbers, and you can delete everything anytime from Settings.',
+              },
+              {
+                q: 'Which banks does it work with?',
+                a: 'Any bank that lets you export a CSV, Excel, or PDF statement. TrackSpendZ auto-detects the columns, and it learns new statement formats as more people use it.',
+              },
+              {
+                q: 'Does it really categorize everything automatically?',
+                a: 'It auto-sorts the large majority using 150+ built-in merchant patterns. Anything it’s unsure of you can fix in one click — and it remembers your choice so the same merchant is categorized correctly next time.',
+              },
+              {
+                q: 'Is it actually free?',
+                a: 'Yes — up to 500 transactions with the core spending dashboards, no card required. Upgrade to Pro only when you want unlimited transactions, AI advice, FIRE planning, and cloud sync.',
+              },
+              {
+                q: 'Can I cancel?',
+                a: 'Anytime. You keep Pro until the end of your billing cycle, and there’s a 7-day refund window if it’s not for you.',
+              },
+            ].map(item => (
+              <details key={item.q} className="card p-5 group">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-base font-semibold text-slate-800 dark:text-slate-100 pr-4">{item.q}</span>
+                  <Icon name="chevronDown" className="w-5 h-5 text-slate-400 flex-shrink-0 transition-transform group-open:rotate-180" />
+                </summary>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-3">{item.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -468,9 +570,9 @@ const LandingPage = () => {
       <section className="bg-white dark:bg-slate-900 py-16 border-t border-slate-100 dark:border-slate-800">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="bg-brand-600 rounded-2xl p-10 text-white text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3">Stop guessing. Start knowing.</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3">Stop guessing where it went.</h2>
             <p className="text-brand-100 mb-7 max-w-md mx-auto">
-              Upload your first statement in under 2 minutes and see your spending instantly — no account required.
+              Upload your first statement and see your real spending in under two minutes — no account, no bank login.
             </p>
             <button
               onClick={() => navigate('/dashboard')}
